@@ -17,6 +17,9 @@ https://puredata.info/
 Automationism:
 https://www.automatonism.com/
 
+Comport (PD plugin to get serial data in there)
+https://puredata.info/downloads/comport
+
 Orac Patchbox
 https://community.blokas.io/t/orac-2-0-for-the-raspberry-pi/1099
 
