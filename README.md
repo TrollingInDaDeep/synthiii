@@ -11,3 +11,12 @@ With the Arduino I can just send it to serial via USB.
 The base of the synth will still be Pure data and Automationism, this is fully platform independent!
 So on this AMD platform currently running it on (hopefully headless) windows, but might switch to Patchbox or another low-latency linux kernel later.
 
+Pure Data:
+https://puredata.info/
+
+Automationism:
+https://www.automatonism.com/
+
+Orac Patchbox
+https://community.blokas.io/t/orac-2-0-for-the-raspberry-pi/1099
+
