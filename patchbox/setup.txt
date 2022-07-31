@@ -1,0 +1,15 @@
+wlan setup via lan
+
+user: patch
+pw: ras
+
+sudo systemctl start mec
+sudo systemctl stop orac
+
+
+tightvncserver -geometry 600x400
+raspberr
+move window: alt+space -> move -> maus oder pfeiltasten -> enter / klick
+
+/usr/bin/pd -rt -alsamidi -nogui -audiobuf 4 /home/patch/synthiii/main.pd
+/usr/bin/pd -rt -alsamidi -nogui -audiobuf 4 /home/patch/synthiii/readComPort.pd
