@@ -42,16 +42,16 @@
 
 // Arrays for Items
 // 9 Analog inputs
-arrAin[9];
+int arrAin[9];
 
 // 1 Digital inputs (switch)
-arrDin[1];
+bool arrDin[1];
 
 // 5 Connection Outputs
-arrCout[5];
+bool arrCout[5];
 
 // 9 connection inputs
-arrCin[9];
+bool arrCin[9];
 
 
 void setup() {
@@ -76,6 +76,9 @@ void setup() {
   pinMode(T1_A,OUTPUT);
   pinMode(T1_B,OUTPUT);
   pinMode(T1_C,OUTPUT);
+
+
+  //find longest array for T3
   
 }
 
@@ -85,7 +88,19 @@ void loop() {
 // check empty pins
 //check double pins where its connected to T1 instead of T2
 
-  //T1 to 0
+  // set T1 to 0
+
+
+
+// loop through Output connections and apply voltage
+For (output = 0; output < sizeof(arrCout); output++)
+{
+    //todo: set multiplexer T3 to output
+    digitalWrite(Cout, HIGH)
+}
+
+
+
   // loop through T1
       
       // loop through T2
