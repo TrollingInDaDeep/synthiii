@@ -49,7 +49,12 @@
 
 // Arrays for Items
 // 9 Analog inputs
-int arrAin[9];
+//int arrAin[9];
+
+intA:  5
+intA1: 5
+int arrAin[intA][intA1]
+
 
 // 1 Digital inputs (switch)
 bool arrDin[1];
@@ -141,7 +146,25 @@ For (output = 0; output < sizeof(arrCout); output++)
 
 //invert the loop: inner loop should be sensor readings, outer loop connection readings
 
-  
+//set Cout pin high
+// loop through T3
+      // loop through T4
+          //loop through T1
+            //loop through T2
+              //read cin ->
+                      //if true, then T1:T2 is connected to T3:T4
+                      //else, T1:t2 is disconnected from T3:T4
+              
+              //read Ain, write value to Analog T1:T2
+
+              //read Din, write value to Digital T1:T2
+
+
+
+
+
+
+  // false loop:
   // loop through T1
       
       // loop through T2
