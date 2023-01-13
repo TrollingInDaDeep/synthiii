@@ -13,8 +13,15 @@
  * 
  * Thanks to:
  * https://www.goetzmd.de
+ * https://www.midi.org/specifications-old/item/table-2-expanded-messages-list-status-bytes
+ * https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
  * 
  */
+
+ 
+///
+/// constant variables (settings)
+///
 
 // Analog Pins
   const int Ain = 0;
@@ -52,7 +59,25 @@ bool arrCout[5];
 
 // 9 connection inputs
 bool arrCin[9];
+// Max. Number of connections on T1-4?
+// what about empty ones?
 
+// Number of Connection inputs and outputs
+const int nrCout = 5;  //number of connection outputs
+const int nrCin = 9;   // number of connection inputs
+
+//Defines the statusByte that should be used by the updateConnection method
+const byte statusByteMakeConnection = 145; //means Channel 2 Note on
+const byte statusByteBreakConnection = 130; //means Channel 2 Note off
+
+
+///
+/// variables (pre-declarations)
+///
+
+// Array that holds all connection states
+// first value is Cout index , 2nd value is Cin index
+bool arrConnectionStates[nrCout][nrCin];
 
 void setup() {
   // set pin modes
@@ -79,6 +104,12 @@ void setup() {
 
 
   //find longest array for T3
+  // initialize connection values all to 0
+  for(int i=0;i<nrCout;i++){
+    for(int j=0;j<nrCin;i++){
+        arrConnectionStates[i][j]=0;
+    }
+}
   
 }
 
@@ -101,6 +132,16 @@ For (output = 0; output < sizeof(arrCout); output++)
 
 
 
+  // set T1-4 to 0
+  int T1 = 0;
+  int T2 = 0;
+  int T3 = 0;
+  int T4 = 0;
+
+
+//invert the loop: inner loop should be sensor readings, outer loop connection readings
+
+  
   // loop through T1
       
       // loop through T2
@@ -114,6 +155,10 @@ For (output = 0; output < sizeof(arrCout); output++)
               
                   // loop through T4
                     //read cin
+                        //todo calculate cin/cout number
+                        bool blnConnected = digitalRead(Cin);
+                        //updateConnection(iCin, iCout, 
+                        
                     // write cin state to array
                     // sendmidi
 
