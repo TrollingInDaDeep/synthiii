@@ -46,23 +46,51 @@
   const int T1_B = 12;
   const int T1_C = 13;
 
+/// alternative
+din
+num connections T1
+num mux T2
+
+ain
+num connections T1
+num mux T2
+
+...
+
+build max value
+loop until max. value above
+on data entry and sending -> loop only until max. value of the type (din/ain/cout/cin)
+
+// topography of the multiplexers
+// Multiplexers on T2 are added output by output on the multiplexers on T1
+// we only want to loop through T2 when any of the T1 Mux has a T2 connected to this output
+// when set to false, in the loop it will only read the value on the connected pin (Din, Dout, Cin, Cout) one time, not 8 times.
+
+//multiplexers of inputs/outputs:
+// used to limit iterations through the value arrays. ex. Ain needs to iterate through 1,2 and 3 | Din only needs 1 -> has less values set to "true"
+bool arrMuxAin[8] = {true, false, false, false, false, false, false, false};
+bool arrMuxDin[8] = {true, false, false, false, false, false, false, false};
+bool arrMuxCout[8] = {true, false, false, false, false, false, false, false};
+bool arrMuxCin[8] = {true, false, false, false, false, false, false, false};
+
+// combine the values to one mux. only used to limit T2 iterations.
+bool arrMuxT2[8];
+
+// go through all type arrays, if one is true at "i" means that arrMuxT2 needs to be "true" at "i"
+for (int i=0; i<8; i++) {
+  if (arrMuxAin[i] || arrMuxDin[i] || arrMuxCout[i] || arrMuxCin[i]) {
+    arrMuxT2[i] = true;
+  }
+  else {
+    arrMuxT2[i] = false;
+  }
+}
 
 // Arrays for Items
 // 9 Analog inputs
 //int arrAin[9];
 
-intA:  5
-intA1: 5
 int arrAin[intA][intA1]
-
-
-// topography of the multiplexers
-// stored in an array. for every pin on the multiplexer theres a boolean if another multiplexer is connected to it
-// helps to determine if you have to loop through T2 on the pins or only read once (would be the case if a sensor is connected directli to the mux on T1)
-bool arrMuxAin[8] = {true, false, false, false, false, false, false, false}; // means on Analog mux on outputs 1 is a multiplexer, the rest has the sensors connected directly to them
-bool arrMuxDin[8] = {true, false, false, false, false, false, false, false};
-bool arrMuxCin[8] = {true, false, false, false, false, false, false, false};
-bool arrMuxCout[8] = {true, false, false, false, false, false, false, false};
 
 // 1 Digital inputs (switch)
 bool arrDin[1];
