@@ -56,6 +56,14 @@ intA1: 5
 int arrAin[intA][intA1]
 
 
+// topography of the multiplexers
+// stored in an array. for every pin on the multiplexer theres a boolean if another multiplexer is connected to it
+// helps to determine if you have to loop through T2 on the pins or only read once (would be the case if a sensor is connected directli to the mux on T1)
+bool arrMuxAin[8] = {true, false, false, false, false, false, false, false}; // means on Analog mux on outputs 1 is a multiplexer, the rest has the sensors connected directly to them
+bool arrMuxDin[8] = {true, false, false, false, false, false, false, false};
+bool arrMuxCin[8] = {true, false, false, false, false, false, false, false};
+bool arrMuxCout[8] = {true, false, false, false, false, false, false, false};
+
 // 1 Digital inputs (switch)
 bool arrDin[1];
 
