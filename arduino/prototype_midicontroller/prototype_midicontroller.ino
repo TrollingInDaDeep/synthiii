@@ -46,18 +46,22 @@
   const int T1_B = 12;
   const int T1_C = 13;
 
-/// alternative
-din
-num connections T1
-num mux T2
+// many pins are connected to a L1 mux
+// how to connect stuff to a Mux (L1):
+// add a mux to the first outputs in order: 1. output 0, 2. output 1 etc.
+// afterwards add direct connections on the remaining pins.
+// that way, we can loop through the first # pins and also loop through T2 as there's a mux to read
+// if we're above #, we only need to read the value once, as there's no mux connected to T2
+const int intMuxAin = 1 // means one L2 multiplexer is connected to mux Ain (always on output0, then output1, etc.)
+const int intMuxDin = 1
+const int intMuxCout = 1
+const int intMuxCin = 1
 
-ain
-num connections T1
-num mux T2
+// combine the values to one mux. only used to limit T2 iterations.
+//maximum value from the 4
+int maxMux = max4(intMuxAin, intMuxDin, intMuxCout, intMuxCin) // yes the var is called maxMux :)
 
-...
 
-build max value
 loop until max. value above
 on data entry and sending -> loop only until max. value of the type (din/ain/cout/cin)
 
@@ -73,18 +77,9 @@ bool arrMuxDin[8] = {true, false, false, false, false, false, false, false};
 bool arrMuxCout[8] = {true, false, false, false, false, false, false, false};
 bool arrMuxCin[8] = {true, false, false, false, false, false, false, false};
 
-// combine the values to one mux. only used to limit T2 iterations.
 bool arrMuxT2[8];
 
-// go through all type arrays, if one is true at "i" means that arrMuxT2 needs to be "true" at "i"
-for (int i=0; i<8; i++) {
-  if (arrMuxAin[i] || arrMuxDin[i] || arrMuxCout[i] || arrMuxCin[i]) {
-    arrMuxT2[i] = true;
-  }
-  else {
-    arrMuxT2[i] = false;
-  }
-}
+
 
 // Arrays for Items
 // 9 Analog inputs
@@ -231,4 +226,16 @@ void sendMIDI(byte statusByte, byte dataByte1, byte dataByte2) {
  Serial.write(statusByte);
  Serial.write(dataByte1);
  Serial.write(dataByte2);
+}
+
+// gives back the maximum out of 4 values
+int max4(int a, int b, int c, int d)
+{
+   int maxguess;
+
+   maxguess = max(a,b);  // biggest of a and b
+   maxguess = max(maxguess, c);  // but maybe c is bigger?
+   maxguess = max(maxguess, d);  // but maybe d is bigger?
+
+   return(maxguess);
 }
