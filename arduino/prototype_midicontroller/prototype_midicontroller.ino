@@ -33,7 +33,7 @@
 
 // Ditital Pins
   const int Din = 1;
-  const int Dout = 2;
+  //const int Dout = 2;
   const int Cin = 3;
   const int Cout = 4;
   const int T3_A = 5;
@@ -83,40 +83,39 @@ const byte statusByteBreakConnection = 130; //means Channel 2 Note off
 ///
 
 // Array that holds all connection states
-// first value is Cout index , 2nd value is Cin index
-  bool arrConnectionStates[nrCout][nrCin];
+// first value is Cin index , 2nd value is Cout index
+  bool arrConnectionStates[][];
 
 // var declarations to use later
 // stores current state/value of inputs/outputs/mux control pins
-  int currDin;
-  bool currDout;
-  bool currCin;
-  bool currCout;
-  bool currT3_A;
-  bool currT3_B;
-  bool currT3_C;
-  bool currT2_A;
-  bool currT2_B;
-  bool currT2_C;
-  bool currT1_A;
-  bool currT1_B;
-  bool currT1_C;
+  int intCurrAin;
+  bool blnCurrDin;
+  bool blnCurrCin;
+  bool blnCurrCout;
+  bool blnCurrT3_A;
+  bool blnCurrT3_B;
+  bool blnCurrT3_C;
+  bool blnCurrT2_A;
+  bool blnCurrT2_B;
+  bool blnCurrT2_C;
+  bool blnCurrT1_A;
+  bool blnCurrT1_B;
+  bool blnCurrT1_C;
 
 
-  int intInputNr = 0; // which input are we on
-  int intOutputNr = 0; // which output are we on
+  int intInputNr; // which input are we on
+  int intOutputNr; // which output are we on
 
 void setup() {
-  // set pin modes
+  //set pin modes
   //Analog
-  pinMode(A0, INPUT);
+  pinMode(A0, INPUT);  //Ain
   pinMode(A3, OUTPUT); //T4_A
   pinMode(A4, OUTPUT); //T4_B
   pinMode(A5, OUTPUT); //T4_C
 
   //Digital
   pinMode(Din,INPUT_PULLUP);
-  pinMode(Dout,OUTPUT);
   pinMode(Cin,INPUT_PULLUP);
   pinMode(Cout,OUTPUT);
   pinMode(T3_A,OUTPUT);
@@ -132,49 +131,86 @@ void setup() {
 
   //find longest array for T3
   // initialize connection values all to 0
-  for(int i=0;i<nrCout;i++){
-    for(int j=0;j<nrCin;i++){
-        arrConnectionStates[i][j]=0;
-    }
-}
+  //for(int i=0;i<nrCout;i++){
+    //for(int j=0;j<nrCin;i++){
+      //  arrConnectionStates[i][j]=0;
+    //}
+//}
   
 }
 
 void loop() {
 
-
-//check empty pins
+//reset input/output indexes
+intInputNr = 0;
+intOutputNr = 0;
 
 //set Cout pin high
-  digitalWrite(Cout, HIGH);
+digitalWrite(Cout, HIGH);
 
-// outer loop: through T3 (Cout)
+// outer loop: through T3 (Cout L1)
 for(int T3=0;T3<8;T3++){
+        intOutputNr++;
 
-        currT3_A = bitRead(T3, 0); //LSB
-        currT3_B = bitRead(T3, 1);
-        currT3_C = bitRead(T3, 2); //MSB
+        //use T3 for Cout L1
+        blnCurrT3_A = bitRead(T3, 0); //LSB
+        blnCurrT3_B = bitRead(T3, 1);
+        blnCurrT3_C = bitRead(T3, 2); //MSB
+        digitalWrite(T3_A, blnCurrT3_A);
+        digitalWrite(T3_B, blnCurrT3_B);
+        digitalWrite(T3_C, blnCurrT3_C);        
 
-        digitalWrite(T3_A, currT3_A);
-        digitalWrite(T3_B, currT3_B);
-        digitalWrite(T3_C, currT3_C);        
 
-        // loop through T4
+        // loop through T4 (Cout L2)
         for(int T4=0;T4<8;T4++){
+            intOutputNr++;
+            //use T4 for Cout L2
+            blnCurrT4_A = bitRead(T4, 0); //LSB
+            blnCurrT4_B = bitRead(T4, 1);
+            blnCurrT4_C = bitRead(T4, 2); //MSB
+            digitalWrite(T4_A, blnCurrT4_A);
+            digitalWrite(T4_B, blnCurrT4_B);
+            digitalWrite(T4_C, blnCurrT4_C);
 
-            //inner loop: through T1. Ain, Din, Cin
+            //inner loop: through T1. Ain, Din, Cin L1
             for(int T1=0;T1<8;T1++){
+                intInputNr++;
 
-               //loop through T2
+                //use T1 for Ain, Din, Cin L1
+                blnCurrT1_A = bitRead(T1, 0); //LSB
+                blnCurrT1_B = bitRead(T1, 1);
+                blnCurrT1_C = bitRead(T1, 2); //MSB
+                digitalWrite(T1_A, blnCurrT1_A);
+                digitalWrite(T1_B, blnCurrT1_B);
+                digitalWrite(T1_C, blnCurrT1_C);
+
+               //loop through T2. Ain, Din, Cin L2
                 for(int T2=0;T2<8;T2++){
+                      intInputNr++;
 
-                      //read cin ->
-                      //if true, then T1:T2 is connected to T3:T4
-                      //else, T1:t2 is disconnected from T3:T4
+                      //use T2 for Ain, Din, Cin L2
+                      blnCurrT2_A = bitRead(T2, 0); //LSB
+                      blnCurrT2_B = bitRead(T2, 1);
+                      blnCurrT2_C = bitRead(T2, 2); //MSB
+                      digitalWrite(T2_A, blnCurrT2_A);
+                      digitalWrite(T2_B, blnCurrT2_B);
+                      digitalWrite(T2_C, blnCurrT2_C);
 
-                      int intCurrAin = analogRead(Ain);
-                      readAnalog(intCurrAin, lT1, lT2);
-                      readDigital();
+                      //do actual stuff
+
+                      //read cin
+                      blnCurrCin = digitalRead(Cin);
+                      // set connection at intInputNr:intOutputNr to blnCurrCin
+                      updateConnection(intInputNr, intOutputNr, blnCurrCin)
+
+                      // Read analog value and send it to Analog function.
+                      intCurrAin = analogRead(Ain);
+                      readAin(intCurrAin, intInputNr);
+                      
+
+                      // Read Digital value and send it to Digital function.
+                      blnCurrDin = digitalRead(Din)
+                      readDin(blnCurrDin, intInputNr);
 
                 }
             }
