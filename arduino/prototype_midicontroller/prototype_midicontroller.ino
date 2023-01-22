@@ -52,6 +52,10 @@
 // afterwards add direct connections on the remaining pins.
 // that way, we can loop through the first # pins and also loop through T2 as there's a mux to read
 // if we're above #, we only need to read the value once, as there's no mux connected to T2
+//alternatively put:
+// Multiplexers on T2 are added output by output (ascending) on the multiplexers on T1
+// we only want to loop through T2 when any of the T1 Mux has a T2 connected to this output
+
 const int intMuxAin = 1 // means one L2 multiplexer is connected to mux Ain (always on output0, then output1, etc.)
 const int intMuxDin = 1
 const int intMuxCout = 1
@@ -64,39 +68,6 @@ int maxMux = max4(intMuxAin, intMuxDin, intMuxCout, intMuxCin) // yes the var is
 
 loop until max. value above
 on data entry and sending -> loop only until max. value of the type (din/ain/cout/cin)
-
-// topography of the multiplexers
-// Multiplexers on T2 are added output by output on the multiplexers on T1
-// we only want to loop through T2 when any of the T1 Mux has a T2 connected to this output
-// when set to false, in the loop it will only read the value on the connected pin (Din, Dout, Cin, Cout) one time, not 8 times.
-
-//multiplexers of inputs/outputs:
-// used to limit iterations through the value arrays. ex. Ain needs to iterate through 1,2 and 3 | Din only needs 1 -> has less values set to "true"
-bool arrMuxAin[8] = {true, false, false, false, false, false, false, false};
-bool arrMuxDin[8] = {true, false, false, false, false, false, false, false};
-bool arrMuxCout[8] = {true, false, false, false, false, false, false, false};
-bool arrMuxCin[8] = {true, false, false, false, false, false, false, false};
-
-bool arrMuxT2[8];
-
-
-
-// Arrays for Items
-// 9 Analog inputs
-//int arrAin[9];
-
-int arrAin[intA][intA1]
-
-// 1 Digital inputs (switch)
-bool arrDin[1];
-
-// 5 Connection Outputs
-bool arrCout[5];
-
-// 9 connection inputs
-bool arrCin[9];
-// Max. Number of connections on T1-4?
-// what about empty ones?
 
 // Number of Connection inputs and outputs
 const int nrCout = 5;  //number of connection outputs
@@ -113,7 +84,27 @@ const byte statusByteBreakConnection = 130; //means Channel 2 Note off
 
 // Array that holds all connection states
 // first value is Cout index , 2nd value is Cin index
-bool arrConnectionStates[nrCout][nrCin];
+  bool arrConnectionStates[nrCout][nrCin];
+
+// var declarations to use later
+// stores current state/value of inputs/outputs/mux control pins
+  int currDin;
+  bool currDout;
+  bool currCin;
+  bool currCout;
+  bool currT3_A;
+  bool currT3_B;
+  bool currT3_C;
+  bool currT2_A;
+  bool currT2_B;
+  bool currT2_C;
+  bool currT1_A;
+  bool currT1_B;
+  bool currT1_C;
+
+
+  int intInputNr = 0; // which input are we on
+  int intOutputNr = 0; // which output are we on
 
 void setup() {
   // set pin modes
@@ -152,39 +143,45 @@ void setup() {
 void loop() {
 
 
-// check empty pins
-//check double pins where its connected to T1 instead of T2
-
-  // set T1 to 0
-
-
-
-// loop through Output connections and apply voltage
-For (output = 0; output < sizeof(arrCout); output++)
-{
-    //todo: set multiplexer T3 to output
-    digitalWrite(Cout, HIGH)
-}
-
-
-
-  // set T1-4 to 0
-  int T1 = 0;
-  int T2 = 0;
-  int T3 = 0;
-  int T4 = 0;
-
-
-//invert the loop: inner loop should be sensor readings, outer loop connection readings
+//check empty pins
 
 //set Cout pin high
-// loop through T3
-      // loop through T4
-          //loop through T1
-            //loop through T2
-              //read cin ->
+  digitalWrite(Cout, HIGH);
+
+// outer loop: through T3 (Cout)
+for(int T3=0;T3<8;T3++){
+
+        currT3_A = bitRead(T3, 0); //LSB
+        currT3_B = bitRead(T3, 1);
+        currT3_C = bitRead(T3, 2); //MSB
+
+        digitalWrite(T3_A, currT3_A);
+        digitalWrite(T3_B, currT3_B);
+        digitalWrite(T3_C, currT3_C);        
+
+        // loop through T4
+        for(int T4=0;T4<8;T4++){
+
+            //inner loop: through T1. Ain, Din, Cin
+            for(int T1=0;T1<8;T1++){
+
+               //loop through T2
+                for(int T2=0;T2<8;T2++){
+
+                      //read cin ->
                       //if true, then T1:T2 is connected to T3:T4
                       //else, T1:t2 is disconnected from T3:T4
+
+                      int intCurrAin = analogRead(Ain);
+                      readAnalog(intCurrAin, lT1, lT2);
+                      readDigital();
+
+                }
+            }
+        }
+    }
+
+
               
               //read Ain, write value to Analog T1:T2
 
@@ -215,10 +212,6 @@ For (output = 0; output < sizeof(arrCout); output++)
                         
                     // write cin state to array
                     // sendmidi
-
-
-  // sendMidi all (oooor, see above)
-                  
 
 }
 
