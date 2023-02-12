@@ -3,9 +3,9 @@
  * sends it via midi to designated ControlChange
  */
 
-void readAin(int currentValue, inputNr)
+void readAin(int currentValue, int inputNr)
  {
 
-    
-    sendMIDI(statusByteCC#, currentValue, inputNr);
+    // 176 means controlChange Channel 1
+    sendMIDI(statusByteAin, inputNr, currentValue);
  }

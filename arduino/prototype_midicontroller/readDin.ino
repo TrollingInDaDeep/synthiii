@@ -3,9 +3,15 @@
  * sends it via midi to designated ControlChange
  */
 
-void readDin(int currentValue, inputNr)
+void readDin(bool currentValue, int inputNr)
  {
-
-    
-    sendMIDI(statusByteSetDigitalValue, currentValue, inputNr);
+    int currentValueDec; //value will be sent in decimal. 0 for false, 127 for true
+    if (currentValue)
+    {
+      currentValueDec = 127;
+    } else
+    {
+      currentValueDec = 0;
+    }
+    sendMIDI(statusByteDin, inputNr, currentValueDec);
  }

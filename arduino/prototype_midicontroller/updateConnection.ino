@@ -18,10 +18,12 @@ void updateConnection(int Cin, int Cout, bool blnConnected)
       if (blnConnected)
       {
         sendMIDI(statusByteMakeConnection, Cin, Cout);
+        //Serial.println("Connection made");
       }
       else
       {
         sendMIDI(statusByteBreakConnection, Cin, Cout);
+        //Serial.println("Connection broken");
       }
       
     }

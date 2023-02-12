@@ -17,8 +17,26 @@
  * https://www.midi.org/specifications-old/item/table-3-control-change-messages-data-bytes-2
  * 
  */
-
  
+
+///
+/// functions
+///
+
+// gives back the maximum out of 4 values
+int max4(int a, int b, int c, int d)
+{
+   int maxguess;
+
+   maxguess = max(a,b);  // biggest of a and b
+   maxguess = max(maxguess, c);  // but maybe c is bigger?
+   maxguess = max(maxguess, d);  // but maybe d is bigger?
+
+   return(maxguess);
+}
+
+
+
 ///
 /// constant variables (settings)
 ///
@@ -46,6 +64,11 @@
   const int T1_B = 12;
   const int T1_C = 13;
 
+// Status Bytes
+// see links above for documentation
+  const int statusByteAin = 176; // Status byte for analog inputs. 176 = controlChange Channel 1
+  const int statusByteDin = 177; // Status byte for analog inputs. 177 = controlChange Channel 2
+
 // many pins are connected to a L1 mux
 // how to connect stuff to a Mux (L1):
 // add a mux to the first outputs in order: 1. output 0, 2. output 1 etc.
@@ -56,18 +79,18 @@
 // Multiplexers on T2 are added output by output (ascending) on the multiplexers on T1
 // we only want to loop through T2 when any of the T1 Mux has a T2 connected to this output
 
-const int intMuxAin = 1 // means one L2 multiplexer is connected to mux Ain (always on output0, then output1, etc.)
-const int intMuxDin = 1
-const int intMuxCout = 1
-const int intMuxCin = 1
+const int intMuxAin = 1; // means one L2 multiplexer is connected to mux Ain (always on output0, then output1, etc.)
+const int intMuxDin = 1;
+const int intMuxCout = 1;
+const int intMuxCin = 1;
 
 // combine the values to one mux. only used to limit T2 iterations.
 //maximum value from the 4
-int maxMux = max4(intMuxAin, intMuxDin, intMuxCout, intMuxCin) // yes the var is called maxMux :)
+int maxMux = max4(intMuxAin, intMuxDin, intMuxCout, intMuxCin); // yes the var is called maxMux :)
 
 
-loop until max. value above
-on data entry and sending -> loop only until max. value of the type (din/ain/cout/cin)
+//loop until max. value above
+//on data entry and sending -> loop only until max. value of the type (din/ain/cout/cin)
 
 // Number of Connection inputs and outputs
 const int nrCout = 5;  //number of connection outputs
@@ -84,7 +107,7 @@ const byte statusByteBreakConnection = 130; //means Channel 2 Note off
 
 // Array that holds all connection states
 // first value is Cin index , 2nd value is Cout index
-  bool arrConnectionStates[][];
+  bool arrConnectionStates[nrCin][nrCout];
 
 // var declarations to use later
 // stores current state/value of inputs/outputs/mux control pins
@@ -92,6 +115,9 @@ const byte statusByteBreakConnection = 130; //means Channel 2 Note off
   bool blnCurrDin;
   bool blnCurrCin;
   bool blnCurrCout;
+  bool blnCurrT4_A;
+  bool blnCurrT4_B;
+  bool blnCurrT4_C;
   bool blnCurrT3_A;
   bool blnCurrT3_B;
   bool blnCurrT3_C;
@@ -127,16 +153,8 @@ void setup() {
   pinMode(T1_A,OUTPUT);
   pinMode(T1_B,OUTPUT);
   pinMode(T1_C,OUTPUT);
-
-
-  //find longest array for T3
-  // initialize connection values all to 0
-  //for(int i=0;i<nrCout;i++){
-    //for(int j=0;j<nrCin;i++){
-      //  arrConnectionStates[i][j]=0;
-    //}
-//}
   
+  Serial.begin(9600);
 }
 
 void loop() {
@@ -151,7 +169,8 @@ digitalWrite(Cout, HIGH);
 // outer loop: through T3 (Cout L1)
 for(int T3=0;T3<8;T3++){
         intOutputNr++;
-
+        Serial.print("T3: ");
+        Serial.println(T3);
         //use T3 for Cout L1
         blnCurrT3_A = bitRead(T3, 0); //LSB
         blnCurrT3_B = bitRead(T3, 1);
@@ -164,6 +183,8 @@ for(int T3=0;T3<8;T3++){
         // loop through T4 (Cout L2)
         for(int T4=0;T4<8;T4++){
             intOutputNr++;
+            Serial.print("T4: ");
+            Serial.println(T4);            
             //use T4 for Cout L2
             blnCurrT4_A = bitRead(T4, 0); //LSB
             blnCurrT4_B = bitRead(T4, 1);
@@ -175,6 +196,8 @@ for(int T3=0;T3<8;T3++){
             //inner loop: through T1. Ain, Din, Cin L1
             for(int T1=0;T1<8;T1++){
                 intInputNr++;
+                Serial.print("T1: ");
+                Serial.println(T1);
 
                 //use T1 for Ain, Din, Cin L1
                 blnCurrT1_A = bitRead(T1, 0); //LSB
@@ -187,6 +210,8 @@ for(int T3=0;T3<8;T3++){
                //loop through T2. Ain, Din, Cin L2
                 for(int T2=0;T2<8;T2++){
                       intInputNr++;
+                      Serial.print("T2: ");
+                      Serial.println(T2);
 
                       //use T2 for Ain, Din, Cin L2
                       blnCurrT2_A = bitRead(T2, 0); //LSB
@@ -201,7 +226,7 @@ for(int T3=0;T3<8;T3++){
                       //read cin
                       blnCurrCin = digitalRead(Cin);
                       // set connection at intInputNr:intOutputNr to blnCurrCin
-                      updateConnection(intInputNr, intOutputNr, blnCurrCin)
+                      updateConnection(intInputNr, intOutputNr, blnCurrCin);
 
                       // Read analog value and send it to Analog function.
                       intCurrAin = analogRead(Ain);
@@ -209,7 +234,7 @@ for(int T3=0;T3<8;T3++){
                       
 
                       // Read Digital value and send it to Digital function.
-                      blnCurrDin = digitalRead(Din)
+                      blnCurrDin = digitalRead(Din);
                       readDin(blnCurrDin, intInputNr);
 
                 }
@@ -252,19 +277,16 @@ for(int T3=0;T3<8;T3++){
 }
 
 void sendMIDI(byte statusByte, byte dataByte1, byte dataByte2) {
- Serial.write(statusByte);
- Serial.write(dataByte1);
- Serial.write(dataByte2);
+ //Serial.print("Status Byte: ");
+ //Serial.print(statusByte);
+ //Serial.print("| Data byte 1:");
+ //Serial.print(dataByte1);
+ //Serial.print(" | Data Byte 2: ");
+ //Serial.println(dataByte2);
+ //Serial.write(statusByte);
+ //Serial.write(dataByte1);
+ //Serial.write(dataByte2);
+
 }
 
-// gives back the maximum out of 4 values
-int max4(int a, int b, int c, int d)
-{
-   int maxguess;
 
-   maxguess = max(a,b);  // biggest of a and b
-   maxguess = max(maxguess, c);  // but maybe c is bigger?
-   maxguess = max(maxguess, d);  // but maybe d is bigger?
-
-   return(maxguess);
-}
