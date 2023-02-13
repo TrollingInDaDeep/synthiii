@@ -1,0 +1,14 @@
+by openAI Playground
+Convert this text to arduino Uno code:
+
+create a two dimensional array with 4 elements in the first dimension and  5 elements in the second dimension called arrTest. Then print out all values of arrTest as a table to the serial monitor.
+
+int arrTest[4][5]; 
+
+for (int i = 0; i < 4; i++) { 
+  for (int j = 0; j < 5; j++) { 
+    Serial.print(arrTest[i][j]); 
+    Serial.print("\t"); 
+  } 
+  Serial.println(); 
+}
