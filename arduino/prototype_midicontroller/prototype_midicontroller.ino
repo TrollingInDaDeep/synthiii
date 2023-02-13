@@ -154,7 +154,9 @@ void setup() {
   pinMode(T1_B,OUTPUT);
   pinMode(T1_C,OUTPUT);
   
-  Serial.begin(9600);
+  Serial.begin(115200);
+  delay(10);
+  Serial.println("Initialized");
 }
 
 void loop() {
@@ -169,8 +171,9 @@ digitalWrite(Cout, HIGH);
 // outer loop: through T3 (Cout L1)
 for(int T3=0;T3<8;T3++){
         intOutputNr++;
-        Serial.print("T3: ");
-        Serial.println(T3);
+        if (T3 == 0) { Serial.println("#### New read Cycle ####"); }
+        //Serial.print("T3: ");
+        //Serial.println(T3);
         //use T3 for Cout L1
         blnCurrT3_A = bitRead(T3, 0); //LSB
         blnCurrT3_B = bitRead(T3, 1);
@@ -183,8 +186,8 @@ for(int T3=0;T3<8;T3++){
         // loop through T4 (Cout L2)
         for(int T4=0;T4<8;T4++){
             intOutputNr++;
-            Serial.print("T4: ");
-            Serial.println(T4);            
+            //Serial.print("T4: ");
+            //Serial.println(T4);            
             //use T4 for Cout L2
             blnCurrT4_A = bitRead(T4, 0); //LSB
             blnCurrT4_B = bitRead(T4, 1);
@@ -196,46 +199,47 @@ for(int T3=0;T3<8;T3++){
             //inner loop: through T1. Ain, Din, Cin L1
             for(int T1=0;T1<8;T1++){
                 intInputNr++;
-                Serial.print("T1: ");
-                Serial.println(T1);
+                //Serial.print("T1: ");
+                //Serial.println(T1);
 
                 //use T1 for Ain, Din, Cin L1
                 blnCurrT1_A = bitRead(T1, 0); //LSB
                 blnCurrT1_B = bitRead(T1, 1);
                 blnCurrT1_C = bitRead(T1, 2); //MSB
+                if (blnCurrT1_C && blnCurrT1_B && blnCurrT1_A) { Serial.println("111"); }
                 digitalWrite(T1_A, blnCurrT1_A);
-                digitalWrite(T1_B, blnCurrT1_B);
-                digitalWrite(T1_C, blnCurrT1_C);
+                // digitalWrite(T1_B, blnCurrT1_B);
+                // digitalWrite(T1_C, blnCurrT1_C);
 
                //loop through T2. Ain, Din, Cin L2
                 for(int T2=0;T2<8;T2++){
                       intInputNr++;
-                      Serial.print("T2: ");
-                      Serial.println(T2);
+                      //Serial.print("T2: ");
+                      //Serial.println(T2);
 
                       //use T2 for Ain, Din, Cin L2
                       blnCurrT2_A = bitRead(T2, 0); //LSB
                       blnCurrT2_B = bitRead(T2, 1);
                       blnCurrT2_C = bitRead(T2, 2); //MSB
-                      digitalWrite(T2_A, blnCurrT2_A);
-                      digitalWrite(T2_B, blnCurrT2_B);
-                      digitalWrite(T2_C, blnCurrT2_C);
+                      // digitalWrite(T2_A, blnCurrT2_A);
+                      // digitalWrite(T2_B, blnCurrT2_B);
+                      // digitalWrite(T2_C, blnCurrT2_C);
 
                       //do actual stuff
 
                       //read cin
                       blnCurrCin = digitalRead(Cin);
                       // set connection at intInputNr:intOutputNr to blnCurrCin
-                      updateConnection(intInputNr, intOutputNr, blnCurrCin);
+                      //updateConnection(intInputNr, intOutputNr, blnCurrCin);
 
                       // Read analog value and send it to Analog function.
                       intCurrAin = analogRead(Ain);
-                      readAin(intCurrAin, intInputNr);
+                      //readAin(intCurrAin, intInputNr);
                       
 
                       // Read Digital value and send it to Digital function.
                       blnCurrDin = digitalRead(Din);
-                      readDin(blnCurrDin, intInputNr);
+                      //readDin(blnCurrDin, intInputNr);
 
                 }
             }
