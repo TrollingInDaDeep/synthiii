@@ -156,7 +156,7 @@ void setup() {
   
   Serial.begin(115200);
   delay(10);
-  Serial.println("Initialized");
+  //Serial.println("Initialized");
 }
 
 void loop() {
@@ -206,7 +206,7 @@ for(int T3=0;T3<8;T3++){
                 blnCurrT1_A = bitRead(T1, 0); //LSB
                 blnCurrT1_B = bitRead(T1, 1);
                 blnCurrT1_C = bitRead(T1, 2); //MSB
-                if (blnCurrT1_C && blnCurrT1_B && blnCurrT1_A) { Serial.println("111"); }
+                ///if (blnCurrT1_C && blnCurrT1_B && blnCurrT1_A) { Serial.print("111"); }
                 digitalWrite(T1_A, blnCurrT1_A);
                 // digitalWrite(T1_B, blnCurrT1_B);
                 // digitalWrite(T1_C, blnCurrT1_C);
@@ -214,6 +214,14 @@ for(int T3=0;T3<8;T3++){
                //loop through T2. Ain, Din, Cin L2
                 for(int T2=0;T2<8;T2++){
                       intInputNr++;
+                      //Serial.print(T1);
+                      //Serial.print(";");
+                      // Serial.print(T2);
+                      // Serial.print(";");
+                      // Serial.print(T3);
+                      // Serial.print(";");
+                      // Serial.print(T4);
+                      // Serial.println(";");
                       //Serial.print("T2: ");
                       //Serial.println(T2);
 
@@ -224,7 +232,7 @@ for(int T3=0;T3<8;T3++){
                       // digitalWrite(T2_A, blnCurrT2_A);
                       // digitalWrite(T2_B, blnCurrT2_B);
                       // digitalWrite(T2_C, blnCurrT2_C);
-
+                      delay(1);
                       //do actual stuff
 
                       //read cin
@@ -240,6 +248,7 @@ for(int T3=0;T3<8;T3++){
                       // Read Digital value and send it to Digital function.
                       blnCurrDin = digitalRead(Din);
                       //readDin(blnCurrDin, intInputNr);
+                      Serial.println(blnCurrDin);
 
                 }
             }
