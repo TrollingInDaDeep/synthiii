@@ -166,7 +166,7 @@ intInputNr = 0;
 intOutputNr = 0;
 
 //set Cout pin high
-digitalWrite(Cout, HIGH);
+digitalWrite(Cout, LOW);
 
 // outer loop: through T3 (Cout L1)
 for(int T3=0;T3<8;T3++){
