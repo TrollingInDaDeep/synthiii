@@ -156,7 +156,7 @@ void setup() {
   
   Serial.begin(115200);
   delay(10);
-  //Serial.println("Initialized");
+  Serial.println("Initialized");
 }
 
 void loop() {
@@ -208,11 +208,11 @@ for(int T3=0;T3<8;T3++){
                 blnCurrT1_C = bitRead(T1, 2); //MSB
                 ///if (blnCurrT1_C && blnCurrT1_B && blnCurrT1_A) { Serial.print("111"); }
                 digitalWrite(T1_A, blnCurrT1_A);
-                // digitalWrite(T1_B, blnCurrT1_B);
-                // digitalWrite(T1_C, blnCurrT1_C);
+                digitalWrite(T1_B, blnCurrT1_B);
+                digitalWrite(T1_C, blnCurrT1_C);
 
                //loop through T2. Ain, Din, Cin L2
-                for(int T2=0;T2<8;T2++){
+                //for(int T2=0;T2<8;T2++){
                       intInputNr++;
                       //Serial.print(T1);
                       //Serial.print(";");
@@ -226,31 +226,33 @@ for(int T3=0;T3<8;T3++){
                       //Serial.println(T2);
 
                       //use T2 for Ain, Din, Cin L2
-                      blnCurrT2_A = bitRead(T2, 0); //LSB
-                      blnCurrT2_B = bitRead(T2, 1);
-                      blnCurrT2_C = bitRead(T2, 2); //MSB
+                      // blnCurrT2_A = bitRead(T2, 0); //LSB
+                      // blnCurrT2_B = bitRead(T2, 1);
+                      // blnCurrT2_C = bitRead(T2, 2); //MSB
                       // digitalWrite(T2_A, blnCurrT2_A);
                       // digitalWrite(T2_B, blnCurrT2_B);
                       // digitalWrite(T2_C, blnCurrT2_C);
-                      delay(1);
+                      //delay(1);
                       //do actual stuff
 
                       //read cin
-                      blnCurrCin = digitalRead(Cin);
+                      //blnCurrCin = digitalRead(Cin);
                       // set connection at intInputNr:intOutputNr to blnCurrCin
                       //updateConnection(intInputNr, intOutputNr, blnCurrCin);
 
                       // Read analog value and send it to Analog function.
-                      intCurrAin = analogRead(Ain);
+                      // intCurrAin = analogRead(Ain);
                       //readAin(intCurrAin, intInputNr);
                       
 
                       // Read Digital value and send it to Digital function.
-                      blnCurrDin = digitalRead(Din);
                       //readDin(blnCurrDin, intInputNr);
+                      if (T1 == 4) {
+                      blnCurrDin = digitalRead(Din);
                       Serial.println(blnCurrDin);
+                      }
 
-                }
+                //}
             }
         }
     }
