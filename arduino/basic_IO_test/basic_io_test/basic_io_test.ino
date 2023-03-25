@@ -80,7 +80,7 @@ void loop() {
       blnCurrCin = digitalRead(arrCinPins[i]);
 
       //fuuck, connects and disconnects both outputs
-      updateConnection(i, o, !blnCurrCin); //send negated value because of inverted logic
+      //updateConnection(i, o, !blnCurrCin); //send negated value because of inverted logic
       //Serial.print(arrCinPins[i]);
       //Serial.print(":");
       //Serial.print(o);

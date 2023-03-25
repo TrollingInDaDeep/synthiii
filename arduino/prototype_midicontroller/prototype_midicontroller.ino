@@ -42,12 +42,12 @@ int max4(int a, int b, int c, int d)
 ///
 
 // Analog Pins
-  const int Ain = 0;
+  const byte Ain = A0;
   //A1 -> unused
   //A2 -> unused
-  const int T4_A = 3;
-  const int T4_B = 4;
-  const int T4_C = 5;
+  const int T4_A = A3;
+  const int T4_B = A4;
+  const int T4_C = A5;
 
 // Ditital Pins
   const int Din = 1;
@@ -135,10 +135,10 @@ const byte statusByteBreakConnection = 130; //means Channel 2 Note off
 void setup() {
   //set pin modes
   //Analog
-  pinMode(A0, INPUT);  //Ain
-  pinMode(A3, OUTPUT); //T4_A
-  pinMode(A4, OUTPUT); //T4_B
-  pinMode(A5, OUTPUT); //T4_C
+  pinMode(Ain, INPUT);  //Ain
+  pinMode(T4_A, OUTPUT); //T4_A
+  pinMode(T4_B, OUTPUT); //T4_B
+  pinMode(T4_C, OUTPUT); //T4_C
 
   //Digital
   pinMode(Din,INPUT_PULLUP);
