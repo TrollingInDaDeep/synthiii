@@ -9,7 +9,7 @@
 
 // Detailed pinout:
 // Mux 1
-// I/O -> A0
+// I/O -> A5
 // C   -> 7
 // B   -> 8
 // A   -> 2
@@ -26,13 +26,12 @@
 
 // Digital Pins
   const int Din = 6;
-  const int Dout = 8;
   const int T1_A = 2;
-  const int T1_B = 3;
-  const int T1_C = 4;
+  const int T1_B = 8;
+  const int T1_C = 7;
   const int T2_A = 5;
-  const int T2_B = 6;
-  const int T2_C = 7;
+  const int T2_B = 4;
+  const int T2_C = 3;
 
 // var declarations to use later
 // stores current state/value of inputs/outputs/mux control pins
@@ -65,15 +64,9 @@ void setup() {
   //set pin modes
   //Analog
   pinMode(Ain, INPUT);
-  pinMode(A1, INPUT);
-  pinMode(A2, INPUT);
-  pinMode(A3, INPUT);
-  pinMode(A4, INPUT);
-  pinMode(A5, INPUT);
 
   //Digital
   pinMode(Din,INPUT_PULLUP);
-  pinMode(Dout,OUTPUT);
   pinMode(T1_A,OUTPUT);
   pinMode(T1_B,OUTPUT);
   pinMode(T1_C,OUTPUT);
@@ -86,7 +79,6 @@ void setup() {
 }
 
 void loop() {
-   digitalWrite(Dout, HIGH);
   // digitalWrite(T2_A, 0);
   // digitalWrite(T2_B, 0);
   // digitalWrite(T2_C, 0);
