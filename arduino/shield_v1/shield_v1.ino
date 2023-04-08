@@ -21,7 +21,7 @@
 // A   -> 5
 
 // Analog Pins
-  const int Ain = A5;
+  const int Ain = A4;
 
 
 // Digital Pins
@@ -92,7 +92,6 @@ void loop() {
   intInputNr = 0;
 
   for(int T1=0;T1<8;T1++){
-    intInputNr++;
 
     //use T1 for Ain L1
     blnCurrT1_A = bitRead(T1, 0); //LSB
@@ -117,6 +116,9 @@ void loop() {
     Serial.print(intCurrAin);
     //Serial.print(intInputNr);
     Serial.print("\t");
+    
+   
+    intInputNr++;
   }
   Serial.println("");
   delay(5);
