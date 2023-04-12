@@ -7,5 +7,5 @@ void readAin(int currentValue, int inputNr)
  {
 
     // 176 means controlChange Channel 1
-    //sendMIDI(statusByteAin, inputNr, currentValue);
+    sendMIDI(statusByteAin, inputNr, currentValue);
  }

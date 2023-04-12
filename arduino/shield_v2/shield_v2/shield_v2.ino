@@ -1,6 +1,7 @@
 // 25.03.2023
 // Dominik Rieder
 // https://github.com/TrollingInDaDeep/synthiii
+// thanks: https://www.hackster.io/danisferreira27/build-an-arduino-powered-midi-controller-7d04dd
 // Sketch for Shield_v1
 // Arduino shield, currently with 2 CD4051BE multiplexers
 // Used to prototype basic multiplexer connections, still easily removable and all with connector cables
@@ -44,10 +45,10 @@
   bool blnCurrT2_B;
   bool blnCurrT2_C;
 
+//stores analog values. last read and new read.
   int analogInputs[8];
-  int newAnalogInputs[8];
-
-
+  int tmpAnalogInputs[8];
+  int analogChangeThreshold = 3; // threshold how big a change in pot value needs to be to be sent (smoothening)
 
   // Status Bytes
   const int statusByteAin = 176; // Status byte for analog inputs. 176 = controlChange Channel 1
@@ -115,14 +116,12 @@ void loop() {
 
     // Read analog value and send it to Analog function.
     intCurrAin = analogRead(Ain);
-    readAin(intCurrAin, intInputNr);
-    Serial.print(intCurrAin);
-    //Serial.print(intInputNr);
-    Serial.print("\t");
-    
-   
+    readAin(map(intCurrAin,0,1023,0,127), intInputNr); //map 1023 to 127 values for midi
+    // Serial.print(intInputNr);
+    // Serial.print(":");
+    // Serial.println(analogInputs[intInputNr]);
+    //Serial.print("\t");
+    //Serial.println("");
     intInputNr++;
   }
-  Serial.println("");
-  delay(5);
 }
