@@ -2,42 +2,43 @@
 // Dominik Rieder
 // https://github.com/TrollingInDaDeep/synthiii
 // thanks: https://www.hackster.io/danisferreira27/build-an-arduino-powered-midi-controller-7d04dd
-// Sketch for Shield_v1
+// Sketch for breadboard v1 tests connections of outputs to inputs
 // Arduino shield, currently with 2 CD4051BE multiplexers
-// Used to prototype basic multiplexer connections, still easily removable and all with connector cables
-// getting pretty professional eh? 
-// One MUX is connected to A0 and one to digital port 6 to have both types of connections
 
 // Detailed pinout:
-// Mux 1
-// I/O -> A5
-// C   -> 7
-// B   -> 8
+// Mux 1 (outgoing connections)
+// I/O -> 
+// C   -> 4
+// B   -> 3
 // A   -> 2
 
-// MUX2
+// MUX2 (incoming connections)
 // I/O -> A4
-// C   -> 3
-// B   -> 4
+// C   -> 7
+// B   -> 6
 // A   -> 5
 
 // Analog Pins
-  const int Ain = A4;
-  const int Ain2 = A5;
+//  const int Ain = A4;
+//  const int Ain2 = A5;
 
 // Digital Pins
-  const int Din = 6;
+  //const int Din = 6;
+  const int Cout = 8;
+  const int Cin = 9;
   const int T1_A = 2;
-  const int T1_B = 8;
-  const int T1_C = 7;
+  const int T1_B = 3;
+  const int T1_C = 4;
   const int T2_A = 5;
-  const int T2_B = 4;
-  const int T2_C = 3;
+  const int T2_B = 6;
+  const int T2_C = 7;
 
 // var declarations to use later
 // stores current state/value of inputs/outputs/mux control pins
   int intCurrAin;
   bool blnCurrDin;
+  bool blnCurrCout;
+  bool blnCurrCin;
   bool blnCurrT1_A;
   bool blnCurrT1_B;
   bool blnCurrT1_C;
@@ -45,9 +46,10 @@
   bool blnCurrT2_B;
   bool blnCurrT2_C;
 
-//stores analog values. last read and new read.
-  int analogInputs[8];
-  int tmpAnalogInputs[8];
+//stores digital values. last read and new read.
+  numCout = 8;
+  numCin = 8;
+  bool connectionMatrix[numCout][numCin];
   int analogChangeThreshold = 3; // threshold how big a change in pot value needs to be to be sent (smoothening)
 
   // Status Bytes
@@ -67,11 +69,13 @@ void sendMIDI(byte statusByte, byte dataByte1, byte dataByte2) {
 void setup() {
   //set pin modes
   //Analog
-  pinMode(Ain, INPUT);
-  pinMode(Ain2, INPUT);
+  //pinMode(Ain, INPUT);
+  //pinMode(Ain2, INPUT);
 
   //Digital
-  pinMode(Din,INPUT_PULLUP);
+  //pinMode(Din,INPUT_PULLUP);
+  pinMode(Cin,INPUT_PULLUP);
+  pinMode(Cout,OUTPUT);
   pinMode(T1_A,OUTPUT);
   pinMode(T1_B,OUTPUT);
   pinMode(T1_C,OUTPUT);
@@ -94,35 +98,41 @@ void loop() {
   // delay(500);
 
   //reset input/output indexes
-  intInputNr = 0;
+  //intInputNr = 0;
 
-  for(int T1=0;T1<8;T1++){
+  for(int opt=0;opt<numCout;opt++){
 
     //use T1 for Ain L1
-    blnCurrT1_A = bitRead(T1, 0); //LSB
-    blnCurrT1_B = bitRead(T1, 1);
-    blnCurrT1_C = bitRead(T1, 2); //MSB
+    blnCurrT1_A = bitRead(opt, 0); //LSB
+    blnCurrT1_B = bitRead(opt, 1);
+    blnCurrT1_C = bitRead(opt, 2); //MSB
     digitalWrite(T1_A, blnCurrT1_A);
     digitalWrite(T1_B, blnCurrT1_B);
     digitalWrite(T1_C, blnCurrT1_C);
 
+    digitalWrite(Cout, HIGH);
 
-    blnCurrT2_A = bitRead(T1, 0); //LSB
-    blnCurrT2_B = bitRead(T1, 1);
-    blnCurrT2_C = bitRead(T1, 2); //MSB
-    digitalWrite(T2_A, blnCurrT2_A);
-    digitalWrite(T2_B, blnCurrT2_B);
-    digitalWrite(T2_C, blnCurrT2_C);
-    delay(1);
+    for(int inpt=0;inpt<numCin;inpt++){
+      blnCurrT2_A = bitRead(inpt, 0); //LSB
+      blnCurrT2_B = bitRead(inpt, 1);
+      blnCurrT2_C = bitRead(inpt, 2); //MSB
+      digitalWrite(T2_A, blnCurrT2_A);
+      digitalWrite(T2_B, blnCurrT2_B);
+      digitalWrite(T2_C, blnCurrT2_C);
+      delay(1);
 
+      blnCurrCin = digitalRead(Cin);
+      readDin(blnCurrCin,numCout, numCin)
+
+    }
     // Read analog value and send it to Analog function.
-    intCurrAin = analogRead(Ain);
-    readAin(map(intCurrAin,0,1023,0,127), intInputNr); //map 1023 to 127 values for midi
+    
+    //readAin(map(intCurrAin,0,1023,0,127), intInputNr); //map 1023 to 127 values for midi
     // Serial.print(intInputNr);
     // Serial.print(":");
     // Serial.println(analogInputs[intInputNr]);
     //Serial.print("\t");
     //Serial.println("");
-    intInputNr++;
+    //intInputNr++;
   }
 }
