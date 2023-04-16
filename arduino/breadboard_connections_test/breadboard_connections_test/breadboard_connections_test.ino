@@ -47,14 +47,17 @@
   bool blnCurrT2_C;
 
 //stores digital values. last read and new read.
-  numCout = 8;
-  numCin = 8;
+  const int numCout = 8;
+  const int numCin = 8;
   bool connectionMatrix[numCout][numCin];
   int analogChangeThreshold = 3; // threshold how big a change in pot value needs to be to be sent (smoothening)
 
   // Status Bytes
   const int statusByteAin = 176; // Status byte for analog inputs. 176 = controlChange Channel 1
-  const int statusByteDin = 177; // Status byte for analog inputs. 177 = controlChange Channel 2
+  const int statusByteDin = 177; // Status byte for digital inputs. 177 = controlChange Channel 2
+  const int statusByteMakeConnection = 144; // 144 = Channel 1 note on
+  const int statusByteBreakConnection = 128; // 128 = Channel 1 note off
+
 
   int intInputNr; // which input are we on
 
@@ -110,7 +113,7 @@ void loop() {
     digitalWrite(T1_B, blnCurrT1_B);
     digitalWrite(T1_C, blnCurrT1_C);
 
-    digitalWrite(Cout, HIGH);
+    digitalWrite(Cout, LOW); // pull to ground as input is pulled high with pullup
 
     for(int inpt=0;inpt<numCin;inpt++){
       blnCurrT2_A = bitRead(inpt, 0); //LSB
@@ -122,8 +125,11 @@ void loop() {
       delay(1);
 
       blnCurrCin = digitalRead(Cin);
-      readDin(blnCurrCin,numCout, numCin)
-
+      delay(1);
+      bool blnCheckCin = digitalRead(Cin);
+      if (blnCurrCin==blnCheckCin){ //check if value is stable over 1ms, only then send an update
+        readDin(!blnCurrCin,opt,inpt); //inverted as inverted logic
+      }
     }
     // Read analog value and send it to Analog function.
     
