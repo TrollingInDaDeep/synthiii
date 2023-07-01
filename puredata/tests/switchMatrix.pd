@@ -1,0 +1,35 @@
+#N canvas 31 193 1351 758 12;
+#X obj 1073 329 select 0;
+#X msg 820 558 \; pd submodule disconnect;
+#X obj 434 17 sysexin;
+#X text 96 42 Sysex input has following format: HEX INT Purpose 0xF0
+240 Start Sysex (0-127) Manufacturer ID (69) (0-127) Device ID (69)
+(0-127) Output Module ID (0-127) Output ID (0-127) Input Module ID
+(0-127) Input ID (0-127) Action (0=disconnect \, 1=connect) 0xF7 247
+End Sysex;
+#X msg 623 139 69 69 1 1 2 1 1;
+#X msg 844 138 69 69 1 1 2 1 0;
+#X msg 634 181 manufacturerID \$1 \, deviceID \$2 \, outModule \$3
+\, outNr \$4 \, inModule \$5 \, inNr \$6 \, action \$7;
+#X text 713 72 mit oder ohne start/stop byte von sysex?;
+#X text 590 116 example sysex connect;
+#X text 835 113 example sysex disconnect;
+#X obj 634 238 route manufacturerID deviceID outModule outNr inModule
+inNr action, f 67;
+#X floatatom 1073 305 5 0 0 0 - - -;
+#X text 662 426 next step: read module number and output number and
+give it to the "connect" or "disconnect" button;
+#X obj 612 434 print;
+#X msg 607 389 outModule \$3 \, outNr \$4 \, inModule \$5 \, inNr \$6
+;
+#X obj 1075 385 print disconnect;
+#X obj 1112 456 print connect;
+#X msg 634 566 \; pd submodule connect \$1 \$2 \$3 \$4;
+#X connect 0 0 15 0;
+#X connect 0 1 16 0;
+#X connect 4 0 6 0;
+#X connect 5 0 6 0;
+#X connect 6 0 10 0;
+#X connect 10 6 11 0;
+#X connect 11 0 0 0;
+#X connect 14 0 13 0;
