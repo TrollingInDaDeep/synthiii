@@ -1,0 +1,451 @@
+{
+  "version": "1.1.6",
+  "modules": [
+    {
+      "id": 1,
+      "plugin": "Core",
+      "version": "1.1.6",
+      "model": "AudioInterface",
+      "params": [],
+      "leftModuleId": 2,
+      "data": {
+        "audio": {
+          "driver": 6,
+          "deviceName": "Lautsprecher (High Definition Audio Device)",
+          "offset": 0,
+          "maxChannels": 8,
+          "sampleRate": 44100,
+          "blockSize": 256
+        }
+      },
+      "pos": [
+        82,
+        1
+      ]
+    },
+    {
+      "id": 2,
+      "plugin": "Fundamental",
+      "version": "1.4.0",
+      "model": "VCMixer",
+      "params": [
+        {
+          "id": 0,
+          "value": 1.07099855
+        },
+        {
+          "id": 1,
+          "value": 0.339411497
+        },
+        {
+          "id": 2,
+          "value": 1.10732961
+        },
+        {
+          "id": 3,
+          "value": 1.0
+        },
+        {
+          "id": 4,
+          "value": 1.0
+        }
+      ],
+      "rightModuleId": 1,
+      "pos": [
+        72,
+        1
+      ]
+    },
+    {
+      "id": 11,
+      "plugin": "Bogaudio",
+      "version": "1.1.38",
+      "model": "Bogaudio-VCO",
+      "params": [
+        {
+          "id": 0,
+          "value": -2.48700309
+        },
+        {
+          "id": 1,
+          "value": 0.0
+        },
+        {
+          "id": 2,
+          "value": 0.0
+        },
+        {
+          "id": 3,
+          "value": 0.0
+        },
+        {
+          "id": 4,
+          "value": 0.0
+        },
+        {
+          "id": 5,
+          "value": 1.0
+        },
+        {
+          "id": 6,
+          "value": 0.0
+        }
+      ],
+      "rightModuleId": 13,
+      "data": {
+        "poly_input": 0,
+        "dc_correction": true
+      },
+      "pos": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": 13,
+      "plugin": "VultModulesFree",
+      "version": "1.19.1",
+      "model": "Basal",
+      "params": [
+        {
+          "id": 0,
+          "value": 0.485000134
+        },
+        {
+          "id": 1,
+          "value": -0.648999572
+        },
+        {
+          "id": 2,
+          "value": 0.357000053
+        },
+        {
+          "id": 3,
+          "value": 0.0
+        },
+        {
+          "id": 4,
+          "value": 0.0
+        },
+        {
+          "id": 5,
+          "value": 0.0
+        }
+      ],
+      "leftModuleId": 11,
+      "rightModuleId": 19,
+      "pos": [
+        10,
+        1
+      ]
+    },
+    {
+      "id": 14,
+      "plugin": "Bogaudio",
+      "version": "1.1.38",
+      "model": "Bogaudio-VCF",
+      "params": [
+        {
+          "id": 0,
+          "value": 0.390999824
+        },
+        {
+          "id": 1,
+          "value": -0.819000006
+        },
+        {
+          "id": 2,
+          "value": 0.0
+        },
+        {
+          "id": 3,
+          "value": 0.0
+        },
+        {
+          "id": 4,
+          "value": 0.0
+        },
+        {
+          "id": 5,
+          "value": 0.522233009
+        }
+      ],
+      "rightModuleId": 15,
+      "data": {
+        "bandwidthMode": "pitched"
+      },
+      "pos": [
+        0,
+        2
+      ]
+    },
+    {
+      "id": 15,
+      "plugin": "Fundamental",
+      "version": "1.4.0",
+      "model": "VCF",
+      "params": [
+        {
+          "id": 0,
+          "value": 0.69849968
+        },
+        {
+          "id": 1,
+          "value": 0.5
+        },
+        {
+          "id": 2,
+          "value": 0.711002767
+        },
+        {
+          "id": 3,
+          "value": 0.0759999603
+        },
+        {
+          "id": 4,
+          "value": 0.912000299
+        }
+      ],
+      "leftModuleId": 14,
+      "rightModuleId": 21,
+      "pos": [
+        10,
+        2
+      ]
+    },
+    {
+      "id": 18,
+      "plugin": "Core",
+      "version": "1.1.6",
+      "model": "MIDI-Map",
+      "params": [],
+      "data": {
+        "maps": [
+          {
+            "cc": -1,
+            "moduleId": -1,
+            "paramId": 0
+          }
+        ],
+        "midi": {
+          "driver": 4,
+          "deviceName": "LPD8 0",
+          "channel": -1
+        }
+      },
+      "pos": [
+        77,
+        0
+      ]
+    },
+    {
+      "id": 19,
+      "plugin": "Fundamental",
+      "version": "1.4.0",
+      "model": "Noise",
+      "params": [],
+      "leftModuleId": 13,
+      "rightModuleId": 20,
+      "pos": [
+        16,
+        1
+      ]
+    },
+    {
+      "id": 20,
+      "plugin": "Fundamental",
+      "version": "1.4.0",
+      "model": "LFO2",
+      "params": [
+        {
+          "id": 0,
+          "value": 1.0
+        },
+        {
+          "id": 1,
+          "value": 1.0
+        },
+        {
+          "id": 2,
+          "value": 0.873998344
+        },
+        {
+          "id": 3,
+          "value": 1.06199706
+        },
+        {
+          "id": 4,
+          "value": 0.5
+        }
+      ],
+      "leftModuleId": 19,
+      "pos": [
+        19,
+        1
+      ]
+    },
+    {
+      "id": 21,
+      "plugin": "Fundamental",
+      "version": "1.4.0",
+      "model": "VCA",
+      "params": [
+        {
+          "id": 0,
+          "value": 0.795000196
+        },
+        {
+          "id": 1,
+          "value": 1.0
+        }
+      ],
+      "leftModuleId": 15,
+      "rightModuleId": 22,
+      "pos": [
+        18,
+        2
+      ]
+    },
+    {
+      "id": 22,
+      "plugin": "Autodafe",
+      "version": "1.0.1",
+      "model": "ReverbFx",
+      "params": [
+        {
+          "id": 0,
+          "value": 10.0
+        },
+        {
+          "id": 1,
+          "value": 0.499500811
+        }
+      ],
+      "leftModuleId": 21,
+      "rightModuleId": 23,
+      "pos": [
+        23,
+        2
+      ]
+    },
+    {
+      "id": 23,
+      "plugin": "Autodafe",
+      "version": "1.0.1",
+      "model": "ReverbFx",
+      "params": [
+        {
+          "id": 0,
+          "value": 10.0
+        },
+        {
+          "id": 1,
+          "value": 0.485499918
+        }
+      ],
+      "leftModuleId": 22,
+      "pos": [
+        29,
+        2
+      ]
+    }
+  ],
+  "cables": [
+    {
+      "id": 46,
+      "outputModuleId": 2,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 0,
+      "color": "#0986ad"
+    },
+    {
+      "id": 47,
+      "outputModuleId": 2,
+      "outputId": 0,
+      "inputModuleId": 1,
+      "inputId": 1,
+      "color": "#c9b70e"
+    },
+    {
+      "id": 123,
+      "outputModuleId": 14,
+      "outputId": 0,
+      "inputModuleId": 22,
+      "inputId": 0,
+      "color": "#c9b70e"
+    },
+    {
+      "id": 125,
+      "outputModuleId": 20,
+      "outputId": 0,
+      "inputModuleId": 14,
+      "inputId": 2,
+      "color": "#c91847"
+    },
+    {
+      "id": 126,
+      "outputModuleId": 13,
+      "outputId": 0,
+      "inputModuleId": 15,
+      "inputId": 3,
+      "color": "#0986ad"
+    },
+    {
+      "id": 124,
+      "outputModuleId": 22,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 1,
+      "color": "#0c8e15"
+    },
+    {
+      "id": 133,
+      "outputModuleId": 20,
+      "outputId": 0,
+      "inputModuleId": 21,
+      "inputId": 0,
+      "color": "#0986ad"
+    },
+    {
+      "id": 131,
+      "outputModuleId": 15,
+      "outputId": 0,
+      "inputModuleId": 21,
+      "inputId": 2,
+      "color": "#0c8e15"
+    },
+    {
+      "id": 132,
+      "outputModuleId": 21,
+      "outputId": 0,
+      "inputModuleId": 23,
+      "inputId": 0,
+      "color": "#c91847"
+    },
+    {
+      "id": 134,
+      "outputModuleId": 23,
+      "outputId": 0,
+      "inputModuleId": 2,
+      "inputId": 2,
+      "color": "#c9b70e"
+    },
+    {
+      "id": 136,
+      "outputModuleId": 20,
+      "outputId": 0,
+      "inputModuleId": 15,
+      "inputId": 0,
+      "color": "#c91847"
+    },
+    {
+      "id": 122,
+      "outputModuleId": 11,
+      "outputId": 1,
+      "inputModuleId": 14,
+      "inputId": 3,
+      "color": "#0986ad"
+    }
+  ]
+}

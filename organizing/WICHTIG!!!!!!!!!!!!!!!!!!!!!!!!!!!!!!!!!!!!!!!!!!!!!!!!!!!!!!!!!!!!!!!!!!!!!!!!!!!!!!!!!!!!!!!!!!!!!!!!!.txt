@@ -1,0 +1,66 @@
+semi modular (mit switches und vorgefertigten routen) -> keine veränderbaren kabel, nur in vcv gesteckt
+die veränderbar sind, mit switch matrix (hardsync, FM,)
+
+so wie pisound, einfach mit bissl mehr controls
+SEQUENCER, ADSR
+we can stack controllers, add as wished
+
+PIsiound (+++NO+++ patching, maybe switches (module on/off))
+ - more controls
+	- synth
+	- effects (rev / dly mit rate)
+	- more modules? lfo, clock, logic, utility
+ - sequencer
+	- builtin or own metropolis
+
+ - Drum machine
+	- clock
+	- fill steps via button
+	- 
+
+
+Steps:
+- existing synth, list all controls
+	- divide in ok / too much (48 analog, 64 digital, how many out?)
+	- orda
+- test sequencers (best is software, so only midi controller is needed from arduino)
+	- 8-x individual pitch
+	- step numbers (how often)
+	- play mode (<, >, ><)
+	- gate modes
+	- slide / mute
+	- gimmicks
+
+- build arduino midi sequencer, can be done and tested with vcv
+++platform individual
+++clock
+++blöh
+
+
+$$$ Needs to be native, no hairless on pi
+either flip/ISP or we use a DIN midi pin
+
+Instrumente input (mit pisound schon möglich)
+- als sound
+- als midi controller
+
+midi sequencer (standalone metropolis mit arduino)
+8x:
+   pitch (slider)
+   step indikator LED wo wir sind
+   number (drehschalter)
+   gatemode (schalter, ?)
+   slide (knopf mit led)
+   mute (knopf mit led)
+
+gate time (pot)
+slide amount (pot)
+steps (drehschalter)
+scale (drehschalter/pot)
+play/pause (knopf)
+count mode steps/pulses (knopf)
+
+
+
+komplette voices
+vco->vcf->vca->envelope->lfo->fx

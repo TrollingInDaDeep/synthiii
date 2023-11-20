@@ -1,0 +1,33 @@
+install ControlSurface https://github.com/tttapa/Control-Surface
+https://tttapa.github.io/Control-Surface-doc/Doxygen/d8/da8/md_pages_Installation.html#md_pages_Installation
+MIDIUSB: https://github.com/arduino-libraries/MIDIUSB
+
+getting started:
+https://tttapa.github.io/Control-Surface-doc/Doxygen/d5/d7d/md_pages_Getting-Started.html
+
+use usbDebugMIDI_interface
+send notes
+https://tttapa.github.io/Control-Surface-doc/Doxygen/d3/df7/midi-tutorial.html
+
+use HairlesSMIDI interface
+
+when working
+
+use usbMIDI interface (31250)
+
+use flip to upload hiduino
+dfu:
+- Flip https://www.microchip.com/en-us/development-tool/flip
+- flip error message
+
+ISP
+- need to try
+https://github.com/ddiakopoulos/hiduino/wiki/HIDUINO-via-ISP-Method
+
+
+sequencer:
+https://www.instructables.com/Old-School-Arduino-MIDI-Sequencer/
+
+
+For a more detailed overview of MIDI interfaces and using them to send and receive MIDI message, have a look at the MIDI Tutorial.
+https://tttapa.github.io/Control-Surface-doc/Doxygen/d3/df7/midi-tutorial.html
