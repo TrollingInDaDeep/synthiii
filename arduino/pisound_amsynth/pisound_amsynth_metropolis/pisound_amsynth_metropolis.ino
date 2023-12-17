@@ -18,7 +18,8 @@ long bpm = 90.0;
 long tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
 
 float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
-//float interval = tempo/24.0; //number of milliseconds after which to send the midi clock. MIDI spec is to send clock 24 times per quarter note
+float prevClockStart = 0; //previous millisecond timestamp before last clock signal was sent
+float clockInterval = tempo/24; //number of milliseconds after which to send the midi clock. MIDI spec is to send clock 24 times per quarter note
 float pulseStart = 0; //timestamp when the pulse started
 float noteStart = 0; //timestamp when the note started
 
@@ -31,20 +32,26 @@ bool reset = false;
 int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
 const int maxSteps = 8; // Maximum number of Steps of your sequencer
 int stepValues[maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; // initialize values to middle
+bool digitalInputs1[8] {0, 0, 0, 0, 0, 0, 0, 0}; //first multiplexer with digital inputs
+bool prevDigitalInputs1[8] {0, 0, 0, 0, 0, 0, 0, 0}; //previous state of the inputs
 
 int pulsePointer = 0; //points to the pulse within the step we're currently in
 int lastStepPointer = 0; //previous step, to trigger note off
 int lastNoteSent = 0; //previous note sent, to trigger note off on time
 int pulseCount [] {1, 1, 1, 1, 1, 1, 1, 1}; // how many times a step should be played
-int gateMode [] {2, 2, 2, 2, 2, 2, 2, 2}; //0=no gate, 1=first gate, 2=every gate
+int gateMode [maxSteps] {2, 2, 2, 2, 2, 2, 2, 2}; //0=no gate, 1=first gate, 2=every gate
+bool skipStep [maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; //1=skip a step, 0=don't skip
+
 bool noteStopped = true; //if note has been stopped for this step already
 
 int stepPointer = 0; //pointer, points to current step that we're at
 int gateTime = 50; //time in ms how long the note should be on
 
 // Pins
-const int muxSeqIO = A5;//A0;
-const int muxLEDIO = 7;
+const int muxSeqIO = A5;// multiplexer with sequencer faders
+const int muxLEDIO = 7; // multiplexer with sequencer leds
+const int muxDigIO = 6; // multiplexer with digital inputs
+
 //const int selectPins[3] = {8, 9, 10};//{10, 9, 8}; //A on mux is pin 10, B=9, C=8
 const int muxIn_A = 8;
 const int muxIn_B = 9;
@@ -93,10 +100,6 @@ void selectMuxOutPin(byte pin){
   digitalWrite(muxOut_B, valB);
   digitalWrite(muxOut_C, valC);
   delay(1);
-  Serial.print("selected");
-  Serial.print(valA);
-  Serial.print(valB);
-  Serial.println(valC);
 }
 
 void noteButtonPressed(int note) {
@@ -110,6 +113,7 @@ void noteButtonReleased(int note){
 // functions
 void updateTempo(){
   tempo = 1000.0/(bpm/60.0);
+  clockInterval = tempo/24;
 }
 
 void nextStep() {
@@ -144,9 +148,14 @@ void nextPulse() {
   //go to next pulse
   pulseStart = millis();
 
+  if (skipStep[stepPointer]) {
+    stepPointer++;
+  }
   startNote(stepPointer); // start the note of this pulse
-  
+
+
   pulsePointer++;
+
   //go to next step if last pulse is reached
   if (pulsePointer >= pulseCount[stepPointer]) {
     pulsePointer = 0;
@@ -180,6 +189,79 @@ void readAnalogPins() {
   }
 }
 
+void readDigitalPins() {
+  
+  // read multiplexer
+  for (byte pin=0; pin<=7; pin++){
+    selectMuxInPin(pin);
+    //store current value in previous for comparison later
+    prevDigitalInputs1[pin] = digitalInputs1[pin];
+
+    //inversion because LOW is enabled
+    digitalInputs1[pin] = !digitalRead(muxDigIO);
+
+    //analog pins
+    // int potClockrawr = analogRead(A1);
+    // int potClock = map(potClockrawr, 0,1023,40,480);
+    // bpm = potClock;
+    //gateTime = potClockrawr;
+  }
+}
+
+void sendDigitalPins(){
+  //loop through digital inputs
+  for (int ptr=0; ptr<=7; ptr++){
+    //check if a value changed
+    if (digitalInputs1[ptr] != prevDigitalInputs1[ptr]){
+      switch(ptr){
+
+        //button for sequencer note 1
+        case 0:
+          if (digitalInputs1[ptr]){
+            noteButtonPressed(0);
+          }
+          if (!digitalInputs1[ptr]){
+            noteButtonReleased(0);
+          }
+          break;
+        //button for sequencer note 2
+        case 1:
+          if (digitalInputs1[ptr]){
+              noteButtonPressed(1);
+            }
+            if (!digitalInputs1[ptr]){
+              noteButtonReleased(1);
+            }
+            break;
+        // skip button for step 3
+        case 2:
+            if(digitalInputs1[ptr]){
+              skipStep[2]=!skipStep[2];
+            }
+          break;
+        case 3:
+          Serial.println(3);
+          break;
+        case 4:
+          Serial.println(4);
+          break;
+        case 5:
+          Serial.println(5);
+          break;
+        case 6:
+          Serial.println(6);
+          break;
+        case 7:
+          if (digitalInputs1[ptr]){
+            run=!run;
+          }
+      
+          break;
+      }
+    }
+  }
+  
+}
 void setup() {
 
   // for (int i = 0; i>3; i++){
@@ -196,6 +278,7 @@ void setup() {
 
   pinMode(muxLEDIO, OUTPUT);
   pinMode(muxSeqIO, INPUT);
+  pinMode(muxDigIO, INPUT_PULLUP);
   pinMode(A1, INPUT);
 
   //turn on the LED
@@ -214,8 +297,10 @@ void loop() {
   unsigned long currentMillis = millis();
   
   readAnalogPins();
+  readDigitalPins();
+  sendDigitalPins();
   updateTempo();
-
+  
   //make sure the gateTime doesn't exceed the tempo, note shouldnt be longer than
   //the pulse itself
   if (gateTime > tempo) {
@@ -223,18 +308,26 @@ void loop() {
   }
 
   if (run) {
+    // send clock if necessary
+    if (currentMillis - prevClockStart >= clockInterval) {
+      //save timestamp when pulse started
+      prevClockStart = currentMillis;
+      MIDI.sendClock();
+    }
+
+    // do next pulse if necessary
     if (currentMillis - prevPulseStart >= tempo) {
       //save timestamp when pulse started
       prevPulseStart = currentMillis;
       nextPulse(); //after last pulse, next step will be triggered
     }
-  }
-
+    //stop note if necessary
     if (!noteStopped) {
       if (currentMillis - noteStart >= gateTime) {
         stopLastNote();
       }
     }
+  }
   
     //MIDI.sendControlChange(1, pot, 1);
     
