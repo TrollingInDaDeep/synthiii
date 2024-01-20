@@ -8,51 +8,37 @@
 // ... if this shit here is working
 
 #include <Keypad.h>
-//#include <MIDIUSB.h>
 #include <MIDI.h>
 
 MIDI_CREATE_DEFAULT_INSTANCE();
-// Keypad
-
-const byte ROWS = 4;
-const byte COLS = 4;
-
-int kpc = 144; // Channel 1 Note on
-int midiC = 60; // Standard midi C
-int transpose = 0;
-
-char hexaKeys[ROWS][COLS] = {
-  {'0', '1', '2', '3'},
-  {'4', '5', '6', '7'},
-  {'8', '9', '10', '11'},
-  {'12', '13', '14', '15'}
-};
-
-char drumPadChars [16] = {'1', '2', '3', '+', '4', '5', '6', '>', '7', '8', '9', '!', '*', '0', '#', 'R'};
-
-
-// flachbandkabel:
-// weisser leerer pin links
-// R1, R2, C1, C2, C3, C4, R3, R4
-byte rowPins[ROWS] = {7, 6, 8, 9}; 
-byte colPins[COLS] = {5, 4, 3, 2}; 
-Keypad kpd = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 // drum definitions
-const int numDrumSteps = 16; //number of notes / steps the drum sequencer has
-int drumStepPointer = 0; // pointer at which step in the drum sequencer we are
+// number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
+const int drumInstruments = 4;
+// which instrument is currently selected for keypad play mode
+int selectedInstrument = 0;
 
-bool seq = false; // if false -> keypad is drum player
-                  // if true -> keypad is to enable/disable trigger of certain notes
+const int instrumentNotes[] = {60, 75, 63, 67};
+
+//number of notes / steps the drum sequencer has
+const int numDrumSteps = 16;
+// pointer at which step in the drum sequencer we are
+int drumStepPointer = 0;
+
+int keypadMode = 1; //0=play, 1=sequence notes 2=fillXStep, 4=settings
+bool runDrum = true;
 
 //bools if a drum sound should be triggered at the selected step
-int kickNote = 60; // note to be triggered when kick is sent
-bool kickNotes[numDrumSteps] = {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0};
-bool kickStarted = 0; //if the kick has been triggered already in the current step
-
+bool drumSequence [drumInstruments][numDrumSteps] {
+  {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
+  {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0},
+  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+};
 
 void startNote(int noteToStart) {
   MIDI.sendNoteOn(noteToStart, 127, 2);
+  stopNote(noteToStart);
 }
 
 void stopNote(int noteToStop) {
@@ -64,20 +50,23 @@ void nextDrumStep() {
     drumStepPointer = 0;
   }
 
-  stopNote(kickNote);
-
-  //only send kick if not already done
-  if (kickNotes[drumStepPointer]) {
-    startNote(kickNote);
+  for (int i = 0; i < drumInstruments; i++) {
+    stopNote(instrumentNotes[i]);
   }
-    
+  
+  for (int i = 0; i < drumInstruments; i++) {
+    if (drumSequence[i][drumStepPointer]) {
+      startNote(instrumentNotes[i]);
+    }
+  }
   drumStepPointer++;
 }
 
 // what happens when a clock signal is received
 void handleClock() {
-  nextDrumStep();
- //startNote(midiC + transpose + 0);
+  if (runDrum) {
+    nextDrumStep();
+  }
 }
 
 void setup() {
@@ -94,6 +83,6 @@ void setup() {
 
 void loop() {
   
-    readDrumpad(seq);
+    readDrumpad();
     MIDI.read();
 }
