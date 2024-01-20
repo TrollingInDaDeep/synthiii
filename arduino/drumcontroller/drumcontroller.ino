@@ -11,14 +11,24 @@
 #include <MIDI.h>
 
 MIDI_CREATE_DEFAULT_INSTANCE();
+///
+/// Variable definitions
+///
 
-// drum definitions
+// ############
+// DRUMS
+// ############
+int midiC = 60; // Standard midi C
+int transpose = 0;
+
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int drumInstruments = 4;
+// which midi note to play for each instrument
+const int instrumentNotes[] = {60, 75, 63, 67};
 // which instrument is currently selected for keypad play mode
 int selectedInstrument = 0;
 
-const int instrumentNotes[] = {60, 75, 63, 67};
+
 
 //number of notes / steps the drum sequencer has
 const int numDrumSteps = 16;
@@ -36,31 +46,40 @@ bool drumSequence [drumInstruments][numDrumSteps] {
   {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 };
 
-void startNote(int noteToStart) {
-  MIDI.sendNoteOn(noteToStart, 127, 2);
-  stopNote(noteToStart);
-}
+int howManyKeypadKeys = 16;
+char drumPadChars [16] = {'1', '2', '3', '+', '4', '5', '6', '>', '7', '8', '9', '!', '*', '0', '#', 'R'};
 
-void stopNote(int noteToStop) {
-  MIDI.sendNoteOff(noteToStop, 127, 2);
-}
 
-void nextDrumStep() {  
-  if (drumStepPointer >= numDrumSteps) {
-    drumStepPointer = 0;
-  }
+// ############
+// KEYPAD
+// ############
+const byte ROWS = 4;
+const byte COLS = 4;
+//hex because only 1 digit char possible
+char hexaKeys[ROWS][COLS] = {
+  {'0', '1', '2', '3'},
+  {'4', '5', '6', '7'},
+  {'8', '9', 'A', 'B'},
+  {'C', 'D', 'E', 'F'}
+};
 
-  for (int i = 0; i < drumInstruments; i++) {
-    stopNote(instrumentNotes[i]);
-  }
-  
-  for (int i = 0; i < drumInstruments; i++) {
-    if (drumSequence[i][drumStepPointer]) {
-      startNote(instrumentNotes[i]);
-    }
-  }
-  drumStepPointer++;
-}
+// flachbandkabel:
+// weisser leerer pin links
+// R1, R2, C1, C2, C3, C4, R3, R4
+byte rowPins[ROWS] = {7, 6, 8, 9}; 
+byte colPins[COLS] = {5, 4, 3, 2}; 
+Keypad kpd = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+
+
+///
+/// End variable definitions
+///
+
+
+///
+/// Functions
+///
+
 
 // what happens when a clock signal is received
 void handleClock() {

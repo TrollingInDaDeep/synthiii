@@ -1,5 +1,46 @@
 #include <Keypad.h>
 
+// sets all steps for selected instrument to false
+// means, clear all enabled triggers
+void clearInstrumenSequence() {
+  for (int i = 0; i < numDrumSteps; i++){
+    drumSequence [selectedInstrument][i] = false;
+  }
+}
+
+
+// trigger next step for drum sequencer
+// stops the previous notes and triggers the new ones
+void nextDrumStep() {  
+  if (drumStepPointer >= numDrumSteps) {
+    drumStepPointer = 0;
+  }
+
+  for (int i = 0; i < drumInstruments; i++) {
+    stopDrumNote(instrumentNotes[i]);
+  }
+  
+  for (int i = 0; i < drumInstruments; i++) {
+    if (drumSequence[i][drumStepPointer]) {
+      startDrumNote(instrumentNotes[i]);
+    }
+  }
+  drumStepPointer++;
+}
+
+void startDrumNote(int noteToStart) {
+  MIDI.sendNoteOn(noteToStart, 127, 2);
+  stopDrumNote(noteToStart);
+}
+
+void stopDrumNote(int noteToStop) {
+  MIDI.sendNoteOff(noteToStop, 127, 2);
+}
+
+
+//scans through the keypad
+//checks if key is pressed -> runs needed action
+//checks if key is released -> runs needed action
 void readDrumpad() {
     // supports up to ten simultaneous key presses
       if (kpd.getKeys())  
@@ -19,7 +60,7 @@ void readDrumpad() {
             switch (keypadMode) {
               //Play Mode
               case 0:
-                startNote(midiC + transpose + keyNumber);
+                startDrumNote(midiC + transpose + keyNumber);
               break;
 
               //enable / disable notes sequence Mode
@@ -47,7 +88,7 @@ void readDrumpad() {
             switch (keypadMode) {
               //Play Mode
               case 0:
-                stopNote(midiC + transpose + keyNumber);
+                stopDrumNote(midiC + transpose + keyNumber);
               break;
 
               //enable / disable notes sequence Mode
