@@ -2,6 +2,10 @@
 #include <MIDIUSB.h>
 USBMIDI_Interface midi;
 
+// PINS
+const int 
+
+
 //Multiplexers
 CD74HC4051 I1 {38, {37, 38, 39} };
 CD74HC4051 I2 {41, {37, 38, 39} };

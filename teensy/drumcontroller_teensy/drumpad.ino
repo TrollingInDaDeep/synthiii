@@ -30,11 +30,13 @@ void nextDrumStep() {
 
 void startDrumNote(int noteToStart) {
   usbMIDI.sendNoteOn(noteToStart, 127, 2);
+  //Serial.println(noteToStart);
   stopDrumNote(noteToStart);
 }
 
 void stopDrumNote(int noteToStop) {
   usbMIDI.sendNoteOff(noteToStop, 127, 2);
+  //Serial.println(noteToStop);
 }
 
 

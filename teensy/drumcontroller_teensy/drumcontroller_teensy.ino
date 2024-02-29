@@ -33,7 +33,7 @@ const int numDrumSteps = 16;
 // pointer at which step in the drum sequencer we are
 int drumStepPointer = 0;
 
-int keypadMode = 0; //0=play, 1=sequence notes 2=fillXStep, 4=settings
+int keypadMode = 1; //0=play, 1=sequence notes 2=fillXStep, 4=settings
 bool runDrum = true;
 
 //bools if a drum sound should be triggered at the selected step
@@ -64,7 +64,7 @@ char hexaKeys[ROWS][COLS] = {
 // flachbandkabel:
 // weisser leerer pin links
 // R1, R2, C1, C2, C3, C4, R3, R4
-byte rowPins[ROWS] = {2, 3, 8, 9}; 
+byte rowPins[ROWS] = {2, 3, 9, 8}; 
 byte colPins[COLS] = {4, 5, 6, 7}; 
 Keypad kpd = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
@@ -87,7 +87,11 @@ void handleClock() {
 }
 
 void setup() {
-  //Serial.begin(57600);
+  // Pin definitions
+
+
+
+  
   //usbMIDI.begin(MIDI_CHANNEL_OMNI);
   Serial.begin(115200);
   delay(10);
@@ -99,7 +103,7 @@ void setup() {
 
 
 void loop() {
-  
     readDrumpad();
     usbMIDI.read();
+
 }
