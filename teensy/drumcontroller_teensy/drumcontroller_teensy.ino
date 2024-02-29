@@ -33,7 +33,7 @@ const int numDrumSteps = 16;
 // pointer at which step in the drum sequencer we are
 int drumStepPointer = 0;
 
-int keypadMode = 1; //0=play, 1=sequence notes 2=fillXStep, 4=settings
+int keypadMode = 0; //0=play, 1=sequence notes 2=fillXStep, 4=settings
 bool runDrum = true;
 
 //bools if a drum sound should be triggered at the selected step
