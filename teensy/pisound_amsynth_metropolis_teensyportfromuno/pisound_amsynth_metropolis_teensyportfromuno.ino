@@ -1,9 +1,7 @@
-//#include <MIDI.h>
 #include <Timer.h>
 
 // https://www.instructables.com/Old-School-Arduino-MIDI-Sequencer/
 
-//MIDI_CREATE_DEFAULT_INSTANCE();
 
 //vars
 //timer

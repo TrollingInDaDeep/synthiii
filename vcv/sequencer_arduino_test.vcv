@@ -256,7 +256,7 @@
         },
         {
           "id": 3,
-          "value": 0.972001374
+          "value": 0.300001442
         },
         {
           "id": 4,
@@ -284,7 +284,7 @@
         },
         {
           "id": 1,
-          "value": 0.566929102
+          "value": 0.0
         },
         {
           "id": 2,
@@ -448,42 +448,8 @@
         }
       ],
       "leftModuleId": 21,
-      "rightModuleId": 17,
       "pos": [
         62,
-        0
-      ]
-    },
-    {
-      "id": 17,
-      "plugin": "Fundamental",
-      "version": "1.4.0",
-      "model": "LFO2",
-      "params": [
-        {
-          "id": 0,
-          "value": 0.0
-        },
-        {
-          "id": 1,
-          "value": 1.0
-        },
-        {
-          "id": 2,
-          "value": -1.61900461
-        },
-        {
-          "id": 3,
-          "value": 1.28249931
-        },
-        {
-          "id": 4,
-          "value": 0.114499934
-        }
-      ],
-      "leftModuleId": 16,
-      "pos": [
-        68,
         0
       ]
     },
@@ -583,7 +549,6 @@
       "version": "1.4.0",
       "model": "Quantizer",
       "params": [],
-      "leftModuleId": 77,
       "rightModuleId": 18,
       "data": {
         "enabledNotes": [
@@ -644,7 +609,7 @@
       "params": [
         {
           "id": 0,
-          "value": 0.456692904
+          "value": 0.0
         },
         {
           "id": 1,
@@ -862,6 +827,7 @@
         "velocity": false,
         "midi": {
           "driver": 4,
+          "deviceName": "Teensy MIDI 0",
           "channel": 1
         }
       },
@@ -1010,11 +976,11 @@
         },
         {
           "id": 2,
-          "value": -2.0
+          "value": -0.0
         },
         {
           "id": 3,
-          "value": 1.0
+          "value": -0.0
         },
         {
           "id": 4,
@@ -1108,40 +1074,13 @@
       "data": {
         "midi": {
           "driver": 4,
-          "channel": 1
+          "deviceName": "Teensy MIDI 1",
+          "channel": 0
         }
       },
       "pos": [
         20,
         2
-      ]
-    },
-    {
-      "id": 77,
-      "plugin": "Stoermelder-P1",
-      "version": "1.10.0",
-      "model": "MidiMon",
-      "params": [],
-      "rightModuleId": 19,
-      "data": {
-        "panelTheme": 0,
-        "showNoteMsg": true,
-        "showKeyPressure": true,
-        "showCcMsg": true,
-        "showProgChangeMsg": true,
-        "showChannelPressurelMsg": true,
-        "showPitchWheelMsg": true,
-        "showSysExMsg": false,
-        "showClockMsg": false,
-        "showSystemMsg": true,
-        "midiInput": {
-          "driver": 4,
-          "channel": -1
-        }
-      },
-      "pos": [
-        5,
-        0
       ]
     },
     {
@@ -4713,6 +4652,34 @@
         20,
         5
       ]
+    },
+    {
+      "id": 82,
+      "plugin": "Stoermelder-P1",
+      "version": "1.10.0",
+      "model": "MidiMon",
+      "params": [],
+      "data": {
+        "panelTheme": 0,
+        "showNoteMsg": true,
+        "showKeyPressure": true,
+        "showCcMsg": true,
+        "showProgChangeMsg": true,
+        "showChannelPressurelMsg": true,
+        "showPitchWheelMsg": true,
+        "showSysExMsg": false,
+        "showClockMsg": false,
+        "showSystemMsg": true,
+        "midiInput": {
+          "driver": 4,
+          "deviceName": "Teensy MIDI 0",
+          "channel": -1
+        }
+      },
+      "pos": [
+        3,
+        0
+      ]
     }
   ],
   "cables": [
@@ -4853,14 +4820,6 @@
       "color": "#c91847"
     },
     {
-      "id": 288,
-      "outputModuleId": 47,
-      "outputId": 3,
-      "inputModuleId": 33,
-      "inputId": 0,
-      "color": "#0986ad"
-    },
-    {
       "id": 289,
       "outputModuleId": 33,
       "outputId": 0,
@@ -4923,6 +4882,22 @@
       "inputModuleId": 6,
       "inputId": 4,
       "color": "#c9b70e"
+    },
+    {
+      "id": 299,
+      "outputModuleId": 75,
+      "outputId": 2,
+      "inputModuleId": 13,
+      "inputId": 0,
+      "color": "#c91847"
+    },
+    {
+      "id": 288,
+      "outputModuleId": 47,
+      "outputId": 3,
+      "inputModuleId": 33,
+      "inputId": 0,
+      "color": "#0986ad"
     }
   ]
 }

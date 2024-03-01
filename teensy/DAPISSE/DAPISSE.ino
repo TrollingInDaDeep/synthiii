@@ -1,109 +1,329 @@
-#include <Control_Surface.h>
-#include <MIDIUSB.h>
-USBMIDI_Interface midi;
+#include <Keypad.h>
 
 // PINS
-const int 
-
+const int I1 = 38;    //Analog In -> synth rechts
+const int I2 = 41;    //Analog In -> synth links
+const int I3 = 40;    //Analog In -> seq links pot
+const int I4 = 39;    //Digital In -> seq links btn
+const int I5 = 25;    //Analog In -> seq faders
+const int I6 = 26;    //Analog In -> seq pulse
+const int I7 = 11;    //Digital Out -> seq LEDs
+const int I8 = 12;    //Digital In -> seq btn triggers
+const int A = 37;     //Digital Out
+const int B = 36;     //Digital Out
+const int C = 35;     //Digital Out
+const int Aout = 30;  //Digital Out
+const int Bout = 31;  //Digital Out
+const int Cout = 32;  //Digital Out
 
 //Multiplexers
-CD74HC4051 I1 {38, {37, 38, 39} };
-CD74HC4051 I2 {41, {37, 38, 39} };
-CD74HC4051 I3 {40, {37, 38, 39} };
-CD74HC4051 I4 {39, {37, 38, 39} };
-CD74HC4051 I5 {25, {37, 38, 39} };
-CD74HC4051 I6 {26, {37, 38, 39} };
-CD74HC4051 I7 {11, {37, 38, 39} };
-CD74HC4051 I8 {12, {37, 38, 39} };
+// Settings
+const int pinPerMux = 8; // 4051 Multiplexer has 8 pins
+const int numAnalogInMux = 5; // how many analog multiplexers
+const int numDigitalInMux = 2; // how many analog multiplexers
+
+//sequencer
+//const int note = 42;
+// standard velocity for notes
+const uint8_t velocity = 127;
+
+//vars
+
+///
+/// Variable definitions
+///
+
+// ############
+// DRUMS
+// ############
+int midiC = 60; // Standard midi C
+int transpose = 0;
+
+// number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
+const int drumInstruments = 4;
+// which midi note to play for each instrument
+const int instrumentNotes[] = {60, 75, 63, 67};
+// which instrument is currently selected for keypad play mode
+int selectedInstrument = 0;
 
 
-// Controls
-//CCPotentiometer
-CCPotentiometer I1_POTS[] {
-    { I1.pin(0), {0x00, Channel_1} },
-    { I1.pin(1), {0x01, Channel_2} },
-    { I1.pin(2), {0x02, Channel_3} },
-    { I1.pin(3), {0x03, Channel_4} },
-    { I1.pin(4), {0x04, Channel_5} },
-    { I1.pin(5), {0x05, Channel_6} },
-    { I1.pin(6), {0x06, Channel_7} },
-    { I1.pin(7), {0x07, Channel_8} },
+
+//number of notes / steps the drum sequencer has
+const int numDrumSteps = 16;
+// pointer at which step in the drum sequencer we are
+int drumStepPointer = 0;
+
+int keypadMode = 0; //0=play, 1=sequence notes 2=fillXStep, 4=settings
+bool runDrum = true;
+
+//bools if a drum sound should be triggered at the selected step
+bool drumSequence [drumInstruments][numDrumSteps] {
+  {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
+  {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0},
+  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
 };
-CCPotentiometer I2_POTS[] {
-    { I2.pin(0), {0x08, Channel_9} },
-    { I2.pin(1), {0x09, Channel_10} },
-    { I2.pin(2), {0x0A, Channel_11} },
-    { I2.pin(3), {0x0B, Channel_12} },
-    { I2.pin(4), {0x0C, Channel_13} },
-    { I2.pin(5), {0x0D, Channel_14} },
-    { I2.pin(6), {0x0E, Channel_15} },
-    { I2.pin(7), {0x0F, Channel_16} },
+
+int howManyKeypadKeys = 16;
+char drumPadChars [16] = {'1', '2', '3', '+', '4', '5', '6', '>', '7', '8', '9', '!', '*', '0', '#', 'R'};
+
+
+// ############
+// KEYPAD
+// ############
+const byte ROWS = 4;
+const byte COLS = 4;
+//hex because only 1 digit char possible
+char hexaKeys[ROWS][COLS] = {
+  {'0', '1', '2', '3'},
+  {'4', '5', '6', '7'},
+  {'8', '9', 'A', 'B'},
+  {'C', 'D', 'E', 'F'}
 };
-CCPotentiometer I3_POTS[] {
-    { I3.pin(0), {0x10, Channel_1} },
-    { I3.pin(1), {0x11, Channel_2} },
-    { I3.pin(2), {0x12, Channel_3} },
-    { I3.pin(3), {0x13, Channel_4} },
-    { I3.pin(4), {0x14, Channel_5} },
-    { I3.pin(5), {0x15, Channel_6} },
-    { I3.pin(6), {0x16, Channel_7} },
-    { I3.pin(7), {0x17, Channel_8} },
+
+// flachbandkabel:
+// weisser leerer pin links
+// R1, R2, C1, C2, C3, C4, R3, R4
+byte rowPins[ROWS] = {2, 3, 9, 8}; 
+byte colPins[COLS] = {4, 5, 6, 7}; 
+Keypad kpd = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+
+/// ############
+/// Sequencer
+/// ############
+
+int rawAnalog = 0;
+bool rawDigital = 0;
+
+// alternative timer
+long bpm = 90.0;
+long tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
+
+float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
+float prevClockStart = 0; //previous millisecond timestamp before last clock signal was sent
+float clockInterval = tempo/24; //number of milliseconds after which to send the midi clock. MIDI spec is to send clock 24 times per quarter note
+float pulseStart = 0; //timestamp when the pulse started
+float noteStart = 0; //timestamp when the note started
+
+
+
+//int clockspeed = 120;
+bool run = true;
+bool reset = false;
+int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
+const int maxSteps = 8; // Maximum number of Steps of your sequencer
+//int stepValues[maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; // initialize values to middle
+//bool digitalInputs1[8] {0, 0, 0, 0, 0, 0, 0, 0}; //first multiplexer with digital inputs
+//bool prevDigitalInputs1[8] {0, 0, 0, 0, 0, 0, 0, 0}; //previous state of the inputs
+
+int pulsePointer = 0; //points to the pulse within the step we're currently in
+int lastStepPointer = 0; //previous step, to trigger note off
+int lastNoteSent = 0; //previous note sent, to trigger note off on time
+int pulseCount [] {1, 1, 1, 1, 1, 1, 1, 1}; // how many times a step should be played
+int gateMode [maxSteps] {2, 2, 2, 2, 2, 2, 2, 2}; //0=no gate, 1=first gate, 2=every gate
+bool skipStep [maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; //1=skip a step, 0=don't skip
+
+const int numSeqBanks = 4; // how many modes we can have for the sequencer buttons
+int selectedSeqBank = 0; // which sequencer bank is selected
+// 0=play/trigger pulse/step
+// 1=enable/disable skip step
+// 2=enable/disable slide step
+// 3=?? open for ideas
+
+// stores the different bank values that the sequencer buttons can have
+// is int, as first row needs int value
+// rest are actually bools
+int arr_seq_buttons [numSeqBanks][maxSteps] {
+  {0, 0, 0, 0, 0, 0, 1, 1},   // Step Value
+  {0, 0, 0, 0, 0, 0, 0, 0},   // Skip Step
+  {0, 0, 0, 0, 0, 0, 1, 1},   // Slide Step
+  {0, 0, 0, 0, 0, 0, 0, 0}    // ??
 };
-CCPotentiometer I4_POTS[] {
-    { I4.pin(0), {0x18, Channel_9} },
-    { I4.pin(1), {0x19, Channel_10} },
-    { I4.pin(2), {0x1A, Channel_11} },
-    { I4.pin(3), {0x1B, Channel_12} },
-    { I4.pin(4), {0x1C, Channel_13} },
-    { I4.pin(5), {0x1D, Channel_14} },
-    { I4.pin(6), {0x1E, Channel_15} },
-    { I4.pin(7), {0x1F, Channel_16} },
+
+bool noteStopped = true; //if note has been stopped for this step already
+
+int stepPointer = 0; //pointer, points to current step that we're at
+int gateTime = 50; //time in ms how long the note should be on
+
+///
+/// End variable definitions
+///
+
+
+
+///
+/// Arrays
+///
+
+// collection of analog inputs
+int arr_pin_analog_inputs [numAnalogInMux] {
+  I1,
+  I2,
+  I3,
+  I5,
+  I6
 };
-CCPotentiometer I5_POTS[] {
-    { I5.pin(0), {0x20, Channel_1} },
-    { I5.pin(1), {0x21, Channel_2} },
-    { I5.pin(2), {0x22, Channel_3} },
-    { I5.pin(3), {0x23, Channel_4} },
-    { I5.pin(4), {0x24, Channel_5} },
-    { I5.pin(5), {0x25, Channel_6} },
-    { I5.pin(6), {0x26, Channel_7} },
-    { I5.pin(7), {0x27, Channel_8} },
+
+// collection of digital inputs
+int arr_pin_digital_inputs [numAnalogInMux] {
+  I4,
+  I8
 };
-CCPotentiometer I6_POTS[] {
-    { I6.pin(0), {0x28, Channel_9} },
-    { I6.pin(1), {0x29, Channel_10} },
-    { I6.pin(2), {0x2A, Channel_11} },
-    { I6.pin(3), {0x2B, Channel_12} },
-    { I6.pin(4), {0x2C, Channel_13} },
-    { I6.pin(5), {0x2D, Channel_14} },
-    { I6.pin(6), {0x2E, Channel_15} },
-    { I6.pin(7), {0x2F, Channel_16} },
+
+// previous reading of analog inputs
+int arr_prev_read_analog_inputs [numAnalogInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I1
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I2
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I3
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I5
+  {0, 0, 0, 0, 0, 0, 0, 0} //I6
 };
-CCPotentiometer I7_POTS[] {
-    { I7.pin(0), {0x30, Channel_1} },
-    { I7.pin(1), {0x31, Channel_2} },
-    { I7.pin(2), {0x32, Channel_3} },
-    { I7.pin(3), {0x33, Channel_4} },
-    { I7.pin(4), {0x34, Channel_5} },
-    { I7.pin(5), {0x35, Channel_6} },
-    { I7.pin(6), {0x36, Channel_7} },
-    { I7.pin(7), {0x37, Channel_8} },
+
+// previous reading of digital inputs
+int arr_prev_read_digital_inputs [numDigitalInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I4
+  {0, 0, 0, 0, 0, 0, 0, 0} //I8
 };
-CCPotentiometer I8_POTS[] {
-    { I8.pin(0), {0x38, Channel_9} },
-    { I8.pin(1), {0x39, Channel_10} },
-    { I8.pin(2), {0x3A, Channel_11} },
-    { I8.pin(3), {0x3B, Channel_12} },
-    { I8.pin(4), {0x3C, Channel_13} },
-    { I8.pin(5), {0x3D, Channel_14} },
-    { I8.pin(6), {0x3E, Channel_15} },
-    { I8.pin(7), {0x3F, Channel_16} },
+
+// current reading of analog inputs
+int arr_read_analog_inputs [numAnalogInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I1
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I2
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I3
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I5
+  {0, 0, 0, 0, 0, 0, 0, 0} //I6
 };
+
+// current reading of digital inputs
+int arr_read_digital_inputs [numDigitalInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I4
+  {0, 0, 0, 0, 0, 0, 0, 0} //I8
+};
+
+// midi/CC to send for analog inputs
+int arr_send_analog_inputs [numAnalogInMux][pinPerMux] {
+  {1, 2, 3, 4, 5, 6, 7, 8}, //I1
+  {9, 10, 11, 12, 13, 14, 15, 16}, //I2
+  {17, 18, 19, 20, 21, 22, 23, 24}, //I3
+  {25, 26, 27, 28, 29, 30, 31, 32}, //I5
+  {33, 34, 35, 36, 37, 38, 39, 40} //I6
+};
+
+// midi/CC to send for digital inputs
+int arr_send_digital_inputs [numDigitalInMux][pinPerMux] {
+  {41, 42, 43, 44, 45, 46, 47, 48}, //I4
+  {49, 50, 51, 52, 53, 54, 55, 56} //I8
+};
+
+// Masks to enable/disable single inputs/outputs
+// Used to ignored non-connected inputs/outputs
+// 1 = disabled
+bool arr_disable_analog_inputs [numAnalogInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 1, 1}, //I1
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I2
+  {0, 0, 0, 0, 1, 1, 1, 1}, //I3
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I5
+  {0, 0, 0, 0, 0, 0, 0, 0} //I6
+};
+
+bool arr_disable_digital_inputs [numDigitalInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 1, 1}, //I4
+  {0, 0, 0, 0, 0, 0, 0, 0} //I8
+};
+
+///
+/// Functions
+///
+
+
+// what happens when a clock signal is received
+void handleClock() {
+  if (runDrum) {
+    nextDrumStep();
+  }
+}
+// selects the pin on input multiplexer
+void selectMuxInPin(byte pin) {
+
+  bool valA = bitRead(pin, 0);
+  bool valB = bitRead(pin, 1);
+  bool valC = bitRead(pin, 2);
+
+  digitalWrite(A, valA);
+  digitalWrite(B, valB);
+  digitalWrite(C, valC);
+  delay(1);
+}
+
+// selects the pin on output multiplexer
+void selectMuxOutPin(byte pin){
+  bool valA = bitRead(pin, 0);
+  bool valB = bitRead(pin, 1);
+  bool valC = bitRead(pin, 2);
+
+  digitalWrite(Aout, valA);
+  digitalWrite(Bout, valB);
+  digitalWrite(Cout, valC);
+  delay(1);
+}
+
+
+void readDigitalPins() {
+  // loop through digital in multiplexers
+  for (int mux = 0; mux<numDigitalInMux; mux++){
+    
+    //loop through every pin for the digital muxes
+    for (byte pin=0; pin<=7; pin++){
+        selectMuxInPin(pin);
+        // only read if input is not disabled
+        if (!arr_disable_digital_inputs[mux][pin]){
+          rawDigital = digitalRead(arr_pin_digital_inputs[mux]);
+          arr_prev_read_digital_inputs[mux][pin] = arr_read_digital_inputs[mux][pin];
+          arr_read_digital_inputs[mux][pin] = rawDigital;
+        }
+        
+        if (arr_prev_read_digital_inputs[mux][pin] != arr_read_digital_inputs[mux][pin]) {
+          // Serial.print("mux ");
+          // Serial.print(mux);
+          // Serial.print(" pin ");
+          // Serial.print(pin);
+          // Serial.print(" reads: ");
+          Serial.println(arr_read_digital_inputs[mux][pin]);
+          usbMIDI.sendControlChange(arr_send_digital_inputs[mux][pin], arr_read_digital_inputs[mux][pin], 1);
+        }
+      }
+  }
+}
+
+
 void setup() {
-  Control_Surface.begin();
+  pinMode(I1, INPUT);
+  pinMode(I2, INPUT);
+  pinMode(I3, INPUT);
+  pinMode(I4, INPUT_PULLUP);
+  pinMode(I5, INPUT);
+  pinMode(I6, INPUT);
+  //pinMode(I7, OUTPUT);
+  pinMode(I8, INPUT_PULLUP);
+  pinMode(A, OUTPUT);
+  pinMode(B, OUTPUT);
+  pinMode(C, OUTPUT);
+  pinMode(Aout, OUTPUT);
+  pinMode(Bout, OUTPUT);
+  pinMode(Cout, OUTPUT);
+
+
+  usbMIDI.setHandleClock(handleClock);
 }
 
 void loop() {
-  Control_Surface.loop();
+  //reading drumpad after every function for lower latency
+  readDrumpad();
+  readAnalogPins();
 
+  readDrumpad();
+  readDigitalPins();
+
+  readDrumpad();
+  usbMIDI.read();
 }
