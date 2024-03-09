@@ -21,17 +21,19 @@ const int Cout = 32;  //Digital Out
 const int pinPerMux = 8; // 4051 Multiplexer has 8 pins
 const int numAnalogInMux = 5; // how many analog multiplexers
 const int numDigitalInMux = 2; // how many analog multiplexers
+const int analogSmoother = 2; // how much does an analog value have to differ to detect change. higher means less jumping but less accurate
 
 //sequencer
 //const int note = 42;
 // standard velocity for notes
 const uint8_t velocity = 127;
 
-//vars
 
 ///
 /// Variable definitions
 ///
+
+int analogReadDiff = 0;
 
 // ############
 // DRUMS
@@ -165,7 +167,7 @@ int arr_pin_analog_inputs [numAnalogInMux] {
 };
 
 // collection of digital inputs
-int arr_pin_digital_inputs [numAnalogInMux] {
+int arr_pin_digital_inputs [numDigitalInMux] {
   I4,
   I8
 };
@@ -231,9 +233,31 @@ bool arr_disable_digital_inputs [numDigitalInMux][pinPerMux] {
   {0, 0, 0, 0, 0, 0, 0, 0} //I8
 };
 
+
+// stores the type of input. 0=MIDI CC, 1=internal, value is only used on teensy and not sent as MIDI CC
+bool arr_analog_input_type [numAnalogInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 1, 1}, //I1
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I2
+  {0, 0, 0, 0, 1, 1, 1, 1}, //I3
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I5
+  {0, 0, 0, 0, 0, 0, 0, 0} //I6
+};
+
+bool arr_digital_input_type [numDigitalInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 1, 1}, //I4
+  {0, 0, 0, 0, 0, 0, 0, 0} //I8
+};
+
 ///
 /// Functions
 ///
+
+//Function Prototypes
+void nextDrumStep(void);
+int youFuckenKiddingMe(char);
+void startNote(int);
+void stopNote(int);
+
 
 
 // what happens when a clock signal is received
@@ -267,13 +291,31 @@ void selectMuxOutPin(byte pin){
   delay(1);
 }
 
+void readAnalogPins() {
+  // loop through analog in multiplexers
+  for (int mux = 0; mux<numAnalogInMux; mux++){
+    
+    //loop through every pin for the analog multiplexers
+    for (byte pin=0; pin<pinPerMux; pin++){
+        selectMuxInPin(pin);
+        // only read if input is not disabled
+        if (!arr_disable_analog_inputs[mux][pin]){
+          rawAnalog = analogRead(arr_pin_analog_inputs[mux]);
+          arr_prev_read_analog_inputs[mux][pin] = arr_read_analog_inputs[mux][pin];
+          arr_read_analog_inputs[mux][pin] = map(rawAnalog,0,1023,0,127);
+        }
+        
+        
+      }
+  }
+}
 
 void readDigitalPins() {
   // loop through digital in multiplexers
   for (int mux = 0; mux<numDigitalInMux; mux++){
     
     //loop through every pin for the digital muxes
-    for (byte pin=0; pin<=7; pin++){
+    for (byte pin=0; pin<pinPerMux; pin++){
         selectMuxInPin(pin);
         // only read if input is not disabled
         if (!arr_disable_digital_inputs[mux][pin]){
@@ -281,20 +323,320 @@ void readDigitalPins() {
           arr_prev_read_digital_inputs[mux][pin] = arr_read_digital_inputs[mux][pin];
           arr_read_digital_inputs[mux][pin] = rawDigital;
         }
-        
-        if (arr_prev_read_digital_inputs[mux][pin] != arr_read_digital_inputs[mux][pin]) {
-          // Serial.print("mux ");
-          // Serial.print(mux);
-          // Serial.print(" pin ");
-          // Serial.print(pin);
-          // Serial.print(" reads: ");
-          Serial.println(arr_read_digital_inputs[mux][pin]);
-          usbMIDI.sendControlChange(arr_send_digital_inputs[mux][pin], arr_read_digital_inputs[mux][pin], 1);
-        }
-      }
+    }
   }
 }
 
+
+void UpdateSendValues() {
+  
+  ///
+  ///Analog
+  ///
+  for (int mux = 0; mux<numAnalogInMux; mux++){
+
+
+    //loop through every pin for the analog multiplexers
+    for (byte pin=0; pin<pinPerMux; pin++){
+      //calculate difference of the read values. square and squareroot to always get positive difference
+      analogReadDiff = arr_prev_read_analog_inputs[mux][pin] - arr_read_analog_inputs[mux][pin];
+      analogReadDiff = sq(analogReadDiff);
+      analogReadDiff = sqrt(analogReadDiff);
+
+      if (analogReadDiff > analogSmoother) {
+        // Serial.print("mux ");
+        // Serial.print(mux);
+        // Serial.print(" pin ");
+        // Serial.print(pin);
+        Serial.print("Controller ");
+        Serial.print(arr_send_analog_inputs[mux][pin]);
+        Serial.print(": ");
+        Serial.println(arr_read_analog_inputs[mux][pin]);
+
+        // Type = MIDI CC
+        if (!arr_analog_input_type[mux][pin]) {
+          usbMIDI.sendControlChange(arr_send_analog_inputs[mux][pin], arr_read_analog_inputs[mux][pin], 1);
+        } else {
+          //Type = Internal Variable
+          //Mapping of Controller Number (from arr_send_analog_inputs) to internal variables
+          switch (arr_send_analog_inputs[mux][pin]){
+            case 1:
+
+
+            break;
+            case 2:
+
+            break;
+            case 3:
+
+            break;
+            case 4:
+
+            break;
+            case 5:
+
+            break;
+            case 6:
+
+            break;
+            case 7:
+
+            break;
+            case 8:
+
+            break;
+            case 9:
+
+            break;
+            case 10:
+
+            break;
+            case 11:
+
+            break;
+            case 12:
+
+            break;
+            case 13:
+
+            break;
+            case 14:
+
+            break;
+            case 15:
+
+            break;
+            case 16:
+
+            break;
+            case 17:
+
+            break;
+            case 18:
+
+            break;
+            case 19:
+
+            break;
+            case 20:
+
+            break;
+            case 21:
+
+            break;
+            case 22:
+
+            break;
+            case 23:
+
+            break;
+            case 24:
+
+            break;
+            case 25:
+
+            break;
+            case 26:
+
+            break;
+            case 27:
+
+            break;
+            case 28:
+
+            break;
+            case 29:
+
+            break;
+            case 30:
+
+            break;
+            case 31:
+
+            break;
+            case 32:
+
+            break;
+            case 33:
+
+            break;
+            case 34:
+
+            break;
+            case 35:
+
+            break;
+            case 36:
+
+            break;
+            case 37:
+
+            break;
+            case 38:
+
+            break;
+            case 39:
+
+            break;
+            case 40:
+
+            break;
+
+          }
+        }
+      }
+    }   
+  }
+
+  ///
+  ///Digital
+  ///
+  for (int mux = 0; mux<numDigitalInMux; mux++){
+    //loop through every pin for the analog multiplexers
+    for (byte pin=0; pin<pinPerMux; pin++){
+      if (arr_prev_read_digital_inputs[mux][pin] != arr_read_digital_inputs[mux][pin]) {
+        Serial.print("Digital ");
+        Serial.print(arr_send_digital_inputs[mux][pin]);
+        Serial.print(": ");
+        Serial.println(arr_read_digital_inputs[mux][pin]);
+
+
+        // Type = MIDI CC
+        if (!arr_digital_input_type[mux][pin]) {
+          //usbMIDI.sendControlChange(arr_send_digital_inputs[mux][pin], arr_read_digital_inputs[mux][pin], 1);
+        } else {
+        //Type = Internal Variable
+        //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
+        switch (arr_send_analog_inputs[mux][pin]){
+            case 1:
+              
+
+            break;
+            case 2:
+
+            break;
+            case 3:
+
+            break;
+            case 4:
+
+            break;
+            case 5:
+
+            break;
+            case 6:
+
+            break;
+            case 7:
+
+            break;
+            case 8:
+
+            break;
+            case 9:
+
+            break;
+            case 10:
+
+            break;
+            case 11:
+
+            break;
+            case 12:
+
+            break;
+            case 13:
+
+            break;
+            case 14:
+
+            break;
+            case 15:
+
+            break;
+            case 16:
+
+            break;
+            case 17:
+
+            break;
+            case 18:
+
+            break;
+            case 19:
+
+            break;
+            case 20:
+
+            break;
+            case 21:
+
+            break;
+            case 22:
+
+            break;
+            case 23:
+
+            break;
+            case 24:
+
+            break;
+            case 25:
+
+            break;
+            case 26:
+
+            break;
+            case 27:
+
+            break;
+            case 28:
+
+            break;
+            case 29:
+
+            break;
+            case 30:
+
+            break;
+            case 31:
+
+            break;
+            case 32:
+
+            break;
+            case 33:
+
+            break;
+            case 34:
+
+            break;
+            case 35:
+
+            break;
+            case 36:
+
+            break;
+            case 37:
+
+            break;
+            case 38:
+
+            break;
+            case 39:
+
+            break;
+            case 40:
+
+            break;
+
+          }
+      }
+    }
+  }
+
+
+}
 
 void setup() {
   pinMode(I1, INPUT);
@@ -326,4 +668,6 @@ void loop() {
 
   readDrumpad();
   usbMIDI.read();
+
+  UpdateSendValues();
 }

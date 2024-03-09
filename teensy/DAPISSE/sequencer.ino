@@ -47,11 +47,11 @@ void nextPulse() {
   //go to next pulse
   pulseStart = millis();
 
-  if (arr_seq_buttons[1][stepPointer]) {
+  // check if step should be skipped
+  if (arr_seq_buttons[1][stepPointer] == 1) {
     stepPointer++;
   }
   startNote(stepPointer); // start the note of this pulse
-
 
   pulsePointer++;
 
@@ -65,32 +65,6 @@ void nextPulse() {
 void stopNote(int noteToStop){
   usbMIDI.sendNoteOff(arr_seq_buttons[0][noteToStop], velocity, 1);
   noteStopped = true;
-  //digitalWrite(muxLEDIO, LOW);
+  digitalWrite(I7, LOW);
 }
 
-void readAnalogPins() {
-  // loop through analog in multiplexers
-  for (int mux = 0; mux<numAnalogInMux; mux++){
-    
-    //loop through every pin for the analog muxes
-    for (byte pin=0; pin<=7; pin++){
-        selectMuxInPin(pin);
-        // only read if input is not disabled
-        if (!arr_disable_analog_inputs[mux][pin]){
-          rawAnalog = analogRead(arr_pin_analog_inputs[mux]);
-          arr_prev_read_analog_inputs[mux][pin] = arr_read_analog_inputs[mux][pin];
-          arr_read_analog_inputs[mux][pin] = map(rawAnalog,0,1023,0,127);
-        }
-        
-        if (arr_prev_read_analog_inputs[mux][pin] != arr_read_analog_inputs[mux][pin]) {
-          // Serial.print("mux ");
-          // Serial.print(mux);
-          // Serial.print(" pin ");
-          // Serial.print(pin);
-          // Serial.print(" reads: ");
-          // Serial.println(arr_read_analog_inputs[mux][pin]);
-          usbMIDI.sendControlChange(arr_send_analog_inputs[mux][pin], arr_read_analog_inputs[mux][pin], 1);
-        }
-      }
-  }
-}

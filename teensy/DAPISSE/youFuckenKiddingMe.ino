@@ -3,7 +3,7 @@
 // RIP Chester
 
 int youFuckenKiddingMe(char input) {
-  int returnNumber;
+  int returnNumber = 0;
   switch (input) {
     case '0':
       returnNumber = 0;
