@@ -124,6 +124,11 @@ int lastNoteSent = 0; //previous note sent, to trigger note off on time
 int pulseCount [] {1, 1, 1, 1, 1, 1, 1, 1}; // how many times a step should be played
 int gateMode [maxSteps] {2, 2, 2, 2, 2, 2, 2, 2}; //0=no gate, 1=first gate, 2=every gate
 bool skipStep [maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; //1=skip a step, 0=don't skip
+int playMode = 0; // Sequencer play order. 0=forwards, 1=backwards, 3=ping-pong,4=brownian
+const int numPlayModes = 4; // how many play modes there are of the sequencer
+bool fuSel0 = 0; // Sequencer button Function Selectors. Act as 2bit input field to select
+bool fuSel1 = 0; // what the sequencer buttons do. 
+int seqButtonFunction = 0; //Int representation of the selected function. 0=Play, 1=Skip, 2=Slide, 3=?
 
 const int numSeqBanks = 4; // how many modes we can have for the sequencer buttons
 int selectedSeqBank = 0; // which sequencer bank is selected
@@ -507,128 +512,76 @@ void UpdateSendValues() {
         } else {
         //Type = Internal Variable
         //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
-        switch (arr_send_analog_inputs[mux][pin]){
-            case 1:
-              
+        switch (arr_send_digital_inputs[mux][pin]){
+            case 41:
+              //Sequencer Play/pause
+              run = arr_read_digital_inputs[0][0];
+            break;
+            case 42:
+              //Sequencer Reset
+              reset = arr_read_digital_inputs[0][1];
+            break;
+            case 43:
+              //Sequencer Play Mode
+              playMode ++;
+              if (playMode>=numPlayModes){
+              playMode = 0;
+              }
+            break;
+            case 44:
+              //Clear selected SeqButton function
+              //todo
+            break;
+            case 45:
+              //SeqButton Function Selector0 (fuSel0)
+              fuSel0 = arr_read_digital_inputs[0][4];
+              selectSeqNoteFunction();
+            break;
+            case 46:
+              //SeqButton Function Selector1 (fuSel1)
+              fuSel1 = arr_read_digital_inputs[0][5];
+              selectSeqNoteFunction();
+            break;
+            case 47:
 
             break;
-            case 2:
+            case 48:
 
             break;
-            case 3:
+            case 49:
 
             break;
-            case 4:
+            case 50:
 
             break;
-            case 5:
+            case 51:
 
             break;
-            case 6:
+            case 52:
 
             break;
-            case 7:
+            case 53:
 
             break;
-            case 8:
+            case 54:
 
             break;
-            case 9:
+            case 55:
 
             break;
-            case 10:
+            case 56:
 
             break;
-            case 11:
+            case 57:
 
             break;
-            case 12:
+            case 58:
 
             break;
-            case 13:
+            case 59:
 
             break;
-            case 14:
-
-            break;
-            case 15:
-
-            break;
-            case 16:
-
-            break;
-            case 17:
-
-            break;
-            case 18:
-
-            break;
-            case 19:
-
-            break;
-            case 20:
-
-            break;
-            case 21:
-
-            break;
-            case 22:
-
-            break;
-            case 23:
-
-            break;
-            case 24:
-
-            break;
-            case 25:
-
-            break;
-            case 26:
-
-            break;
-            case 27:
-
-            break;
-            case 28:
-
-            break;
-            case 29:
-
-            break;
-            case 30:
-
-            break;
-            case 31:
-
-            break;
-            case 32:
-
-            break;
-            case 33:
-
-            break;
-            case 34:
-
-            break;
-            case 35:
-
-            break;
-            case 36:
-
-            break;
-            case 37:
-
-            break;
-            case 38:
-
-            break;
-            case 39:
-
-            break;
-            case 40:
-
-            break;
+//5 -> typo, but a sweet one :) stay a dreamer!
 
           }
       }

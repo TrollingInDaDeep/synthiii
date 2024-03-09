@@ -68,3 +68,8 @@ void stopNote(int noteToStop){
   digitalWrite(I7, LOW);
 }
 
+// todo convert fusel0 and fusel1 to int number and store in seqButtonFunction
+void selectSeqNoteFunction(){
+seqButtonFunction
+}
+
