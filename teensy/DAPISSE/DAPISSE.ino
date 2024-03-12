@@ -734,5 +734,5 @@ void loop() {
     }
     
   }
-  isSlowReadCycle = 0;
+  isSlowReadCycle = 0; //
 }
