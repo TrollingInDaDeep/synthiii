@@ -1,5 +1,18 @@
 #include <Keypad.h>
 
+
+///
+/// How to
+///
+/// add multiplexer: add const int under pins, add input/output in setup, add to pin array, add line to all digi OR analog arrays in array section, 
+/// set if some inputs/outputs are disabled/not scanned in arr_disable
+/// set if MidiCC or internal control
+/// say what happens in UpdateSendValues()
+
+// change settings
+
+
+
 // PINS
 const int I1 = 38;    //Analog In -> synth rechts
 const int I2 = 41;    //Analog In -> synth links
@@ -27,13 +40,23 @@ const int analogSmoother = 2; // how much does an analog value have to differ to
 //const int note = 42;
 // standard velocity for notes
 const uint8_t velocity = 127;
-
+int gateTime = 50; //time in ms how long the note should be on
+int gateMin = 20; //minimum gate time in ms for pot selection
+int gateMax = 300; //maximum gate time in ms for pot selection
+int slideAmount = 0; //how much note slide if enabled
+int minSeqNote = 10; //minimal Midi Note of sequencer fader
+int maxSeqNote = 90; //minimal Midi Note of sequencer fader
+int minPulse = 1; //how many pulses at least for sequencer
+int maxPulse = 8; //how many pulses at max for sequencer
 
 ///
 /// Variable definitions
 ///
 
 int analogReadDiff = 0;
+int caseNumber = 0;
+int noteNumberDigiRead = 0;
+int noteNumberAnalog = 0;
 
 // ############
 // DRUMS
@@ -99,6 +122,8 @@ bool rawDigital = 0;
 
 // alternative timer
 long bpm = 90.0;
+long bpmMin=20;
+long bpmMax=300;
 long tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
 
 float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
@@ -114,9 +139,7 @@ bool run = true;
 bool reset = false;
 int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
 const int maxSteps = 8; // Maximum number of Steps of your sequencer
-//int stepValues[maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; // initialize values to middle
-//bool digitalInputs1[8] {0, 0, 0, 0, 0, 0, 0, 0}; //first multiplexer with digital inputs
-//bool prevDigitalInputs1[8] {0, 0, 0, 0, 0, 0, 0, 0}; //previous state of the inputs
+
 
 int pulsePointer = 0; //points to the pulse within the step we're currently in
 int lastStepPointer = 0; //previous step, to trigger note off
@@ -128,7 +151,7 @@ int playMode = 0; // Sequencer play order. 0=forwards, 1=backwards, 3=ping-pong,
 const int numPlayModes = 4; // how many play modes there are of the sequencer
 bool fuSel0 = 0; // Sequencer button Function Selectors. Act as 2bit input field to select
 bool fuSel1 = 0; // what the sequencer buttons do. 
-int seqButtonFunction = 0; //Int representation of the selected function. 0=Play, 1=Skip, 2=Slide, 3=?
+int seqButtonFunction = 0; //Int representation of the selected function. 0=Play, 1=Skip, 2=Slide, 3=hold
 
 const int numSeqBanks = 4; // how many modes we can have for the sequencer buttons
 int selectedSeqBank = 0; // which sequencer bank is selected
@@ -141,16 +164,15 @@ int selectedSeqBank = 0; // which sequencer bank is selected
 // is int, as first row needs int value
 // rest are actually bools
 int arr_seq_buttons [numSeqBanks][maxSteps] {
-  {0, 0, 0, 0, 0, 0, 1, 1},   // Step Value
+  {0, 0, 0, 0, 0, 0, 1, 1},   // Step Value (Note)
   {0, 0, 0, 0, 0, 0, 0, 0},   // Skip Step
   {0, 0, 0, 0, 0, 0, 1, 1},   // Slide Step
-  {0, 0, 0, 0, 0, 0, 0, 0}    // ??
+  {0, 0, 0, 0, 0, 0, 0, 0}    // Hold
 };
 
 bool noteStopped = true; //if note has been stopped for this step already
 
 int stepPointer = 0; //pointer, points to current step that we're at
-int gateTime = 50; //time in ms how long the note should be on
 
 ///
 /// End variable definitions
@@ -222,6 +244,20 @@ int arr_send_digital_inputs [numDigitalInMux][pinPerMux] {
   {49, 50, 51, 52, 53, 54, 55, 56} //I8
 };
 
+// stores if value was changed during this iteration
+bool arr_changed_analog_inputs [numAnalogInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I1
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I2
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I3
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I5
+  {0, 0, 0, 0, 0, 0, 0, 0} //I6
+};
+
+bool arr_changed_digital_inputs [numDigitalInMux][pinPerMux] {
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I4
+  {0, 0, 0, 0, 0, 0, 0, 0} //I8
+};
+
 // Masks to enable/disable single inputs/outputs
 // Used to ignored non-connected inputs/outputs
 // 1 = disabled
@@ -241,16 +277,16 @@ bool arr_disable_digital_inputs [numDigitalInMux][pinPerMux] {
 
 // stores the type of input. 0=MIDI CC, 1=internal, value is only used on teensy and not sent as MIDI CC
 bool arr_analog_input_type [numAnalogInMux][pinPerMux] {
-  {0, 0, 0, 0, 0, 0, 1, 1}, //I1
+  {0, 0, 0, 0, 0, 0, 0, 0}, //I1
   {0, 0, 0, 0, 0, 0, 0, 0}, //I2
-  {0, 0, 0, 0, 1, 1, 1, 1}, //I3
-  {0, 0, 0, 0, 0, 0, 0, 0}, //I5
-  {0, 0, 0, 0, 0, 0, 0, 0} //I6
+  {1, 1, 1, 1, 1, 1, 1, 1}, //I3
+  {1, 1, 1, 1, 1, 1, 1, 1}, //I5
+  {1, 1, 1, 1, 1, 1, 1, 1} //I6
 };
 
 bool arr_digital_input_type [numDigitalInMux][pinPerMux] {
-  {0, 0, 0, 0, 0, 0, 1, 1}, //I4
-  {0, 0, 0, 0, 0, 0, 0, 0} //I8
+  {1, 1, 1, 1, 1, 1, 1, 1}, //I4
+  {1, 1, 1, 1, 1, 1, 1, 1} //I8
 };
 
 ///
@@ -262,7 +298,9 @@ void nextDrumStep(void);
 int youFuckenKiddingMe(char);
 void startNote(int);
 void stopNote(int);
-
+void selectSeqNoteFunction(void);
+void noteButtonPressed(int note);
+void noteButtonReleased(int note);
 
 
 // what happens when a clock signal is received
@@ -302,12 +340,29 @@ void readAnalogPins() {
     
     //loop through every pin for the analog multiplexers
     for (byte pin=0; pin<pinPerMux; pin++){
+        arr_changed_analog_inputs[mux][pin] = 0;
         selectMuxInPin(pin);
         // only read if input is not disabled
         if (!arr_disable_analog_inputs[mux][pin]){
           rawAnalog = analogRead(arr_pin_analog_inputs[mux]);
-          arr_prev_read_analog_inputs[mux][pin] = arr_read_analog_inputs[mux][pin];
-          arr_read_analog_inputs[mux][pin] = map(rawAnalog,0,1023,0,127);
+          rawAnalog = map(rawAnalog,0,1023,0,127);
+          //calculate difference of the read values. square and squareroot to always get positive difference
+          // Serial.print("/");
+          // Serial.print(analogReadDiff);
+          analogReadDiff = arr_prev_read_analog_inputs[mux][pin] - rawAnalog;
+          // Serial.print("/");
+          // Serial.print(analogReadDiff);
+          analogReadDiff = sq(analogReadDiff);
+          // Serial.print("/");
+          // Serial.print(analogReadDiff);
+          analogReadDiff = sqrt(analogReadDiff);
+          // Serial.print("/");
+          // Serial.println(analogReadDiff);
+          if (analogReadDiff > analogSmoother) {
+            arr_changed_analog_inputs[mux][pin] = 1;
+            arr_prev_read_analog_inputs[mux][pin] = arr_read_analog_inputs[mux][pin];
+            arr_read_analog_inputs[mux][pin] = rawAnalog;
+          }
         }
         
         
@@ -321,12 +376,16 @@ void readDigitalPins() {
     
     //loop through every pin for the digital muxes
     for (byte pin=0; pin<pinPerMux; pin++){
+        arr_changed_digital_inputs[mux][pin] = 0;
         selectMuxInPin(pin);
         // only read if input is not disabled
         if (!arr_disable_digital_inputs[mux][pin]){
-          rawDigital = digitalRead(arr_pin_digital_inputs[mux]);
-          arr_prev_read_digital_inputs[mux][pin] = arr_read_digital_inputs[mux][pin];
-          arr_read_digital_inputs[mux][pin] = rawDigital;
+          rawDigital = !digitalRead(arr_pin_digital_inputs[mux]); //! because inverted logic
+          if (arr_prev_read_analog_inputs[mux][pin] != rawDigital){
+            arr_changed_digital_inputs[mux][pin] = 1;
+            arr_prev_read_digital_inputs[mux][pin] = arr_read_digital_inputs[mux][pin];
+            arr_read_digital_inputs[mux][pin] = rawDigital;
+          }
         }
     }
   }
@@ -343,20 +402,18 @@ void UpdateSendValues() {
 
     //loop through every pin for the analog multiplexers
     for (byte pin=0; pin<pinPerMux; pin++){
-      //calculate difference of the read values. square and squareroot to always get positive difference
-      analogReadDiff = arr_prev_read_analog_inputs[mux][pin] - arr_read_analog_inputs[mux][pin];
-      analogReadDiff = sq(analogReadDiff);
-      analogReadDiff = sqrt(analogReadDiff);
-
-      if (analogReadDiff > analogSmoother) {
-        // Serial.print("mux ");
+      
+      // only act if value changed
+      //if (arr_prev_read_analog_inputs[mux][pin] != arr_read_analog_inputs[mux][pin]) {
+      if (arr_changed_analog_inputs[mux][pin]) {
+        //Serial.println("mux ");
         // Serial.print(mux);
         // Serial.print(" pin ");
         // Serial.print(pin);
-        Serial.print("Controller ");
-        Serial.print(arr_send_analog_inputs[mux][pin]);
-        Serial.print(": ");
-        Serial.println(arr_read_analog_inputs[mux][pin]);
+        // Serial.print("Controller ");
+        // Serial.print(arr_send_analog_inputs[mux][pin]);
+        // Serial.print(": ");
+        // Serial.println(arr_read_analog_inputs[mux][pin]);
 
         // Type = MIDI CC
         if (!arr_analog_input_type[mux][pin]) {
@@ -365,128 +422,111 @@ void UpdateSendValues() {
           //Type = Internal Variable
           //Mapping of Controller Number (from arr_send_analog_inputs) to internal variables
           switch (arr_send_analog_inputs[mux][pin]){
-            case 1:
+            // case 1:
 
+            // break;
+            // case 2:
 
-            break;
-            case 2:
+            // break;
+            // case 3:
 
-            break;
-            case 3:
+            // break;
+            // case 4:
 
-            break;
-            case 4:
+            // break;
+            // case 5:
 
-            break;
-            case 5:
+            // break;
+            // case 6:
 
-            break;
-            case 6:
+            // break;
+            // case 7:
 
-            break;
-            case 7:
+            // break;
+            // case 8:
 
-            break;
-            case 8:
+            // break;
+            // case 9:
 
-            break;
-            case 9:
+            // break;
+            // case 10:
 
-            break;
-            case 10:
+            // break;
+            // case 11:
 
-            break;
-            case 11:
+            // break;
+            // case 12:
 
-            break;
-            case 12:
+            // break;
+            // case 13:
 
-            break;
-            case 13:
+            // break;
+            // case 14:
 
-            break;
-            case 14:
+            // break;
+            // case 15:
 
-            break;
-            case 15:
+            // break;
+            // case 16:
 
-            break;
-            case 16:
-
-            break;
+            // break;
             case 17:
-
+              //Clock / BPM
+              bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
             break;
             case 18:
-
+              // number of steps the sequencer should play
+              numSteps = map(arr_read_analog_inputs[2][1],0,127,1,8);
             break;
             case 19:
-
+              //Gate length
+              gateTime = map(arr_read_analog_inputs[2][2],0,127,gateMin,gateMax);
             break;
             case 20:
-
+              //Slide Amount
+              slideAmount = arr_read_analog_inputs[2][3];
             break;
-            case 21:
+            // case 21:
+            // break;
+            // case 22:
 
-            break;
-            case 22:
+            // break;
+            // case 23:
 
-            break;
-            case 23:
+            // break;
+            // case 24:
 
-            break;
-            case 24:
+            // break;
 
-            break;
+            // Seq Note Faders
             case 25:
-
-            break;
             case 26:
-
-            break;
             case 27:
-
-            break;
             case 28:
-
-            break;
             case 29:
-
-            break;
             case 30:
-
-            break;
             case 31:
-
-            break;
             case 32:
-
+              //-25 so that 25 is 0, 26 is 1 etc...
+              caseNumber = arr_send_analog_inputs[mux][pin];
+              noteNumberAnalog = caseNumber-25;
+              arr_seq_buttons[0][noteNumberAnalog] = map(arr_read_analog_inputs[3][noteNumberAnalog],0,127,minSeqNote,maxSeqNote);
             break;
+
+            // seq Pulse count, how many pulses per step
             case 33:
-
-            break;
             case 34:
-
-            break;
             case 35:
-
-            break;
             case 36:
-
-            break;
             case 37:
-
-            break;
             case 38:
-
-            break;
             case 39:
-
-            break;
             case 40:
-
+              //-33 so that 33 is 0, 34 is 1 etc...
+              caseNumber = arr_send_analog_inputs[mux][pin];
+              noteNumberAnalog = caseNumber-33;
+              pulseCount[noteNumberAnalog] = map(arr_read_analog_inputs[4][noteNumberAnalog],0,127,minPulse,maxPulse);
             break;
-
           }
         }
       }
@@ -499,91 +539,96 @@ void UpdateSendValues() {
   for (int mux = 0; mux<numDigitalInMux; mux++){
     //loop through every pin for the analog multiplexers
     for (byte pin=0; pin<pinPerMux; pin++){
-      if (arr_prev_read_digital_inputs[mux][pin] != arr_read_digital_inputs[mux][pin]) {
-        Serial.print("Digital ");
-        Serial.print(arr_send_digital_inputs[mux][pin]);
-        Serial.print(": ");
-        Serial.println(arr_read_digital_inputs[mux][pin]);
+      //if (arr_prev_read_digital_inputs[mux][pin] != arr_read_digital_inputs[mux][pin]) {
+      if (arr_changed_digital_inputs[mux][pin]) {
+        // Serial.print("Digital ");
+        // Serial.print(arr_send_digital_inputs[mux][pin]);
+        // Serial.print(": ");
+        // Serial.println(arr_read_digital_inputs[mux][pin]);
 
 
         // Type = MIDI CC
         if (!arr_digital_input_type[mux][pin]) {
           //usbMIDI.sendControlChange(arr_send_digital_inputs[mux][pin], arr_read_digital_inputs[mux][pin], 1);
         } else {
-        //Type = Internal Variable
-        //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
-        switch (arr_send_digital_inputs[mux][pin]){
-            case 41:
-              //Sequencer Play/pause
-              run = arr_read_digital_inputs[0][0];
-            break;
-            case 42:
-              //Sequencer Reset
-              reset = arr_read_digital_inputs[0][1];
-            break;
-            case 43:
-              //Sequencer Play Mode
-              playMode ++;
-              if (playMode>=numPlayModes){
-              playMode = 0;
-              }
-            break;
-            case 44:
-              //Clear selected SeqButton function
-              //todo
-            break;
-            case 45:
-              //SeqButton Function Selector0 (fuSel0)
-              fuSel0 = arr_read_digital_inputs[0][4];
-              selectSeqNoteFunction();
-            break;
-            case 46:
-              //SeqButton Function Selector1 (fuSel1)
-              fuSel1 = arr_read_digital_inputs[0][5];
-              selectSeqNoteFunction();
-            break;
-            case 47:
+          //Type = Internal Variable
+          //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
+          switch (arr_send_digital_inputs[mux][pin]){
+              case 41:
+                //Sequencer Play/pause
+                run = arr_read_digital_inputs[0][0];
+              break;
+              case 42:
+                //Sequencer Reset
+                reset = arr_read_digital_inputs[0][1];
+              break;
+              case 43:
+                //Sequencer Play Mode
+                playMode ++;
+                if (playMode>=numPlayModes){
+                playMode = 0;
+                }
+              break;
+              case 44:
+                //Clear selected SeqButton function
+                //except for 0=playMode
+                if (seqButtonFunction!=0){
+                  for (int i = 0; i<pinPerMux; i++)
+                  {
+                    arr_seq_buttons[seqButtonFunction][i]=0;
+                  }
+                }
+                
+              break;
+              case 45:
+                //SeqButton Function Selector0 (fuSel0)
+                fuSel0 = arr_read_digital_inputs[0][4];
+                selectSeqNoteFunction();
+              break;
+              case 46:
+                //SeqButton Function Selector1 (fuSel1)
+                fuSel1 = arr_read_digital_inputs[0][5];
+                selectSeqNoteFunction();
+                
+              break;
+              case 47:
+                //disabled
+              break;
+              case 48:
+                //disabled
+              break;
 
-            break;
-            case 48:
-
-            break;
-            case 49:
-
-            break;
-            case 50:
-
-            break;
-            case 51:
-
-            break;
-            case 52:
-
-            break;
-            case 53:
-
-            break;
-            case 54:
-
-            break;
-            case 55:
-
-            break;
-            case 56:
-
-            break;
-            case 57:
-
-            break;
-            case 58:
-
-            break;
-            case 59:
-
-            break;
-//5 -> typo, but a sweet one :) stay a dreamer!
+              //notebuttons
+              case 49:
+              case 50:
+              case 51:
+              case 52:
+              case 53:
+              case 54:
+              case 55:
+              case 56:
+                switch (seqButtonFunction) {
+                  case 0:
+                    //-49, so 49 will be 0, 50 will be 1 etc...
+                    caseNumber = arr_send_digital_inputs[mux][pin];
+                    noteNumberDigiRead = caseNumber-49;
+                    if (arr_read_digital_inputs[1][noteNumberDigiRead]){
+                      noteButtonPressed(noteNumberDigiRead);
+                    } else {
+                      noteButtonReleased(noteNumberDigiRead);
+                    }
+                  break;
+                  case 1: //skip step
+                  case 2: //slide step
+                  case 3: //hold step
+                    arr_seq_buttons[seqButtonFunction][noteNumberDigiRead]=arr_read_digital_inputs[1][noteNumberDigiRead];
+                    break;
+                  }
+              break;
+  //5 -> typo, but a sweet one :) stay a dreamer!
 
           }
+        }
       }
     }
   }
