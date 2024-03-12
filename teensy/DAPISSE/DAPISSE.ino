@@ -35,6 +35,7 @@ const int pinPerMux = 8; // 4051 Multiplexer has 8 pins
 const int numAnalogInMux = 5; // how many analog multiplexers
 const int numDigitalInMux = 2; // how many analog multiplexers
 const int analogSmoother = 2; // how much does an analog value have to differ to detect change. higher means less jumping but less accurate
+const int digitalSmoother = 5; // how many iterations a digital input should not be updated
 
 //sequencer
 //const int note = 42;
@@ -48,6 +49,8 @@ int minSeqNote = 10; //minimal Midi Note of sequencer fader
 int maxSeqNote = 90; //minimal Midi Note of sequencer fader
 int minPulse = 1; //how many pulses at least for sequencer
 int maxPulse = 8; //how many pulses at max for sequencer
+int slowReadCycleCount = 0;
+bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
 
 ///
 /// Variable definitions
@@ -57,7 +60,7 @@ int analogReadDiff = 0;
 int caseNumber = 0;
 int noteNumberDigiRead = 0;
 int noteNumberAnalog = 0;
-
+unsigned long currentMillis = 0;
 // ############
 // DRUMS
 // ############
@@ -122,8 +125,8 @@ bool rawDigital = 0;
 
 // alternative timer
 long bpm = 90.0;
-long bpmMin=20;
-long bpmMax=300;
+long bpmMin=20.0;
+long bpmMax=300.0;
 long tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
 
 float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
@@ -139,7 +142,7 @@ bool run = true;
 bool reset = false;
 int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
 const int maxSteps = 8; // Maximum number of Steps of your sequencer
-
+int seqDirection = 1; // Sequencer step direction. 1=up, 0=down
 
 int pulsePointer = 0; //points to the pulse within the step we're currently in
 int lastStepPointer = 0; //previous step, to trigger note off
@@ -147,7 +150,7 @@ int lastNoteSent = 0; //previous note sent, to trigger note off on time
 int pulseCount [] {1, 1, 1, 1, 1, 1, 1, 1}; // how many times a step should be played
 int gateMode [maxSteps] {2, 2, 2, 2, 2, 2, 2, 2}; //0=no gate, 1=first gate, 2=every gate
 bool skipStep [maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; //1=skip a step, 0=don't skip
-int playMode = 0; // Sequencer play order. 0=forwards, 1=backwards, 3=ping-pong,4=brownian
+int playMode = 0; // Sequencer play order. 0=forwards, 1=backwards, 2=ping-pong,3=drunk
 const int numPlayModes = 4; // how many play modes there are of the sequencer
 bool fuSel0 = 0; // Sequencer button Function Selectors. Act as 2bit input field to select
 bool fuSel1 = 0; // what the sequencer buttons do. 
@@ -274,6 +277,14 @@ bool arr_disable_digital_inputs [numDigitalInMux][pinPerMux] {
   {0, 0, 0, 0, 0, 0, 0, 0} //I8
 };
 
+// if a pin is "slowread", should not be read every cycle.
+// how many cycles to skip is defined in digitalSmoother
+bool arr_slow_digital_inputs [numDigitalInMux][pinPerMux] {
+  {1, 1, 1, 1, 1, 1, 1, 1}, //I4
+  {0, 0, 0, 0, 0, 0, 0, 0} //I8
+};
+
+
 
 // stores the type of input. 0=MIDI CC, 1=internal, value is only used on teensy and not sent as MIDI CC
 bool arr_analog_input_type [numAnalogInMux][pinPerMux] {
@@ -382,6 +393,13 @@ void readDigitalPins() {
         if (!arr_disable_digital_inputs[mux][pin]){
           rawDigital = !digitalRead(arr_pin_digital_inputs[mux]); //! because inverted logic
           if (arr_prev_read_analog_inputs[mux][pin] != rawDigital){
+            
+            // don't read if its a slow button, except in slowReadCycles
+            if (arr_slow_digital_inputs[mux][pin]) {
+              if (!isSlowReadCycle) {
+                break;
+              }
+            }
             arr_changed_digital_inputs[mux][pin] = 1;
             arr_prev_read_digital_inputs[mux][pin] = arr_read_digital_inputs[mux][pin];
             arr_read_digital_inputs[mux][pin] = rawDigital;
@@ -556,7 +574,12 @@ void UpdateSendValues() {
           switch (arr_send_digital_inputs[mux][pin]){
               case 41:
                 //Sequencer Play/pause
-                run = arr_read_digital_inputs[0][0];
+                if (arr_read_digital_inputs[0][0]) {
+                  Serial.println("play/pause");
+                  run = !run;
+                  //todo debounce
+                }
+                
               break;
               case 42:
                 //Sequencer Reset
@@ -564,10 +587,15 @@ void UpdateSendValues() {
               break;
               case 43:
                 //Sequencer Play Mode
-                playMode ++;
-                if (playMode>=numPlayModes){
-                playMode = 0;
+                if (arr_read_digital_inputs[0][2]){
+                  playMode++;
+                  if (playMode>=numPlayModes){
+                    playMode = 0;
                 }
+                  Serial.print("playmode: ");
+                  Serial.println(playMode);
+                }
+                
               break;
               case 44:
                 //Clear selected SeqButton function
@@ -657,6 +685,14 @@ void setup() {
 }
 
 void loop() {
+  slowReadCycleCount++;
+  if (slowReadCycleCount > digitalSmoother) {
+    isSlowReadCycle = 1;
+  }
+  Serial.println(isSlowReadCycle);
+  // save at what millisecond the loop starts, for timing
+  currentMillis = millis();
+
   //reading drumpad after every function for lower latency
   readDrumpad();
   readAnalogPins();
@@ -668,4 +704,35 @@ void loop() {
   usbMIDI.read();
 
   UpdateSendValues();
+  
+  updateTempo();
+
+  //sequencer step trigger
+  if (run) {
+    if (reset){
+      resetSequencer();
+      currentMillis = millis();
+    }
+    // send clock if necessary
+    if (currentMillis - prevClockStart >= clockInterval) {
+      //save timestamp when pulse started
+      prevClockStart = currentMillis;
+      usbMIDI.sendClock();
+    }
+
+    // do next pulse if necessary
+    if (currentMillis - prevPulseStart >= tempo) {
+      //save timestamp when pulse started
+      prevPulseStart = currentMillis;
+      nextPulse(); //after last pulse, next step will be triggered
+    }
+    //stop note if necessary
+    if (!noteStopped) {
+      if (currentMillis - noteStart >= gateTime) {
+        stopLastNote();
+      }
+    }
+    
+  }
+  isSlowReadCycle = 0;
 }

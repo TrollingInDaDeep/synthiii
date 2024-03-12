@@ -16,12 +16,46 @@ void updateTempo(){
 
 
 void nextStep() {
+  //Sequencer play order
+  switch (playMode) {
+    //0=forwards
+    case 0:
+      stepPointer++;
+      if (stepPointer >= numSteps || stepPointer < 0) {
+        stepPointer = 0;
+      }
+    break;
 
-  stepPointer++;
+    //1=backwards
+    case 1:
+      stepPointer--;
+      if (stepPointer < 0) {
+        stepPointer = numSteps;
+      }
+    break;
 
-  //go to next step if all pulses are done
-  if (stepPointer >= numSteps) {
-    stepPointer = 0;
+    //2=ping-pong
+    case 2:
+      if (stepPointer < 0) {
+        stepPointer = 0;
+        seqDirection = 1; //go upwards
+      }
+      if (stepPointer >= numSteps){
+        stepPointer = numSteps;
+        seqDirection = 0; // go downwards
+      }
+
+      if (seqDirection) {
+        stepPointer++;
+      } else {
+        stepPointer--;
+      }
+    break;
+
+    //3=drunk
+    case 3:
+      stepPointer = random(0,7);
+    break;
   }
   selectMuxOutPin(byte(stepPointer));
 }
@@ -47,6 +81,11 @@ void nextPulse() {
   //go to next pulse
   pulseStart = millis();
 
+  //go first pulse, first step if last pulse is reached or reset is triggered (pulsePointer = -1)
+  if (pulsePointer >= pulseCount[stepPointer] || pulsePointer < 0) {
+    pulsePointer = 0;
+    nextStep();
+  }
   // check if step should be skipped
   if (arr_seq_buttons[1][stepPointer] == 1) {
     stepPointer++;
@@ -55,11 +94,7 @@ void nextPulse() {
 
   pulsePointer++;
 
-  //go to next step if last pulse is reached
-  if (pulsePointer >= pulseCount[stepPointer]) {
-    pulsePointer = 0;
-    nextStep();
-  }
+
 }
 
 void stopNote(int noteToStop){
@@ -89,5 +124,13 @@ void selectSeqNoteFunction(){
   }
 
   
+}
+
+// reset immediately and trigger the first pulse of the first step
+void resetSequencer() {
+  stepPointer = -1;
+  pulsePointer = -1;
+  nextPulse();
+  Serial.println("reset");
 }
 
