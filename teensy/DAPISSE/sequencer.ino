@@ -1,11 +1,13 @@
 // all functions for the sequencer
 // or most
 void noteButtonPressed(int note) {
+  Serial.println("startnote");
   startNote(note);
 }
 
 void noteButtonReleased(int note){
   stopNote(note);
+  Serial.println("stopnote");
 }
 
 // functions
@@ -24,31 +26,33 @@ void nextStep() {
       if (stepPointer >= numSteps || stepPointer < 0) {
         stepPointer = 0;
       }
+      seqDirection = 1; //upwards
     break;
 
     //1=backwards
     case 1:
       stepPointer--;
       if (stepPointer < 0) {
-        stepPointer = numSteps;
+        stepPointer = numSteps-1;
       }
+      seqDirection = 0; //downwards
     break;
 
     //2=ping-pong
     case 2:
+      if (seqDirection) {
+        stepPointer++;
+      } else {
+        stepPointer--;
+      }
+
       if (stepPointer < 0) {
         stepPointer = 0;
         seqDirection = 1; //go upwards
       }
       if (stepPointer >= numSteps){
-        stepPointer = numSteps;
+        stepPointer = numSteps-1;
         seqDirection = 0; // go downwards
-      }
-
-      if (seqDirection) {
-        stepPointer++;
-      } else {
-        stepPointer--;
       }
     break;
 
@@ -130,7 +134,9 @@ void selectSeqNoteFunction(){
 void resetSequencer() {
   stepPointer = -1;
   pulsePointer = -1;
+  prevClockStart = millis();
+  prevPulseStart = millis();
   nextPulse();
-  Serial.println("reset");
+  reset=0;
 }
 
