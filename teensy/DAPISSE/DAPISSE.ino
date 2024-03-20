@@ -42,8 +42,8 @@ const int digitalSmoother = 0; // how many iterations a digital input should not
 // standard velocity for notes
 const uint8_t velocity = 127;
 int gateTime = 50; //time in ms how long the note should be on
-int gateMin = 20; //minimum gate time in ms for pot selection
-int gateMax = 300; //maximum gate time in ms for pot selection
+int gateMin = 5; //minimum gate time in ms for pot selection
+int gateMax = 1000; //maximum gate time in ms for pot selection
 int slideAmount = 0; //how much note slide if enabled
 int minSeqNote = 20; //minimal Midi Note of sequencer fader
 int maxSeqNote = 80; //minimal Midi Note of sequencer fader
@@ -51,7 +51,7 @@ int minPulse = 1; //how many pulses at least for sequencer
 int maxPulse = 8; //how many pulses at max for sequencer
 int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
-
+bool syncSequencerToClock = 0; // if next sequencer note should be triggered when a clock signal comes in
 ///
 /// Variable definitions
 ///
@@ -61,11 +61,24 @@ int caseNumber = 0;
 int noteNumberDigiRead = 0;
 int noteNumberAnalog = 0;
 unsigned long currentMillis = 0;
+//for benchmark purposes
+int startLoopMillis = 0;
+int drumPadMillis = 0;
+int analogReadMillis = 0;
+int digitalReadMillis = 0;
+int updateValueMillis = 0;
+int seqNotesMillis = 0;
+int endLoopMillis = 0;
+
+
+
 // ############
 // DRUMS
 // ############
 int midiC = 60; // Standard midi C
 int transpose = 0;
+
+
 
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int drumInstruments = 4;
@@ -126,7 +139,7 @@ bool rawDigital = 0;
 // alternative timer
 long bpm = 90.0;
 long bpmMin=20.0;
-long bpmMax=600.0;
+long bpmMax=800.0;
 long tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
 
 float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
@@ -138,7 +151,7 @@ float noteStart = 0; //timestamp when the note started
 
 
 //int clockspeed = 120;
-bool run = true;
+bool run = false;
 bool reset = false;
 int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
 const int maxSteps = 8; // Maximum number of Steps of your sequencer
@@ -167,9 +180,9 @@ int selectedSeqBank = 0; // which sequencer bank is selected
 // is int, as first row needs int value
 // rest are actually bools
 int arr_seq_buttons [numSeqBanks][maxSteps] {
-  {0, 0, 0, 0, 0, 0, 1, 1},   // Step Value (Note)
+  {0, 0, 0, 0, 0, 0, 0, 0},   // Step Value (Note)
   {0, 0, 0, 0, 0, 0, 0, 0},   // Skip Step
-  {0, 0, 0, 0, 0, 0, 1, 1},   // Slide Step
+  {0, 0, 0, 0, 0, 0, 0, 0},   // Slide Step
   {0, 0, 0, 0, 0, 0, 0, 0}    // Hold
 };
 
@@ -286,7 +299,7 @@ bool arr_slow_digital_inputs [numDigitalInMux][pinPerMux] {
 
 
 
-// stores the type of input. 0=MIDI CC, 1=internal, value is only used on teensy and not sent as MIDI CC
+// stores the type of input. 0=MIDI CC, 1=internal, value is only used on teensy/arduino and not sent as MIDI CC
 bool arr_analog_input_type [numAnalogInMux][pinPerMux] {
   {0, 0, 0, 0, 0, 0, 0, 0}, //I1
   {0, 0, 0, 0, 0, 0, 0, 0}, //I2
@@ -319,6 +332,9 @@ void handleClock() {
   if (runDrum) {
     nextDrumStep();
   }
+  if (syncSequencerToClock) {
+    nextPulse();
+  }
 }
 // selects the pin on input multiplexer
 void selectMuxInPin(byte pin) {
@@ -330,7 +346,7 @@ void selectMuxInPin(byte pin) {
   digitalWrite(A, valA);
   digitalWrite(B, valB);
   digitalWrite(C, valC);
-  delay(1);
+  //delay(1); //maybe add back if you got stability issues, however it causes latency
 }
 
 // selects the pin on output multiplexer
@@ -342,7 +358,7 @@ void selectMuxOutPin(byte pin){
   digitalWrite(Aout, valA);
   digitalWrite(Bout, valB);
   digitalWrite(Cout, valC);
-  delay(1);
+  //delay(1); //maybe add back if you got stability issues, however it causes latency
 }
 
 void readAnalogPins() {
@@ -389,6 +405,7 @@ void readDigitalPins() {
     for (byte pin=0; pin<pinPerMux; pin++){
         arr_changed_digital_inputs[mux][pin] = 0;
         selectMuxInPin(pin);
+        delay(1);
         // only read if input is not disabled
         if (!arr_disable_digital_inputs[mux][pin]){
           rawDigital = !digitalRead(arr_pin_digital_inputs[mux]); //! because inverted logic
@@ -403,7 +420,6 @@ void readDigitalPins() {
             arr_changed_digital_inputs[mux][pin] = 1;
             arr_prev_read_digital_inputs[mux][pin] = arr_read_digital_inputs[mux][pin];
             arr_read_digital_inputs[mux][pin] = rawDigital;
-
           }
         }
     }
@@ -495,7 +511,7 @@ void UpdateSendValues() {
             break;
             case 18:
               // number of steps the sequencer should play
-              numSteps = map(arr_read_analog_inputs[2][1],0,127,1,8);
+              numSteps = map(arr_read_analog_inputs[2][1],0,127,1,maxSteps);
             break;
             case 19:
               //Gate length
@@ -583,6 +599,8 @@ void UpdateSendValues() {
                     prevPulseStart = millis();
                   } else {
                     // Serial.println("pause");
+                    stopLastNote();
+                    stopNote(stepPointer);
                   }
                 }
                 
@@ -605,7 +623,7 @@ void UpdateSendValues() {
               break;
               case 44:
                 //Clear selected SeqButton function
-                if (arr_read_digital_inputs[0][2] && arr_changed_digital_inputs[0][2]){
+                if (arr_read_digital_inputs[0][3] && arr_changed_digital_inputs[0][3]){
                   //except for 0=playMode
                   if (seqButtonFunction!=0){
                     for (int i = 0; i<pinPerMux; i++)
@@ -647,28 +665,32 @@ void UpdateSendValues() {
               case 55:
               case 56:
                 caseNumber = arr_send_digital_inputs[mux][pin];
+                //-49, so 49 will be 0, 50 will be 1 etc...
                 noteNumberDigiRead = caseNumber-49;
                 switch (seqButtonFunction) {
                   case 0:
-                    //-49, so 49 will be 0, 50 will be 1 etc...
-                    if (arr_read_digital_inputs[0][noteNumberDigiRead]){
-                      noteButtonPressed(noteNumberDigiRead);
-                    } else {
-                      noteButtonReleased(noteNumberDigiRead);
+                    //only play notes when sequencer is not running, keep?
+                    if (!run){
+                     if (arr_read_digital_inputs[1][noteNumberDigiRead]){
+                        noteButtonPressed(noteNumberDigiRead);
+                      } else {
+                        noteButtonReleased(noteNumberDigiRead);
+                      } 
                     }
+                    
                   break;
                   case 1: //skip step
-                    if (arr_read_digital_inputs[0][noteNumberDigiRead] && arr_changed_digital_inputs[0][noteNumberDigiRead]){
+                    if (arr_read_digital_inputs[1][noteNumberDigiRead] && arr_changed_digital_inputs[1][noteNumberDigiRead]){
                       arr_seq_buttons[1][noteNumberDigiRead] = !arr_seq_buttons[1][noteNumberDigiRead];
                     }
                   break;
                   case 2: //slide step
-                    if (arr_read_digital_inputs[0][noteNumberDigiRead] && arr_changed_digital_inputs[0][noteNumberDigiRead]){
+                    if (arr_read_digital_inputs[1][noteNumberDigiRead] && arr_changed_digital_inputs[1][noteNumberDigiRead]){
                       arr_seq_buttons[2][noteNumberDigiRead] = !arr_seq_buttons[2][noteNumberDigiRead];
                     }
                   break;
                   case 3: //hold step
-                    if (arr_read_digital_inputs[0][noteNumberDigiRead] && arr_changed_digital_inputs[0][noteNumberDigiRead]){
+                    if (arr_read_digital_inputs[1][noteNumberDigiRead] && arr_changed_digital_inputs[1][noteNumberDigiRead]){
                       arr_seq_buttons[3][noteNumberDigiRead] = !arr_seq_buttons[3][noteNumberDigiRead];
                     }
                     break;
@@ -703,9 +725,12 @@ void setup() {
 
 
   usbMIDI.setHandleClock(handleClock);
+  selectMuxOutPin(stepPointer);
+  digitalWrite(I7, HIGH);
 }
 
 void loop() {
+  startLoopMillis = millis();
   slowReadCycleCount++;
   if (slowReadCycleCount > digitalSmoother) {
     isSlowReadCycle = 1;
@@ -717,16 +742,17 @@ void loop() {
 
   //reading drumpad after every function for lower latency
   readDrumpad();
+  drumPadMillis = millis();
   readAnalogPins();
-
+  analogReadMillis = millis();
   readDrumpad();
   readDigitalPins();
-
+  digitalReadMillis = millis();
   readDrumpad();
   usbMIDI.read();
 
   UpdateSendValues();
-  
+  updateValueMillis = millis();
   updateTempo();
 
   if (reset){
@@ -742,7 +768,7 @@ void loop() {
       prevClockStart = currentMillis;
       usbMIDI.sendClock();
     }
-
+    seqNotesMillis = millis();
     // do next pulse if necessary
     if (currentMillis - prevPulseStart >= tempo) {
       //save timestamp when pulse started
@@ -758,4 +784,17 @@ void loop() {
     
   }
   isSlowReadCycle = 0; //
+  //benchmarking
+//   endLoopMillis = millis();
+//   Serial.print(drumPadMillis - startLoopMillis);
+//   Serial.print("|");
+//   Serial.print(analogReadMillis  - startLoopMillis);
+//   Serial.print("|");
+//   Serial.print(digitalReadMillis - startLoopMillis);
+//   Serial.print("|");
+//   Serial.print(updateValueMillis - startLoopMillis);
+//   Serial.print("|");
+//   Serial.print(seqNotesMillis - startLoopMillis);
+//   Serial.print("|");
+//   Serial.println(endLoopMillis - startLoopMillis);
 }

@@ -1,13 +1,11 @@
 // all functions for the sequencer
 // or most
 void noteButtonPressed(int note) {
-  Serial.println("startnote");
   startNote(note);
 }
 
 void noteButtonReleased(int note){
   stopNote(note);
-  Serial.println("stopnote");
 }
 
 // functions
@@ -18,6 +16,13 @@ void updateTempo(){
 
 
 void nextStep() {
+  // check if step should be skipped
+  if (arr_seq_buttons[1][stepPointer]) {
+    Serial.print("skipping ");
+    Serial.print(stepPointer);
+    stepPointer++;
+  }
+  
   //Sequencer play order
   switch (playMode) {
     //0=forwards
@@ -47,18 +52,18 @@ void nextStep() {
       }
 
       if (stepPointer < 0) {
-        stepPointer = 0;
+        stepPointer = 1;
         seqDirection = 1; //go upwards
       }
       if (stepPointer >= numSteps){
-        stepPointer = numSteps-1;
+        stepPointer = numSteps-2;
         seqDirection = 0; // go downwards
       }
     break;
 
     //3=drunk
     case 3:
-      stepPointer = random(0,7);
+      stepPointer = random(0,numSteps);
     break;
   }
   selectMuxOutPin(byte(stepPointer));
@@ -90,21 +95,14 @@ void nextPulse() {
     pulsePointer = 0;
     nextStep();
   }
-  // check if step should be skipped
-  if (arr_seq_buttons[1][stepPointer] == 1) {
-    stepPointer++;
-  }
   startNote(stepPointer); // start the note of this pulse
-
   pulsePointer++;
-
-
 }
 
 void stopNote(int noteToStop){
   usbMIDI.sendNoteOff(arr_seq_buttons[0][noteToStop], velocity, 1);
   noteStopped = true;
-  digitalWrite(I7, LOW);
+  //digitalWrite(I7, LOW);
 }
 
 // todo convert fusel0 and fusel1 to int number and store in seqButtonFunction
@@ -126,8 +124,6 @@ void selectSeqNoteFunction(){
     //Hold mode
     seqButtonFunction = 3;
   }
-
-  
 }
 
 // reset immediately and trigger the first pulse of the first step
