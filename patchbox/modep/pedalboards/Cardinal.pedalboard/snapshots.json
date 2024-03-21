@@ -1,0 +1,141 @@
+{
+    "current": 0,
+    "snapshots": [
+        {
+            "name": "Default",
+            "data": {
+                "_phaser": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "dry_wet": 50.0,
+                        "level": 10.0,
+                        "speed": 4.7377232142857135
+                    },
+                    "preset": ""
+                },
+                "amsynth": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "amp_attack": 0.9945609945609942,
+                        "amp_decay": 0.2214452214452214,
+                        "amp_sustain": 0.09906759906759889,
+                        "amp_release": 0.8352758352758354,
+                        "osc1_waveform": 2.0,
+                        "filter_attack": 0.0,
+                        "filter_decay": 0.0,
+                        "filter_sustain": 1.0,
+                        "filter_release": 0.0,
+                        "filter_resonance": 0.6361182220720509,
+                        "filter_env_amount": 0.0,
+                        "filter_cutoff": 0.35484633569739954,
+                        "osc2_detune": 0.0,
+                        "osc2_waveform": 2.0,
+                        "master_vol": 0.6700000166893005,
+                        "lfo_freq": 0.0,
+                        "lfo_waveform": 0.0,
+                        "osc2_range": 0.0,
+                        "osc_mix": 0.0,
+                        "freq_mod_amount": 0.0,
+                        "filter_mod_amount": -1.0,
+                        "amp_mod_amount": -1.0,
+                        "osc_mix_mode": 0.0,
+                        "osc1_pulsewidth": 1.0,
+                        "osc2_pulsewidth": 1.0,
+                        "reverb_roomsize": 0.0,
+                        "reverb_damp": 0.0,
+                        "reverb_wet": 0.0,
+                        "reverb_width": 1.0,
+                        "distortion_crunch": 0.0,
+                        "osc2_sync": 0.0,
+                        "portamento_time": 0.0,
+                        "keyboard_mode": 0.0,
+                        "osc2_pitch": 0.0,
+                        "filter_type": 0.0,
+                        "filter_slope": 1.0,
+                        "freq_mod_osc": 0.0,
+                        "filter_kbd_track": 1.0,
+                        "filter_vel_sens": 1.0,
+                        "amp_vel_sens": 1.0,
+                        "portamento_mode": 0.0
+                    },
+                    "preset": ""
+                },
+                "midi_display_lv2": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {},
+                    "preset": ""
+                },
+                "mini": {
+                    "bypassed": false,
+                    "parameters": {
+                        "https://distrho.kx.studio/plugins/cardinal#mini#comment": [
+                            "",
+                            "s"
+                        ],
+                        "https://distrho.kx.studio/plugins/cardinal#mini#moduleInfos": [
+                            "",
+                            "s"
+                        ],
+                        "https://distrho.kx.studio/plugins/cardinal#mini#param": [
+                            "",
+                            "s"
+                        ],
+                        "https://distrho.kx.studio/plugins/cardinal#mini#patch": [
+                            "",
+                            "s"
+                        ],
+                        "https://distrho.kx.studio/plugins/cardinal#mini#screenshot": [
+                            "",
+                            "s"
+                        ]
+                    },
+                    "ports": {
+                        "param_1": 0.0,
+                        "param_2": 0.0,
+                        "param_3": 0.0,
+                        "param_4": 0.0,
+                        "param_5": 0.0,
+                        "param_6": 0.0,
+                        "param_7": 0.0,
+                        "param_8": 0.0,
+                        "param_9": 0.0,
+                        "param_10": 0.0,
+                        "param_11": 0.0,
+                        "param_12": 0.0,
+                        "param_13": 0.0,
+                        "param_14": 0.0,
+                        "param_15": 0.0,
+                        "param_16": 0.0,
+                        "param_17": 0.0,
+                        "param_18": 0.0,
+                        "param_19": 0.0,
+                        "param_20": 0.0,
+                        "param_21": 0.0,
+                        "param_22": 0.0,
+                        "param_23": 0.0,
+                        "param_24": 0.0,
+                        "lv2_enabled": 1.0,
+                        "tooltips": 1.0,
+                        "cableOpacity": 50.0,
+                        "cableTension": 75.0,
+                        "rackBrightness": 100.0,
+                        "haloBrightness": 25.0,
+                        "knobMode": 0.0,
+                        "knobScroll": 0.0,
+                        "knobScrollSensitivity": 1.0,
+                        "lockModules": 0.0,
+                        "rateLimit": 0.0,
+                        "browserSort": 3.0,
+                        "browserZoom": 50.0,
+                        "invertZoom": 0.0,
+                        "squeezeModules": 1.0
+                    },
+                    "preset": ""
+                }
+            }
+        }
+    ]
+}

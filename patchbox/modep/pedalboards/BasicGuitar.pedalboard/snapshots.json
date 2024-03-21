@@ -1,0 +1,55 @@
+{
+    "current": 0,
+    "snapshots": [
+        {
+            "name": "Default",
+            "data": {
+                "_fuzzfacefm_": {
+                    "bypassed": true,
+                    "parameters": {},
+                    "ports": {
+                        "DRIVE": 0.515625,
+                        "FUZZ": 0.5,
+                        "INPUT": 0.5,
+                        "LEVEL": 0.5
+                    },
+                    "preset": ""
+                },
+                "_phaser": {
+                    "bypassed": true,
+                    "parameters": {},
+                    "ports": {
+                        "dry_wet": 50.0,
+                        "level": 0.0,
+                        "speed": 2.678571428571429
+                    },
+                    "preset": ""
+                },
+                "Delay": {
+                    "bypassed": true,
+                    "parameters": {},
+                    "ports": {
+                        "l_delay": 119.527557,
+                        "rl_delay": 0.771654,
+                        "rl_fixed_ratios": 0.0,
+                        "feedback": 55.118107,
+                        "fb_tone": 0.0,
+                        "fx_mix": 56.692917,
+                        "output": 0.0
+                    },
+                    "preset": ""
+                },
+                "Freaktail": {
+                    "bypassed": true,
+                    "parameters": {},
+                    "ports": {
+                        "Decay": 0.418898,
+                        "Roomsize": 1.974567,
+                        "Tail_level": 0.425984
+                    },
+                    "preset": ""
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,59 @@
+{
+    "current": 0,
+    "snapshots": [
+        {
+            "name": "Default",
+            "data": {
+                "Delay": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "l_delay": 144.37499999999997,
+                        "rl_delay": 0.8783482142857141,
+                        "rl_fixed_ratios": 0.0,
+                        "feedback": 43.52678571428571,
+                        "fb_tone": -0.9497767857142858,
+                        "fx_mix": 51.72991071428571,
+                        "output": -1.6741071428571264
+                    },
+                    "preset": ""
+                },
+                "dj_eq_mono": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "lo": -36.48819,
+                        "mid": -33.496063,
+                        "hi": -35.889763
+                    },
+                    "preset": ""
+                },
+                "Flanger": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "min_delay": 0.10000000149011612,
+                        "mod_depth": 1.0,
+                        "mod_rate": 1.280424474858442,
+                        "feedback": -0.14805803714053944,
+                        "stereo": 360.0,
+                        "reset": 0.0,
+                        "amount": 1.7522321428571428,
+                        "dry": 0.9843750000000002
+                    },
+                    "preset": ""
+                },
+                "Freaktail": {
+                    "bypassed": true,
+                    "parameters": {},
+                    "ports": {
+                        "Decay": 0.43498884022119444,
+                        "Roomsize": 2.8892745534768856,
+                        "Tail_level": 0.1452008942724205
+                    },
+                    "preset": ""
+                }
+            }
+        }
+    ]
+}
