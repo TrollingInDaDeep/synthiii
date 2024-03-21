@@ -16,12 +16,6 @@ void updateTempo(){
 
 
 void nextStep() {
-  // check if step should be skipped
-  if (arr_seq_buttons[1][stepPointer]) {
-    Serial.print("skipping ");
-    Serial.print(stepPointer);
-    stepPointer++;
-  }
   
   //Sequencer play order
   switch (playMode) {
@@ -66,6 +60,10 @@ void nextStep() {
       stepPointer = random(0,numSteps);
     break;
   }
+  // check if step should be skipped
+  if (arr_seq_buttons[1][stepPointer]) {
+    nextStep();
+  }
   selectMuxOutPin(byte(stepPointer));
 }
 
@@ -79,6 +77,10 @@ void stopLastNote(){
 
 void startNote(int noteToPlay){
   stopLastNote();
+  //if slide for note enabled -> enable slide control
+  if (arr_seq_buttons[2][noteToPlay]){
+      usbMIDI.sendControlChange(20, slideAmount, 1); //20 is the slide ctrlr number
+  }
   noteStart = millis();
   usbMIDI.sendNoteOn(arr_seq_buttons[0][noteToPlay], velocity, 1);
   noteStopped = false;
@@ -103,6 +105,8 @@ void stopNote(int noteToStop){
   usbMIDI.sendNoteOff(arr_seq_buttons[0][noteToStop], velocity, 1);
   noteStopped = true;
   //digitalWrite(I7, LOW);
+  //set slide back to 0
+  usbMIDI.sendControlChange(20, 0, 1); //20 is the slide ctrlr number
 }
 
 // todo convert fusel0 and fusel1 to int number and store in seqButtonFunction

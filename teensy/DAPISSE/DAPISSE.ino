@@ -44,14 +44,15 @@ const uint8_t velocity = 127;
 int gateTime = 50; //time in ms how long the note should be on
 int gateMin = 5; //minimum gate time in ms for pot selection
 int gateMax = 1000; //maximum gate time in ms for pot selection
-int slideAmount = 0; //how much note slide if enabled
+int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
 int minSeqNote = 20; //minimal Midi Note of sequencer fader
 int maxSeqNote = 80; //minimal Midi Note of sequencer fader
 int minPulse = 1; //how many pulses at least for sequencer
 int maxPulse = 8; //how many pulses at max for sequencer
 int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
-bool syncSequencerToClock = 0; // if next sequencer note should be triggered when a clock signal comes in
+bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
+bool syncDrumToSequencer = 0; // 1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
 ///
 /// Variable definitions
 ///
@@ -61,6 +62,7 @@ int caseNumber = 0;
 int noteNumberDigiRead = 0;
 int noteNumberAnalog = 0;
 unsigned long currentMillis = 0;
+
 //for benchmark purposes
 int startLoopMillis = 0;
 int drumPadMillis = 0;
@@ -77,7 +79,7 @@ int endLoopMillis = 0;
 // ############
 int midiC = 60; // Standard midi C
 int transpose = 0;
-
+long tempoModifier = 1; //multiplication value with sequencer tempo to get n-times the tempo of the sequencer
 
 
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
@@ -136,7 +138,6 @@ Keypad kpd = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 int rawAnalog = 0;
 bool rawDigital = 0;
 
-// alternative timer
 long bpm = 90.0;
 long bpmMin=20.0;
 long bpmMax=800.0;
@@ -150,7 +151,6 @@ float noteStart = 0; //timestamp when the note started
 
 
 
-//int clockspeed = 120;
 bool run = false;
 bool reset = false;
 int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
@@ -325,13 +325,18 @@ void stopNote(int);
 void selectSeqNoteFunction(void);
 void noteButtonPressed(int note);
 void noteButtonReleased(int note);
-
+void updateDrumTempoModifier(void);
 
 // what happens when a clock signal is received
 void handleClock() {
+  //Drumstep: only when drum running and NOT synced to sequencer
   if (runDrum) {
-    nextDrumStep();
+    if (!syncDrumToSequencer) {
+      nextDrumStep();
+    }
   }
+
+  //SEQ step: only when synced to external clock
   if (syncSequencerToClock) {
     nextPulse();
   }
@@ -508,6 +513,7 @@ void UpdateSendValues() {
             case 17:
               //Clock / BPM
               bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
+              updateDrumTempoModifier(map(arr_read_analog_inputs[2][0],0,127,0,13));
             break;
             case 18:
               // number of steps the sequencer should play
@@ -770,10 +776,19 @@ void loop() {
     }
     seqNotesMillis = millis();
     // do next pulse if necessary
-    if (currentMillis - prevPulseStart >= tempo) {
-      //save timestamp when pulse started
-      prevPulseStart = currentMillis;
-      nextPulse(); //after last pulse, next step will be triggered
+    
+    if (!syncSequencerToClock) {
+      if (currentMillis - prevPulseStart >= tempo) {
+        //save timestamp when pulse started
+        prevPulseStart = currentMillis;
+        nextPulse(); //after last pulse, next step will be triggered
+      }
+    }
+
+    if (syncDrumToSequencer){
+      if (currentMillis - prevPulseStart >= tempo * tempoModifier){
+        nextDrumStep();
+      }
     }
     //stop note if necessary
     if (!noteStopped) {
