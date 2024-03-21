@@ -77,6 +77,10 @@ void stopLastNote(){
 
 void startNote(int noteToPlay){
   stopLastNote();
+
+  //set slide back to 0
+  usbMIDI.sendControlChange(20, 0, 1); //20 is the slide ctrlr number
+
   //if slide for note enabled -> enable slide control
   if (arr_seq_buttons[2][noteToPlay]){
       usbMIDI.sendControlChange(20, slideAmount, 1); //20 is the slide ctrlr number
@@ -105,8 +109,6 @@ void stopNote(int noteToStop){
   usbMIDI.sendNoteOff(arr_seq_buttons[0][noteToStop], velocity, 1);
   noteStopped = true;
   //digitalWrite(I7, LOW);
-  //set slide back to 0
-  usbMIDI.sendControlChange(20, 0, 1); //20 is the slide ctrlr number
 }
 
 // todo convert fusel0 and fusel1 to int number and store in seqButtonFunction
@@ -136,6 +138,9 @@ void resetSequencer() {
   pulsePointer = -1;
   prevClockStart = millis();
   prevPulseStart = millis();
+  if (syncDrumToSequencer){
+    prevDrumClockStart = millis();
+  }
   nextPulse();
   reset=0;
 }

@@ -43,58 +43,59 @@ void stopDrumNote(int noteToStop) {
 /// expects selector number between 0 and 13
 void updateDrumTempoModifier(int modifyNumber) {
   switch (modifyNumber){
-    case 0: // /16
-      tempoModifier = 0.0625;
+    case 0: // *16
+      tempoModifier = 16;
     break;
 
-    case 1: // /8
-      tempoModifier = 0.125;
+    case 1: // *8
+      tempoModifier = 8;
     break;
 
-    case 2: // /4
-      tempoModifier = 0.125;
+    case 2: // *4
+      tempoModifier = 4;
     break;
 
-    case 3: // /3
-      tempoModifier = 0.3333333;
+    case 3: // *3
+      tempoModifier = 3;
     break;
 
-    case 4: // /2
-      tempoModifier = 0.5;
+    case 4: // *2
+      tempoModifier = 2;
     break;
 
-    case 5: // /1.5
-      tempoModifier = 0.6666666;
+    case 5: // *1.5
+      tempoModifier = 1.5;
     break;
 
     case 6: // 1
       tempoModifier = 1;
     break;
 
-    case 7: // *1.5
-      tempoModifier = 1.5;
+    case 7: // /1.5
+      tempoModifier = 0.6666666;
     break;
 
-    case 8: // *2
-      tempoModifier = 2;
+    case 8: // /2
+      tempoModifier = 0.5;
     break;
 
-    case 9: // *3
-      tempoModifier = 3;
+    case 9: // /3
+      tempoModifier = 0.3333333;
     break;
 
-    case 10: // *4
-      tempoModifier = 4;
+    case 10: // /4
+      tempoModifier = 0.25;
     break;
 
-    case 11: // *8
-      tempoModifier = 8;
+    case 11: // /8
+      tempoModifier = 0.125;
     break;
 
-    case 12: // *16
-      tempoModifier = 16;
+    case 12: // /16
+      tempoModifier = 0.0625;
     break;
   }
+  Serial.println(tempoModifier);
 }
 
 //scans through the keypad

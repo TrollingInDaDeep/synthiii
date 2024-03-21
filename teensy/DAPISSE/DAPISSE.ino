@@ -52,7 +52,7 @@ int maxPulse = 8; //how many pulses at max for sequencer
 int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
 bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
-bool syncDrumToSequencer = 0; // 1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
+bool syncDrumToSequencer = 0; //kinda buggy: 1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
 ///
 /// Variable definitions
 ///
@@ -79,9 +79,8 @@ int endLoopMillis = 0;
 // ############
 int midiC = 60; // Standard midi C
 int transpose = 0;
-long tempoModifier = 1; //multiplication value with sequencer tempo to get n-times the tempo of the sequencer
-
-
+float tempoModifier = 6; //multiplication value with sequencer tempo to get n-times the tempo of the sequencer
+float prevDrumClockStart = 0; //previous millisecond timestamp before last drum step was started
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int drumInstruments = 4;
 // which midi note to play for each instrument
@@ -512,8 +511,12 @@ void UpdateSendValues() {
             // break;
             case 17:
               //Clock / BPM
-              bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
-              updateDrumTempoModifier(map(arr_read_analog_inputs[2][0],0,127,0,13));
+              if (!syncSequencerToClock){
+                bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
+              }
+              if (syncDrumToSequencer) {
+                updateDrumTempoModifier(map(arr_read_analog_inputs[2][0],0,127,0,13));
+              }
             break;
             case 18:
               // number of steps the sequencer should play
@@ -596,17 +599,19 @@ void UpdateSendValues() {
           //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
           switch (arr_send_digital_inputs[mux][pin]){
               case 41:
-                //Sequencer Play/pause
-                if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
-                  run = !run;
-                  if (run){
-                    // Serial.println("play");
-                    prevClockStart = millis();
-                    prevPulseStart = millis();
-                  } else {
-                    // Serial.println("pause");
-                    stopLastNote();
-                    stopNote(stepPointer);
+                if (!syncSequencerToClock){
+                  //Sequencer Play/pause
+                  if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
+                    run = !run;
+                    if (run){
+                      // Serial.println("play");
+                      prevClockStart = millis();
+                      prevPulseStart = millis();
+                    } else {
+                      // Serial.println("pause");
+                      stopLastNote();
+                      stopNote(stepPointer);
+                    }
                   }
                 }
                 
@@ -675,8 +680,8 @@ void UpdateSendValues() {
                 noteNumberDigiRead = caseNumber-49;
                 switch (seqButtonFunction) {
                   case 0:
-                    //only play notes when sequencer is not running, keep?
-                    if (!run){
+                    //only play notes when sequencer is not running, and not synced to ext clock
+                    if (!run && !syncSequencerToClock){
                      if (arr_read_digital_inputs[1][noteNumberDigiRead]){
                         noteButtonPressed(noteNumberDigiRead);
                       } else {
@@ -786,8 +791,11 @@ void loop() {
     }
 
     if (syncDrumToSequencer){
-      if (currentMillis - prevPulseStart >= tempo * tempoModifier){
-        nextDrumStep();
+      if (runDrum){
+        if (currentMillis - prevDrumClockStart >= tempo * tempoModifier){
+          prevDrumClockStart = currentMillis;
+          nextDrumStep();
+        }
       }
     }
     //stop note if necessary
