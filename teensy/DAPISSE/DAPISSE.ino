@@ -52,7 +52,8 @@ int maxPulse = 8; //how many pulses at max for sequencer
 int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
 bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
-bool syncDrumToSequencer = 0; //kinda buggy: 1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
+bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
+
 ///
 /// Variable definitions
 ///
@@ -80,7 +81,6 @@ int endLoopMillis = 0;
 int midiC = 60; // Standard midi C
 int transpose = 0;
 float tempoModifier = 6; //multiplication value with sequencer tempo to get n-times the tempo of the sequencer
-float prevDrumClockStart = 0; //previous millisecond timestamp before last drum step was started
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int drumInstruments = 4;
 // which midi note to play for each instrument
@@ -95,7 +95,7 @@ const int numDrumSteps = 16;
 // pointer at which step in the drum sequencer we are
 int drumStepPointer = 0;
 
-int keypadMode = 0; //0=play, 1=sequence notes 2=fillXStep, 4=settings
+int keypadMode = 1; //0=play, 1=sequence notes 2=fillXStep, 4=settings
 bool runDrum = true;
 
 //bools if a drum sound should be triggered at the selected step
@@ -328,6 +328,7 @@ void updateDrumTempoModifier(void);
 
 // what happens when a clock signal is received
 void handleClock() {
+
   //Drumstep: only when drum running and NOT synced to sequencer
   if (runDrum) {
     if (!syncDrumToSequencer) {
@@ -339,6 +340,7 @@ void handleClock() {
   if (syncSequencerToClock) {
     nextPulse();
   }
+
 }
 // selects the pin on input multiplexer
 void selectMuxInPin(byte pin) {
@@ -514,9 +516,9 @@ void UpdateSendValues() {
               if (!syncSequencerToClock){
                 bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
               }
-              if (syncDrumToSequencer) {
-                updateDrumTempoModifier(map(arr_read_analog_inputs[2][0],0,127,0,13));
-              }
+              // if (syncDrumToSequencer) {
+              //   updateDrumTempoModifier(map(arr_read_analog_inputs[2][0],0,127,0,13));
+              // }
             break;
             case 18:
               // number of steps the sequencer should play
@@ -738,6 +740,8 @@ void setup() {
   usbMIDI.setHandleClock(handleClock);
   selectMuxOutPin(stepPointer);
   digitalWrite(I7, HIGH);
+
+
 }
 
 void loop() {
@@ -787,17 +791,15 @@ void loop() {
         //save timestamp when pulse started
         prevPulseStart = currentMillis;
         nextPulse(); //after last pulse, next step will be triggered
+        if (syncDrumToSequencer){
+          if (runDrum){
+            nextDrumStep();
+          }
+    }
       }
     }
-
-    if (syncDrumToSequencer){
-      if (runDrum){
-        if (currentMillis - prevDrumClockStart >= tempo * tempoModifier){
-          prevDrumClockStart = currentMillis;
-          nextDrumStep();
-        }
-      }
-    }
+    
+    
     //stop note if necessary
     if (!noteStopped) {
       if (currentMillis - noteStart >= gateTime) {
@@ -806,6 +808,7 @@ void loop() {
     }
     
   }
+
   isSlowReadCycle = 0; //
   //benchmarking
 //   endLoopMillis = millis();

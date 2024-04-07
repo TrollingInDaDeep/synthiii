@@ -139,7 +139,8 @@ void resetSequencer() {
   prevClockStart = millis();
   prevPulseStart = millis();
   if (syncDrumToSequencer){
-    prevDrumClockStart = millis();
+    drumStepPointer = -1;
+    nextDrumStep();
   }
   nextPulse();
   reset=0;

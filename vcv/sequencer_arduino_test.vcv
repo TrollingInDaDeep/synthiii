@@ -116,7 +116,7 @@
         },
         {
           "id": 2,
-          "value": 0.51968503
+          "value": 0.0
         },
         {
           "id": 3,
@@ -150,7 +150,7 @@
         "midi": {
           "driver": 4,
           "deviceName": "Teensy MIDI 0",
-          "channel": -1
+          "channel": 0
         }
       },
       "pos": [
@@ -170,11 +170,11 @@
         },
         {
           "id": 1,
-          "value": 1.0
+          "value": 0.00787401572
         },
         {
           "id": 2,
-          "value": 0.0
+          "value": 0.708661437
         },
         {
           "id": 3,
@@ -250,7 +250,7 @@
         },
         {
           "id": 1,
-          "value": 0.818897605
+          "value": 0.0
         },
         {
           "id": 2,
@@ -518,18 +518,18 @@
       "rightModuleId": 18,
       "data": {
         "enabledNotes": [
-          false,
-          false,
-          true,
-          false,
           true,
           true,
           true,
-          false,
           true,
-          false,
           true,
-          false
+          true,
+          true,
+          true,
+          true,
+          true,
+          true,
+          true
         ]
       },
       "pos": [
@@ -545,7 +545,7 @@
       "params": [
         {
           "id": 0,
-          "value": 0.937007844
+          "value": 0.283464551
         },
         {
           "id": 1,
@@ -557,7 +557,7 @@
         },
         {
           "id": 3,
-          "value": 0.656999886
+          "value": 0.443999976
         }
       ],
       "leftModuleId": 22,
@@ -575,7 +575,7 @@
       "params": [
         {
           "id": 0,
-          "value": 0.96062994
+          "value": 0.204724401
         },
         {
           "id": 1,
@@ -587,7 +587,7 @@
         },
         {
           "id": 3,
-          "value": 0.384000331
+          "value": 0.504000068
         }
       ],
       "leftModuleId": 15,
@@ -934,7 +934,7 @@
       "params": [
         {
           "id": 0,
-          "value": 114.0
+          "value": 124.0
         },
         {
           "id": 1,
@@ -1018,7 +1018,7 @@
         "panelTheme": 0,
         "running": false,
         "displayDelayNoteMode": true,
-        "bpmDetectionMode": false,
+        "bpmDetectionMode": true,
         "resetOnStartStop": 0,
         "ppqn": 24,
         "resetClockOutputsHigh": true,
@@ -1244,7 +1244,6 @@
         "showSystemMsg": true,
         "midiInput": {
           "driver": 4,
-          "deviceName": "Teensy MIDI 0",
           "channel": -1
         }
       },
@@ -1470,6 +1469,14 @@
       "inputModuleId": 6,
       "inputId": 5,
       "color": "#c91847"
+    },
+    {
+      "id": 345,
+      "outputModuleId": 75,
+      "outputId": 2,
+      "inputModuleId": 76,
+      "inputId": 11,
+      "color": "#0986ad"
     }
   ]
 }

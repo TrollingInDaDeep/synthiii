@@ -12,7 +12,7 @@ void clearInstrumenSequence() {
 // trigger next step for drum sequencer
 // stops the previous notes and triggers the new ones
 void nextDrumStep() {  
-  if (drumStepPointer >= numDrumSteps) {
+  if (drumStepPointer >= numDrumSteps || drumStepPointer < 0) {
     drumStepPointer = 0;
   }
 
@@ -95,7 +95,7 @@ void updateDrumTempoModifier(int modifyNumber) {
       tempoModifier = 0.0625;
     break;
   }
-  Serial.println(tempoModifier);
+  //Serial.println(tempoModifier);
 }
 
 //scans through the keypad
