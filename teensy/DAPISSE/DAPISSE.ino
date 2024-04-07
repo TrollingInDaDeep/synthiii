@@ -680,6 +680,7 @@ void UpdateSendValues() {
                 caseNumber = arr_send_digital_inputs[mux][pin];
                 //-49, so 49 will be 0, 50 will be 1 etc...
                 noteNumberDigiRead = caseNumber-49;
+
                 switch (seqButtonFunction) {
                   case 0:
                     //only play notes when sequencer is not running, and not synced to ext clock
@@ -706,6 +707,8 @@ void UpdateSendValues() {
                     if (arr_read_digital_inputs[1][noteNumberDigiRead] && arr_changed_digital_inputs[1][noteNumberDigiRead]){
                       arr_seq_buttons[3][noteNumberDigiRead] = !arr_seq_buttons[3][noteNumberDigiRead];
                     }
+                    
+                    
                     break;
                   }
               break;
