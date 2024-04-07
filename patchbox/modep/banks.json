@@ -1,0 +1,23 @@
+[
+    {
+        "title": "Parkbank",
+        "pedalboards": [
+            {
+                "bundle": "/var/modep/pedalboards/DAPISSE.pedalboard",
+                "title": "DAPISSE"
+            },
+            {
+                "bundle": "/var/modep/pedalboards/GagiSynth.pedalboard",
+                "title": "GagiSynth"
+            },
+            {
+                "bundle": "/var/modep/pedalboards/BasicGuitar.pedalboard",
+                "title": "BasicGuitar (2)"
+            },
+            {
+                "bundle": "/var/modep/pedalboards/DJ_fx.pedalboard",
+                "title": "DJ fx"
+            }
+        ]
+    }
+]

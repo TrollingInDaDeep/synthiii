@@ -1,0 +1,1652 @@
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix ingen: <http://drobilla.net/ns/ingen#> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
+@prefix mod:   <http://moddevices.com/ns/mod#> .
+@prefix pedal: <http://moddevices.com/ns/modpedal#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+_:b1
+    ingen:tail <capture_2> ;
+    ingen:head <playback_2> .
+
+_:b2
+    ingen:tail <capture_1> ;
+    ingen:head <playback_1> .
+
+_:b3
+    ingen:tail <amsynth/out_l> ;
+    ingen:head <playback_1> .
+
+_:b4
+    ingen:tail <amsynth/out_r> ;
+    ingen:head <playback_2> .
+
+_:b5
+    ingen:tail <amsynth_1/out_l> ;
+    ingen:head <playback_1> .
+
+_:b6
+    ingen:tail <amsynth_1/out_r> ;
+    ingen:head <playback_2> .
+
+_:b7
+    ingen:tail <midi_merger_out> ;
+    ingen:head <amsynth/midi> .
+
+_:b8
+    ingen:tail <midi_merger_out> ;
+    ingen:head <amsynth/midi> .
+
+_:b9
+    ingen:tail <amsynth_2/out_l> ;
+    ingen:head <playback_1> .
+
+_:b10
+    ingen:tail <amsynth_2/out_r> ;
+    ingen:head <playback_2> .
+
+_:b11
+    ingen:tail <amsynth_4/out_l> ;
+    ingen:head <playback_2> .
+
+_:b12
+    ingen:tail <amsynth_4/out_r> ;
+    ingen:head <playback_1> .
+
+_:b13
+    ingen:tail <amsynth_3/out_l> ;
+    ingen:head <playback_1> .
+
+_:b14
+    ingen:tail <amsynth_3/out_r> ;
+    ingen:head <playback_2> .
+
+_:b15
+    ingen:tail <midi_merger_out> ;
+    ingen:head <amsynth_1/midi> .
+
+_:b16
+    ingen:tail <midi_merger_out> ;
+    ingen:head <amsynth_3/midi> .
+
+_:b17
+    ingen:tail <midi_merger_out> ;
+    ingen:head <amsynth_2/midi> .
+
+_:b18
+    ingen:tail <midi_merger_out> ;
+    ingen:head <amsynth_4/midi> .
+
+_:b19
+    ingen:tail <midigen/midiout> ;
+    ingen:head <amsynth/midi> .
+
+_:b20
+    ingen:tail <midigen/midiout> ;
+    ingen:head <amsynth_3/midi> .
+
+_:b21
+    ingen:tail <midigen/midiout> ;
+    ingen:head <amsynth_2/midi> .
+
+_:b22
+    ingen:tail <midigen/midiout> ;
+    ingen:head <amsynth_4/midi> .
+
+<amsynth>
+    ingen:canvasX 778.0 ;
+    ingen:canvasY 43.4 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 5 ;
+    lv2:minorVersion 1 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <amsynth/out_l> ,
+             <amsynth/out_r> ,
+             <amsynth/amp_attack> ,
+             <amsynth/amp_decay> ,
+             <amsynth/amp_sustain> ,
+             <amsynth/amp_release> ,
+             <amsynth/osc1_waveform> ,
+             <amsynth/filter_attack> ,
+             <amsynth/filter_decay> ,
+             <amsynth/filter_sustain> ,
+             <amsynth/filter_release> ,
+             <amsynth/filter_resonance> ,
+             <amsynth/filter_env_amount> ,
+             <amsynth/filter_cutoff> ,
+             <amsynth/osc2_detune> ,
+             <amsynth/osc2_waveform> ,
+             <amsynth/master_vol> ,
+             <amsynth/lfo_freq> ,
+             <amsynth/lfo_waveform> ,
+             <amsynth/osc2_range> ,
+             <amsynth/osc_mix> ,
+             <amsynth/freq_mod_amount> ,
+             <amsynth/filter_mod_amount> ,
+             <amsynth/amp_mod_amount> ,
+             <amsynth/osc_mix_mode> ,
+             <amsynth/osc1_pulsewidth> ,
+             <amsynth/osc2_pulsewidth> ,
+             <amsynth/reverb_roomsize> ,
+             <amsynth/reverb_damp> ,
+             <amsynth/reverb_wet> ,
+             <amsynth/reverb_width> ,
+             <amsynth/distortion_crunch> ,
+             <amsynth/osc2_sync> ,
+             <amsynth/portamento_time> ,
+             <amsynth/keyboard_mode> ,
+             <amsynth/osc2_pitch> ,
+             <amsynth/filter_type> ,
+             <amsynth/filter_slope> ,
+             <amsynth/freq_mod_osc> ,
+             <amsynth/filter_kbd_track> ,
+             <amsynth/filter_vel_sens> ,
+             <amsynth/amp_vel_sens> ,
+             <amsynth/portamento_mode> ,
+             <amsynth/midi> ,
+             <amsynth/:bypass> ;
+    lv2:prototype <http://code.google.com/p/amsynth/amsynth> ;
+    pedal:instanceNumber 0 ;
+    pedal:preset <http://code.google.com/p/amsynth/amsynth#amsynth_factory_008_Church_Organ> ;
+    a ingen:Block .
+
+<amsynth/midi>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<amsynth/amp_attack>
+    ingen:value 0.170000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/amp_decay>
+    ingen:value 0.295260 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/amp_sustain>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/amp_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc1_waveform>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_decay>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_sustain>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_resonance>
+    ingen:value 0.427329 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_env_amount>
+    ingen:value 9.811820 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_cutoff>
+    ingen:value 0.603278 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc2_detune>
+    ingen:value 0.040000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc2_waveform>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/master_vol>
+    ingen:value 0.510638 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/lfo_freq>
+    ingen:value 2.329787 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/lfo_waveform>
+    ingen:value 2.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc2_range>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc_mix>
+    ingen:value 0.477069 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/freq_mod_amount>
+    ingen:value 0.010000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_mod_amount>
+    ingen:value -0.154610 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/amp_mod_amount>
+    ingen:value 0.240662 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc_mix_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc1_pulsewidth>
+    ingen:value 0.785879 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc2_pulsewidth>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/reverb_roomsize>
+    ingen:value 0.785879 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/reverb_damp>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/reverb_wet>
+    ingen:value 0.115122 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/reverb_width>
+    ingen:value 0.972108 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/distortion_crunch>
+    ingen:value 0.825957 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc2_sync>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/portamento_time>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/keyboard_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/osc2_pitch>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_type>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_slope>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/freq_mod_osc>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_kbd_track>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/filter_vel_sens>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/amp_vel_sens>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/portamento_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1>
+    ingen:canvasX 843.0 ;
+    ingen:canvasY 807.0 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 5 ;
+    lv2:minorVersion 1 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <amsynth_1/out_l> ,
+             <amsynth_1/out_r> ,
+             <amsynth_1/amp_attack> ,
+             <amsynth_1/amp_decay> ,
+             <amsynth_1/amp_sustain> ,
+             <amsynth_1/amp_release> ,
+             <amsynth_1/osc1_waveform> ,
+             <amsynth_1/filter_attack> ,
+             <amsynth_1/filter_decay> ,
+             <amsynth_1/filter_sustain> ,
+             <amsynth_1/filter_release> ,
+             <amsynth_1/filter_resonance> ,
+             <amsynth_1/filter_env_amount> ,
+             <amsynth_1/filter_cutoff> ,
+             <amsynth_1/osc2_detune> ,
+             <amsynth_1/osc2_waveform> ,
+             <amsynth_1/master_vol> ,
+             <amsynth_1/lfo_freq> ,
+             <amsynth_1/lfo_waveform> ,
+             <amsynth_1/osc2_range> ,
+             <amsynth_1/osc_mix> ,
+             <amsynth_1/freq_mod_amount> ,
+             <amsynth_1/filter_mod_amount> ,
+             <amsynth_1/amp_mod_amount> ,
+             <amsynth_1/osc_mix_mode> ,
+             <amsynth_1/osc1_pulsewidth> ,
+             <amsynth_1/osc2_pulsewidth> ,
+             <amsynth_1/reverb_roomsize> ,
+             <amsynth_1/reverb_damp> ,
+             <amsynth_1/reverb_wet> ,
+             <amsynth_1/reverb_width> ,
+             <amsynth_1/distortion_crunch> ,
+             <amsynth_1/osc2_sync> ,
+             <amsynth_1/portamento_time> ,
+             <amsynth_1/keyboard_mode> ,
+             <amsynth_1/osc2_pitch> ,
+             <amsynth_1/filter_type> ,
+             <amsynth_1/filter_slope> ,
+             <amsynth_1/freq_mod_osc> ,
+             <amsynth_1/filter_kbd_track> ,
+             <amsynth_1/filter_vel_sens> ,
+             <amsynth_1/amp_vel_sens> ,
+             <amsynth_1/portamento_mode> ,
+             <amsynth_1/midi> ,
+             <amsynth_1/:bypass> ;
+    lv2:prototype <http://code.google.com/p/amsynth/amsynth> ;
+    pedal:instanceNumber 1 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<amsynth_1/midi>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<amsynth_1/amp_attack>
+    ingen:value 1.163559 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/amp_decay>
+    ingen:value 0.869270 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/amp_sustain>
+    ingen:value 0.287490 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/amp_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc1_waveform>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_decay>
+    ingen:value 0.445804 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_sustain>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_resonance>
+    ingen:value 0.006421 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_env_amount>
+    ingen:value -8.631678 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_cutoff>
+    ingen:value 1.121749 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc2_detune>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc2_waveform>
+    ingen:value 3.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/master_vol>
+    ingen:value 0.543262 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/lfo_freq>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/lfo_waveform>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc2_range>
+    ingen:value -0.310638 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc_mix>
+    ingen:value -0.454374 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/freq_mod_amount>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_mod_amount>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/amp_mod_amount>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc_mix_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc1_pulsewidth>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc2_pulsewidth>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/reverb_roomsize>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/reverb_damp>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/reverb_wet>
+    ingen:value 0.002364 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/reverb_width>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/distortion_crunch>
+    ingen:value 0.158723 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc2_sync>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/portamento_time>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/keyboard_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/osc2_pitch>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_type>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_slope>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/freq_mod_osc>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_kbd_track>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/filter_vel_sens>
+    ingen:value 0.003783 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/amp_vel_sens>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/portamento_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_1/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2>
+    ingen:canvasX 1715.0 ;
+    ingen:canvasY 103.0 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 5 ;
+    lv2:minorVersion 1 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <amsynth_2/out_l> ,
+             <amsynth_2/out_r> ,
+             <amsynth_2/amp_attack> ,
+             <amsynth_2/amp_decay> ,
+             <amsynth_2/amp_sustain> ,
+             <amsynth_2/amp_release> ,
+             <amsynth_2/osc1_waveform> ,
+             <amsynth_2/filter_attack> ,
+             <amsynth_2/filter_decay> ,
+             <amsynth_2/filter_sustain> ,
+             <amsynth_2/filter_release> ,
+             <amsynth_2/filter_resonance> ,
+             <amsynth_2/filter_env_amount> ,
+             <amsynth_2/filter_cutoff> ,
+             <amsynth_2/osc2_detune> ,
+             <amsynth_2/osc2_waveform> ,
+             <amsynth_2/master_vol> ,
+             <amsynth_2/lfo_freq> ,
+             <amsynth_2/lfo_waveform> ,
+             <amsynth_2/osc2_range> ,
+             <amsynth_2/osc_mix> ,
+             <amsynth_2/freq_mod_amount> ,
+             <amsynth_2/filter_mod_amount> ,
+             <amsynth_2/amp_mod_amount> ,
+             <amsynth_2/osc_mix_mode> ,
+             <amsynth_2/osc1_pulsewidth> ,
+             <amsynth_2/osc2_pulsewidth> ,
+             <amsynth_2/reverb_roomsize> ,
+             <amsynth_2/reverb_damp> ,
+             <amsynth_2/reverb_wet> ,
+             <amsynth_2/reverb_width> ,
+             <amsynth_2/distortion_crunch> ,
+             <amsynth_2/osc2_sync> ,
+             <amsynth_2/portamento_time> ,
+             <amsynth_2/keyboard_mode> ,
+             <amsynth_2/osc2_pitch> ,
+             <amsynth_2/filter_type> ,
+             <amsynth_2/filter_slope> ,
+             <amsynth_2/freq_mod_osc> ,
+             <amsynth_2/filter_kbd_track> ,
+             <amsynth_2/filter_vel_sens> ,
+             <amsynth_2/amp_vel_sens> ,
+             <amsynth_2/portamento_mode> ,
+             <amsynth_2/midi> ,
+             <amsynth_2/:bypass> ;
+    lv2:prototype <http://code.google.com/p/amsynth/amsynth> ;
+    pedal:instanceNumber 2 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<amsynth_2/midi>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<amsynth_2/amp_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/amp_decay>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/amp_sustain>
+    ingen:value 0.410000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/amp_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc1_waveform>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_decay>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_sustain>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_resonance>
+    ingen:value 0.418270 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_env_amount>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_cutoff>
+    ingen:value 0.763357 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc2_detune>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc2_waveform>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/master_vol>
+    ingen:value 0.944681 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/lfo_freq>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/lfo_waveform>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc2_range>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc_mix>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/freq_mod_amount>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_mod_amount>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/amp_mod_amount>
+    ingen:value 0.296454 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc_mix_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc1_pulsewidth>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc2_pulsewidth>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/reverb_roomsize>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/reverb_damp>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/reverb_wet>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/reverb_width>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/distortion_crunch>
+    ingen:value 0.003830 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc2_sync>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/portamento_time>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/keyboard_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/osc2_pitch>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_type>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_slope>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/freq_mod_osc>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_kbd_track>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/filter_vel_sens>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/amp_vel_sens>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/portamento_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_2/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3>
+    ingen:canvasX 1742.0 ;
+    ingen:canvasY 836.0 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 5 ;
+    lv2:minorVersion 1 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <amsynth_3/out_l> ,
+             <amsynth_3/out_r> ,
+             <amsynth_3/amp_attack> ,
+             <amsynth_3/amp_decay> ,
+             <amsynth_3/amp_sustain> ,
+             <amsynth_3/amp_release> ,
+             <amsynth_3/osc1_waveform> ,
+             <amsynth_3/filter_attack> ,
+             <amsynth_3/filter_decay> ,
+             <amsynth_3/filter_sustain> ,
+             <amsynth_3/filter_release> ,
+             <amsynth_3/filter_resonance> ,
+             <amsynth_3/filter_env_amount> ,
+             <amsynth_3/filter_cutoff> ,
+             <amsynth_3/osc2_detune> ,
+             <amsynth_3/osc2_waveform> ,
+             <amsynth_3/master_vol> ,
+             <amsynth_3/lfo_freq> ,
+             <amsynth_3/lfo_waveform> ,
+             <amsynth_3/osc2_range> ,
+             <amsynth_3/osc_mix> ,
+             <amsynth_3/freq_mod_amount> ,
+             <amsynth_3/filter_mod_amount> ,
+             <amsynth_3/amp_mod_amount> ,
+             <amsynth_3/osc_mix_mode> ,
+             <amsynth_3/osc1_pulsewidth> ,
+             <amsynth_3/osc2_pulsewidth> ,
+             <amsynth_3/reverb_roomsize> ,
+             <amsynth_3/reverb_damp> ,
+             <amsynth_3/reverb_wet> ,
+             <amsynth_3/reverb_width> ,
+             <amsynth_3/distortion_crunch> ,
+             <amsynth_3/osc2_sync> ,
+             <amsynth_3/portamento_time> ,
+             <amsynth_3/keyboard_mode> ,
+             <amsynth_3/osc2_pitch> ,
+             <amsynth_3/filter_type> ,
+             <amsynth_3/filter_slope> ,
+             <amsynth_3/freq_mod_osc> ,
+             <amsynth_3/filter_kbd_track> ,
+             <amsynth_3/filter_vel_sens> ,
+             <amsynth_3/amp_vel_sens> ,
+             <amsynth_3/portamento_mode> ,
+             <amsynth_3/midi> ,
+             <amsynth_3/:bypass> ;
+    lv2:prototype <http://code.google.com/p/amsynth/amsynth> ;
+    pedal:instanceNumber 3 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<amsynth_3/midi>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<amsynth_3/amp_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/amp_decay>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/amp_sustain>
+    ingen:value 0.410000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/amp_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc1_waveform>
+    ingen:value 2.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_decay>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_sustain>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_resonance>
+    ingen:value 0.691154 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_env_amount>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_cutoff>
+    ingen:value 0.957210 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc2_detune>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc2_waveform>
+    ingen:value 3.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/master_vol>
+    ingen:value 0.326714 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/lfo_freq>
+    ingen:value 3.975177 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/lfo_waveform>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc2_range>
+    ingen:value 0.777305 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc_mix>
+    ingen:value -0.315366 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/freq_mod_amount>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_mod_amount>
+    ingen:value 0.335225 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/amp_mod_amount>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc_mix_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc1_pulsewidth>
+    ingen:value 0.794326 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc2_pulsewidth>
+    ingen:value 0.539953 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/reverb_roomsize>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/reverb_damp>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/reverb_wet>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/reverb_width>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/distortion_crunch>
+    ingen:value 0.617447 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc2_sync>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/portamento_time>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/keyboard_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/osc2_pitch>
+    ingen:value -2.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_type>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_slope>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/freq_mod_osc>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_kbd_track>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/filter_vel_sens>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/amp_vel_sens>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/portamento_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_3/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4>
+    ingen:canvasX 2609.5 ;
+    ingen:canvasY 903.6 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 5 ;
+    lv2:minorVersion 1 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <amsynth_4/out_l> ,
+             <amsynth_4/out_r> ,
+             <amsynth_4/amp_attack> ,
+             <amsynth_4/amp_decay> ,
+             <amsynth_4/amp_sustain> ,
+             <amsynth_4/amp_release> ,
+             <amsynth_4/osc1_waveform> ,
+             <amsynth_4/filter_attack> ,
+             <amsynth_4/filter_decay> ,
+             <amsynth_4/filter_sustain> ,
+             <amsynth_4/filter_release> ,
+             <amsynth_4/filter_resonance> ,
+             <amsynth_4/filter_env_amount> ,
+             <amsynth_4/filter_cutoff> ,
+             <amsynth_4/osc2_detune> ,
+             <amsynth_4/osc2_waveform> ,
+             <amsynth_4/master_vol> ,
+             <amsynth_4/lfo_freq> ,
+             <amsynth_4/lfo_waveform> ,
+             <amsynth_4/osc2_range> ,
+             <amsynth_4/osc_mix> ,
+             <amsynth_4/freq_mod_amount> ,
+             <amsynth_4/filter_mod_amount> ,
+             <amsynth_4/amp_mod_amount> ,
+             <amsynth_4/osc_mix_mode> ,
+             <amsynth_4/osc1_pulsewidth> ,
+             <amsynth_4/osc2_pulsewidth> ,
+             <amsynth_4/reverb_roomsize> ,
+             <amsynth_4/reverb_damp> ,
+             <amsynth_4/reverb_wet> ,
+             <amsynth_4/reverb_width> ,
+             <amsynth_4/distortion_crunch> ,
+             <amsynth_4/osc2_sync> ,
+             <amsynth_4/portamento_time> ,
+             <amsynth_4/keyboard_mode> ,
+             <amsynth_4/osc2_pitch> ,
+             <amsynth_4/filter_type> ,
+             <amsynth_4/filter_slope> ,
+             <amsynth_4/freq_mod_osc> ,
+             <amsynth_4/filter_kbd_track> ,
+             <amsynth_4/filter_vel_sens> ,
+             <amsynth_4/amp_vel_sens> ,
+             <amsynth_4/portamento_mode> ,
+             <amsynth_4/midi> ,
+             <amsynth_4/:bypass> ;
+    lv2:prototype <http://code.google.com/p/amsynth/amsynth> ;
+    pedal:instanceNumber 4 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<amsynth_4/midi>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<amsynth_4/amp_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/amp_decay>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/amp_sustain>
+    ingen:value 0.410000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/amp_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc1_waveform>
+    ingen:value 2.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_attack>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_decay>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_sustain>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_release>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_resonance>
+    ingen:value 0.754444 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_env_amount>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_cutoff>
+    ingen:value 1.254137 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc2_detune>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc2_waveform>
+    ingen:value 2.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/master_vol>
+    ingen:value 0.779669 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/lfo_freq>
+    ingen:value 2.790780 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/lfo_waveform>
+    ingen:value 2.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc2_range>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc_mix>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/freq_mod_amount>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_mod_amount>
+    ingen:value 0.252955 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/amp_mod_amount>
+    ingen:value -1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc_mix_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc1_pulsewidth>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc2_pulsewidth>
+    ingen:value 0.695035 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/reverb_roomsize>
+    ingen:value 0.940426 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/reverb_damp>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/reverb_wet>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/reverb_width>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/distortion_crunch>
+    ingen:value 0.771489 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc2_sync>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/portamento_time>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/keyboard_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/osc2_pitch>
+    ingen:value -12.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_type>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_slope>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/freq_mod_osc>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_kbd_track>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/filter_vel_sens>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/amp_vel_sens>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/portamento_mode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<amsynth_4/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<midigen>
+    ingen:canvasX 308.7 ;
+    ingen:canvasY 692.9 ;
+    ingen:enabled false ;
+    ingen:polyphonic false ;
+    lv2:microVersion 0 ;
+    lv2:minorVersion 512 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <midigen/sequence> ,
+             <midigen/bpm> ,
+             <midigen/progress> ,
+             <midigen/midiout> ,
+             <midigen/:bypass> ;
+    lv2:prototype <http://gareus.org/oss/lv2/midigen> ;
+    pedal:instanceNumber 10 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<midigen/midiout>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<midigen/sequence>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<midigen/bpm>
+    ingen:value 249.196429 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<midigen/progress>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<midigen/:bypass>
+    ingen:value 1 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpb>
+    ingen:value 4.000000 ;
+    lv2:index 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpm>
+    ingen:value 120.000000 ;
+    lv2:index 1 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:rolling>
+    ingen:value 0 ;
+    lv2:index 2 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<control_in>
+    atom:bufferType atom:Sequence ;
+    lv2:index 3 ;
+    lv2:name "Control In" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_in" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<control_out>
+    atom:bufferType atom:Sequence ;
+    lv2:index 4 ;
+    lv2:name "Control Out" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_out" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<capture_1>
+    lv2:index 5 ;
+    lv2:name "Capture 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_1" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<capture_2>
+    lv2:index 6 ;
+    lv2:name "Capture 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_2" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<playback_1>
+    lv2:index 7 ;
+    lv2:name "Playback 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_1" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<playback_2>
+    lv2:index 8 ;
+    lv2:name "Playback 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_2" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<midi_separated_mode>
+    ingen:value 0 ;
+    lv2:index 9 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<midi_loopback>
+    ingen:value 0 ;
+    lv2:index 10 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<>
+    doap:name "Drumsynth" ;
+    pedal:unitName "Unknown" ;
+    pedal:unitModel "None" ;
+    pedal:width 0 ;
+    pedal:height 0 ;
+    pedal:addressings <addressings.json> ;
+    pedal:screenshot <screenshot.png> ;
+    pedal:thumbnail <thumbnail.png> ;
+    pedal:version 2 ;
+    ingen:polyphony 1 ;
+    ingen:arc _:b1 ,
+              _:b2 ,
+              _:b3 ,
+              _:b4 ,
+              _:b5 ,
+              _:b6 ,
+              _:b7 ,
+              _:b8 ,
+              _:b9 ,
+              _:b10 ,
+              _:b11 ,
+              _:b12 ,
+              _:b13 ,
+              _:b14 ,
+              _:b15 ,
+              _:b16 ,
+              _:b17 ,
+              _:b18 ,
+              _:b19 ,
+              _:b20 ,
+              _:b21 ,
+              _:b22 ;
+    ingen:block <amsynth> ,
+                <amsynth_1> ,
+                <amsynth_2> ,
+                <amsynth_3> ,
+                <amsynth_4> ,
+                <midigen> ;
+    lv2:port <:bpb> ,
+             <:bpm> ,
+             <:rolling> ,
+             <midi_separated_mode> ,
+             <midi_loopback> ,
+             <control_in> ,
+             <control_out> ,
+             <capture_1> ,
+             <capture_2> ,
+             <playback_1> ,
+             <playback_2> ;
+    lv2:extensionData <http://lv2plug.in/ns/ext/state#interface> ;
+    a lv2:Plugin ,
+        ingen:Graph ,
+        pedal:Pedalboard .

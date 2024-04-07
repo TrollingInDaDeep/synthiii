@@ -1,0 +1,477 @@
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix ingen: <http://drobilla.net/ns/ingen#> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
+@prefix mod:   <http://moddevices.com/ns/mod#> .
+@prefix pedal: <http://moddevices.com/ns/modpedal#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+_:b1
+    ingen:tail <_phaser/out> ;
+    ingen:head <Delay/left_in> .
+
+_:b2
+    ingen:tail <_phaser/out> ;
+    ingen:head <Delay/right_in> .
+
+_:b3
+    ingen:tail <_fuzzfacefm_/out> ;
+    ingen:head <_phaser/in> .
+
+_:b4
+    ingen:tail <capture_1> ;
+    ingen:head <_fuzzfacefm_/in> .
+
+_:b5
+    ingen:tail <capture_2> ;
+    ingen:head <_fuzzfacefm_/in> .
+
+_:b6
+    ingen:tail <Delay/left_out> ;
+    ingen:head <Freaktail/in0> .
+
+_:b7
+    ingen:tail <Delay/right_out> ;
+    ingen:head <Freaktail/in1> .
+
+_:b8
+    ingen:tail <Freaktail/out0> ;
+    ingen:head <playback_1> .
+
+_:b9
+    ingen:tail <Freaktail/out1> ;
+    ingen:head <playback_2> .
+
+<_fuzzfacefm_>
+    ingen:canvasX 728.0 ;
+    ingen:canvasY 188.9 ;
+    ingen:enabled false ;
+    ingen:polyphonic false ;
+    lv2:microVersion 3 ;
+    lv2:minorVersion 28 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <_fuzzfacefm_/in> ,
+             <_fuzzfacefm_/out> ,
+             <_fuzzfacefm_/DRIVE> ,
+             <_fuzzfacefm_/FUZZ> ,
+             <_fuzzfacefm_/INPUT> ,
+             <_fuzzfacefm_/LEVEL> ,
+             <_fuzzfacefm_/:bypass> ;
+    lv2:prototype <http://guitarix.sourceforge.net/plugins/gx_fuzzfacefm_#_fuzzfacefm_> ;
+    pedal:instanceNumber 1 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<_fuzzfacefm_/in>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<_fuzzfacefm_/in>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<_fuzzfacefm_/DRIVE>
+    ingen:value 0.515625 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_fuzzfacefm_/FUZZ>
+    ingen:value 0.500000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_fuzzfacefm_/INPUT>
+    ingen:value 0.500000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_fuzzfacefm_/LEVEL>
+    ingen:value 0.500000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_fuzzfacefm_/:bypass>
+    ingen:value 1 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 9 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_phaser>
+    ingen:canvasX 1022.5 ;
+    ingen:canvasY 167.8 ;
+    ingen:enabled false ;
+    ingen:polyphonic false ;
+    lv2:microVersion 3 ;
+    lv2:minorVersion 28 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <_phaser/in> ,
+             <_phaser/out> ,
+             <_phaser/dry_wet> ,
+             <_phaser/level> ,
+             <_phaser/speed> ,
+             <_phaser/:bypass> ;
+    lv2:prototype <http://guitarix.sourceforge.net/plugins/gx_phaser#_phaser> ;
+    pedal:instanceNumber 2 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<_phaser/in>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<_phaser/in>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<_phaser/dry_wet>
+    ingen:value 50.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_phaser/level>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_phaser/speed>
+    ingen:value 2.678571 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<_phaser/:bypass>
+    ingen:value 1 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 10 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay>
+    ingen:canvasX 1280.4 ;
+    ingen:canvasY 160.8 ;
+    ingen:enabled false ;
+    ingen:polyphonic false ;
+    lv2:microVersion 4 ;
+    lv2:minorVersion 0 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <Delay/left_in> ,
+             <Delay/right_in> ,
+             <Delay/left_out> ,
+             <Delay/right_out> ,
+             <Delay/l_delay> ,
+             <Delay/rl_delay> ,
+             <Delay/rl_fixed_ratios> ,
+             <Delay/feedback> ,
+             <Delay/fb_tone> ,
+             <Delay/fx_mix> ,
+             <Delay/output> ,
+             <Delay/:bypass> ;
+    lv2:prototype <http://moddevices.com/plugins/mda/Delay> ;
+    pedal:instanceNumber 3 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<Delay/left_in>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Delay/right_in>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Delay/left_in>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Delay/right_in>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Delay/l_delay>
+    ingen:value 119.527557 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 1 ;
+        lv2:minimum 0.000000 ;
+        lv2:maximum 330.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/rl_delay>
+    ingen:value 0.771654 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 2 ;
+        lv2:minimum 0.000000 ;
+        lv2:maximum 2.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/rl_fixed_ratios>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/feedback>
+    ingen:value 55.118107 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 3 ;
+        lv2:minimum 0.000000 ;
+        lv2:maximum 100.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/fb_tone>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/fx_mix>
+    ingen:value 56.692917 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 4 ;
+        lv2:minimum 0.000000 ;
+        lv2:maximum 100.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/output>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/:bypass>
+    ingen:value 1 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 11 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail>
+    ingen:canvasX 1670.7 ;
+    ingen:canvasY 141.5 ;
+    ingen:enabled false ;
+    ingen:polyphonic false ;
+    lv2:microVersion 0 ;
+    lv2:minorVersion 1 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <Freaktail/in0> ,
+             <Freaktail/in1> ,
+             <Freaktail/out0> ,
+             <Freaktail/out1> ,
+             <Freaktail/Decay> ,
+             <Freaktail/Roomsize> ,
+             <Freaktail/Tail_level> ,
+             <Freaktail/:bypass> ;
+    lv2:prototype <http://faust-lv2.googlecode.com/Freaktail> ;
+    pedal:instanceNumber 4 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<Freaktail/in0>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Freaktail/in1>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Freaktail/in0>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Freaktail/in1>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Freaktail/Decay>
+    ingen:value 0.418898 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 5 ;
+        lv2:minimum 0.100000 ;
+        lv2:maximum 1.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail/Roomsize>
+    ingen:value 1.974567 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 6 ;
+        lv2:minimum 0.010000 ;
+        lv2:maximum 5.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail/Tail_level>
+    ingen:value 0.425984 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 7 ;
+        lv2:minimum 0.100000 ;
+        lv2:maximum 1.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail/:bypass>
+    ingen:value 1 ;
+    midi:binding [
+        midi:channel 3 ;
+        midi:controllerNumber 12 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpb>
+    ingen:value 4.000000 ;
+    lv2:index 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpm>
+    ingen:value 119.000000 ;
+    lv2:index 1 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:rolling>
+    ingen:value 0 ;
+    lv2:index 2 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<control_in>
+    atom:bufferType atom:Sequence ;
+    lv2:index 3 ;
+    lv2:name "Control In" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_in" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<control_out>
+    atom:bufferType atom:Sequence ;
+    lv2:index 4 ;
+    lv2:name "Control Out" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_out" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<capture_1>
+    lv2:index 5 ;
+    lv2:name "Capture 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_1" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<capture_2>
+    lv2:index 6 ;
+    lv2:name "Capture 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_2" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<playback_1>
+    lv2:index 7 ;
+    lv2:name "Playback 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_1" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<playback_2>
+    lv2:index 8 ;
+    lv2:name "Playback 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_2" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<midi_separated_mode>
+    ingen:value 0 ;
+    lv2:index 9 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<midi_loopback>
+    ingen:value 0 ;
+    lv2:index 10 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<>
+    doap:name "BasicGuitar" ;
+    pedal:unitName "Unknown" ;
+    pedal:unitModel "None" ;
+    pedal:width 0 ;
+    pedal:height 0 ;
+    pedal:addressings <addressings.json> ;
+    pedal:screenshot <screenshot.png> ;
+    pedal:thumbnail <thumbnail.png> ;
+    pedal:version 1 ;
+    ingen:polyphony 1 ;
+    ingen:arc _:b1 ,
+              _:b2 ,
+              _:b3 ,
+              _:b4 ,
+              _:b5 ,
+              _:b6 ,
+              _:b7 ,
+              _:b8 ,
+              _:b9 ;
+    ingen:block <_fuzzfacefm_> ,
+                <_phaser> ,
+                <Delay> ,
+                <Freaktail> ;
+    lv2:port <:bpb> ,
+             <:bpm> ,
+             <:rolling> ,
+             <midi_separated_mode> ,
+             <midi_loopback> ,
+             <control_in> ,
+             <control_out> ,
+             <capture_1> ,
+             <capture_2> ,
+             <playback_1> ,
+             <playback_2> ;
+    lv2:extensionData <http://lv2plug.in/ns/ext/state#interface> ;
+    a lv2:Plugin ,
+        ingen:Graph ,
+        pedal:Pedalboard .

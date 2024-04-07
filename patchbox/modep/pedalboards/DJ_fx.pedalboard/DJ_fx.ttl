@@ -1,0 +1,483 @@
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix ingen: <http://drobilla.net/ns/ingen#> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
+@prefix mod:   <http://moddevices.com/ns/mod#> .
+@prefix pedal: <http://moddevices.com/ns/modpedal#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+_:b1
+    ingen:tail <capture_2> ;
+    ingen:head <Delay/right_in> .
+
+_:b2
+    ingen:tail <capture_1> ;
+    ingen:head <Delay/right_in> .
+
+_:b3
+    ingen:tail <capture_2> ;
+    ingen:head <Delay/left_in> .
+
+_:b4
+    ingen:tail <Delay/left_out> ;
+    ingen:head <dj_eq_mono/input> .
+
+_:b5
+    ingen:tail <Delay/right_out> ;
+    ingen:head <dj_eq_mono/input> .
+
+_:b6
+    ingen:tail <dj_eq_mono/output> ;
+    ingen:head <Flanger/in_l> .
+
+_:b7
+    ingen:tail <dj_eq_mono/output> ;
+    ingen:head <Flanger/in_r> .
+
+_:b8
+    ingen:tail <Freaktail/out0> ;
+    ingen:head <playback_1> .
+
+_:b9
+    ingen:tail <Freaktail/out1> ;
+    ingen:head <playback_2> .
+
+_:b10
+    ingen:tail <Flanger/out_r> ;
+    ingen:head <Freaktail/in0> .
+
+_:b11
+    ingen:tail <Flanger/out_r> ;
+    ingen:head <Freaktail/in1> .
+
+_:b12
+    ingen:tail <Flanger/out_l> ;
+    ingen:head <Freaktail/in1> .
+
+<Delay>
+    ingen:canvasX 308.7 ;
+    ingen:canvasY 78.9 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 4 ;
+    lv2:minorVersion 0 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <Delay/left_in> ,
+             <Delay/right_in> ,
+             <Delay/left_out> ,
+             <Delay/right_out> ,
+             <Delay/l_delay> ,
+             <Delay/rl_delay> ,
+             <Delay/rl_fixed_ratios> ,
+             <Delay/feedback> ,
+             <Delay/fb_tone> ,
+             <Delay/fx_mix> ,
+             <Delay/output> ,
+             <Delay/:bypass> ;
+    lv2:prototype <http://moddevices.com/plugins/mda/Delay> ;
+    pedal:instanceNumber 2 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<Delay/left_in>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Delay/right_in>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Delay/left_in>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Delay/right_in>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Delay/l_delay>
+    ingen:value 144.375000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/rl_delay>
+    ingen:value 0.878348 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/rl_fixed_ratios>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/feedback>
+    ingen:value 43.526786 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/fb_tone>
+    ingen:value -0.949777 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/fx_mix>
+    ingen:value 51.729911 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/output>
+    ingen:value -1.674107 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Delay/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<dj_eq_mono>
+    ingen:canvasX 879.1 ;
+    ingen:canvasY 117.4 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 0 ;
+    lv2:minorVersion 0 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <dj_eq_mono/input> ,
+             <dj_eq_mono/output> ,
+             <dj_eq_mono/lo> ,
+             <dj_eq_mono/mid> ,
+             <dj_eq_mono/hi> ,
+             <dj_eq_mono/latency> ,
+             <dj_eq_mono/:bypass> ;
+    lv2:prototype <http://plugin.org.uk/swh-plugins/dj_eq_mono> ;
+    pedal:instanceNumber 4 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<dj_eq_mono/input>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<dj_eq_mono/input>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<dj_eq_mono/lo>
+    ingen:value -36.488190 ;
+    midi:binding [
+        midi:channel 2 ;
+        midi:controllerNumber 1 ;
+        lv2:minimum -70.000000 ;
+        lv2:maximum 6.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<dj_eq_mono/mid>
+    ingen:value -33.496063 ;
+    midi:binding [
+        midi:channel 2 ;
+        midi:controllerNumber 2 ;
+        lv2:minimum -70.000000 ;
+        lv2:maximum 6.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<dj_eq_mono/hi>
+    ingen:value -35.889763 ;
+    midi:binding [
+        midi:channel 2 ;
+        midi:controllerNumber 3 ;
+        lv2:minimum -70.000000 ;
+        lv2:maximum 6.000000 ;
+        a midi:Controller ;
+    ] ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<dj_eq_mono/latency>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<dj_eq_mono/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger>
+    ingen:canvasX 1304.6 ;
+    ingen:canvasY 72.9 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 0 ;
+    lv2:minorVersion 60 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <Flanger/in_l> ,
+             <Flanger/in_r> ,
+             <Flanger/out_l> ,
+             <Flanger/out_r> ,
+             <Flanger/min_delay> ,
+             <Flanger/mod_depth> ,
+             <Flanger/mod_rate> ,
+             <Flanger/feedback> ,
+             <Flanger/stereo> ,
+             <Flanger/reset> ,
+             <Flanger/amount> ,
+             <Flanger/dry> ,
+             <Flanger/:bypass> ;
+    lv2:prototype <http://calf.sourceforge.net/plugins/Flanger> ;
+    pedal:instanceNumber 5 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<Flanger/in_l>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Flanger/in_r>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Flanger/in_l>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Flanger/in_r>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Flanger/min_delay>
+    ingen:value 0.100000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/mod_depth>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/mod_rate>
+    ingen:value 1.280424 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/feedback>
+    ingen:value -0.148058 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/stereo>
+    ingen:value 360.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/reset>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/amount>
+    ingen:value 1.752232 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/dry>
+    ingen:value 0.984375 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Flanger/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail>
+    ingen:canvasX 1895.8 ;
+    ingen:canvasY 65.1 ;
+    ingen:enabled false ;
+    ingen:polyphonic false ;
+    lv2:microVersion 0 ;
+    lv2:minorVersion 1 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <Freaktail/in0> ,
+             <Freaktail/in1> ,
+             <Freaktail/out0> ,
+             <Freaktail/out1> ,
+             <Freaktail/Decay> ,
+             <Freaktail/Roomsize> ,
+             <Freaktail/Tail_level> ,
+             <Freaktail/:bypass> ;
+    lv2:prototype <http://faust-lv2.googlecode.com/Freaktail> ;
+    pedal:instanceNumber 6 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<Freaktail/in0>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Freaktail/in1>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<Freaktail/in0>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Freaktail/in1>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<Freaktail/Decay>
+    ingen:value 0.434989 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail/Roomsize>
+    ingen:value 2.889275 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail/Tail_level>
+    ingen:value 0.145201 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<Freaktail/:bypass>
+    ingen:value 1 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpb>
+    ingen:value 4.000000 ;
+    lv2:index 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpm>
+    ingen:value 120.000000 ;
+    lv2:index 1 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:rolling>
+    ingen:value 0 ;
+    lv2:index 2 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<control_in>
+    atom:bufferType atom:Sequence ;
+    lv2:index 3 ;
+    lv2:name "Control In" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_in" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<control_out>
+    atom:bufferType atom:Sequence ;
+    lv2:index 4 ;
+    lv2:name "Control Out" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_out" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<capture_1>
+    lv2:index 5 ;
+    lv2:name "Capture 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_1" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<capture_2>
+    lv2:index 6 ;
+    lv2:name "Capture 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_2" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<playback_1>
+    lv2:index 7 ;
+    lv2:name "Playback 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_1" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<playback_2>
+    lv2:index 8 ;
+    lv2:name "Playback 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_2" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<midi_separated_mode>
+    ingen:value 0 ;
+    lv2:index 9 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<midi_loopback>
+    ingen:value 0 ;
+    lv2:index 10 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<>
+    doap:name "DJ fx" ;
+    pedal:unitName "Unknown" ;
+    pedal:unitModel "None" ;
+    pedal:width 0 ;
+    pedal:height 0 ;
+    pedal:addressings <addressings.json> ;
+    pedal:screenshot <screenshot.png> ;
+    pedal:thumbnail <thumbnail.png> ;
+    pedal:version 1 ;
+    ingen:polyphony 1 ;
+    ingen:arc _:b1 ,
+              _:b2 ,
+              _:b3 ,
+              _:b4 ,
+              _:b5 ,
+              _:b6 ,
+              _:b7 ,
+              _:b8 ,
+              _:b9 ,
+              _:b10 ,
+              _:b11 ,
+              _:b12 ;
+    ingen:block <Delay> ,
+                <dj_eq_mono> ,
+                <Flanger> ,
+                <Freaktail> ;
+    lv2:port <:bpb> ,
+             <:bpm> ,
+             <:rolling> ,
+             <midi_separated_mode> ,
+             <midi_loopback> ,
+             <control_in> ,
+             <control_out> ,
+             <capture_1> ,
+             <capture_2> ,
+             <playback_1> ,
+             <playback_2> ;
+    lv2:extensionData <http://lv2plug.in/ns/ext/state#interface> ;
+    a lv2:Plugin ,
+        ingen:Graph ,
+        pedal:Pedalboard .

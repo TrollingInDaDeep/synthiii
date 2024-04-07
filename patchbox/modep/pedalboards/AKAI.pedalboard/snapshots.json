@@ -1,0 +1,32 @@
+{
+    "current": 0,
+    "snapshots": [
+        {
+            "name": "Default",
+            "data": {
+                "midi_display_lv2": {
+                    "bypassed": true,
+                    "parameters": {},
+                    "ports": {},
+                    "preset": ""
+                },
+                "Nekobi": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "waveform": 1.0,
+                        "tuning": -12.0,
+                        "cutoff": 81.102356,
+                        "resonance": 68.070869,
+                        "env_mod": 50.0,
+                        "decay": 72.440948,
+                        "accent": 17.322836,
+                        "volume": 75.0,
+                        "lv2_enabled": 1.0
+                    },
+                    "preset": ""
+                }
+            }
+        }
+    ]
+}

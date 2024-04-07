@@ -1,0 +1,541 @@
+@prefix atom:  <http://lv2plug.in/ns/ext/atom#> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix ingen: <http://drobilla.net/ns/ingen#> .
+@prefix lv2:   <http://lv2plug.in/ns/lv2core#> .
+@prefix midi:  <http://lv2plug.in/ns/ext/midi#> .
+@prefix mod:   <http://moddevices.com/ns/mod#> .
+@prefix pedal: <http://moddevices.com/ns/modpedal#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+
+<mini>
+    ingen:canvasX 1371.3 ;
+    ingen:canvasY 245.7 ;
+    ingen:enabled true ;
+    ingen:polyphonic false ;
+    lv2:microVersion 2 ;
+    lv2:minorVersion 23 ;
+    mod:builderVersion 0 ;
+    mod:releaseNumber 0 ;
+    lv2:port <mini/lv2_audio_in_1> ,
+             <mini/lv2_audio_in_2> ,
+             <mini/lv2_audio_out_1> ,
+             <mini/lv2_audio_out_2> ,
+             <mini/param_1> ,
+             <mini/param_2> ,
+             <mini/param_3> ,
+             <mini/param_4> ,
+             <mini/param_5> ,
+             <mini/param_6> ,
+             <mini/param_7> ,
+             <mini/param_8> ,
+             <mini/param_9> ,
+             <mini/param_10> ,
+             <mini/param_11> ,
+             <mini/param_12> ,
+             <mini/param_13> ,
+             <mini/param_14> ,
+             <mini/param_15> ,
+             <mini/param_16> ,
+             <mini/param_17> ,
+             <mini/param_18> ,
+             <mini/param_19> ,
+             <mini/param_20> ,
+             <mini/param_21> ,
+             <mini/param_22> ,
+             <mini/param_23> ,
+             <mini/param_24> ,
+             <mini/lv2_enabled> ,
+             <mini/tooltips> ,
+             <mini/cableOpacity> ,
+             <mini/cableTension> ,
+             <mini/rackBrightness> ,
+             <mini/haloBrightness> ,
+             <mini/knobMode> ,
+             <mini/knobScroll> ,
+             <mini/knobScrollSensitivity> ,
+             <mini/lockModules> ,
+             <mini/rateLimit> ,
+             <mini/browserSort> ,
+             <mini/browserZoom> ,
+             <mini/invertZoom> ,
+             <mini/squeezeModules> ,
+             <mini/r_audio_in_1> ,
+             <mini/r_audio_in_2> ,
+             <mini/r_cv_in_1> ,
+             <mini/r_cv_in_2> ,
+             <mini/r_cv_in_3> ,
+             <mini/r_cv_in_4> ,
+             <mini/r_cv_in_5> ,
+             <mini/r_time_flags> ,
+             <mini/r_time_bar> ,
+             <mini/r_time_beat> ,
+             <mini/r_time_beatsPerBar> ,
+             <mini/r_time_beatType> ,
+             <mini/r_time_frame> ,
+             <mini/r_time_barStartTick> ,
+             <mini/r_time_bpm> ,
+             <mini/r_time_tick> ,
+             <mini/r_time_ticksPerBeat> ,
+             <mini/lv2_cv_in_1> ,
+             <mini/lv2_cv_in_2> ,
+             <mini/lv2_cv_in_3> ,
+             <mini/lv2_cv_in_4> ,
+             <mini/lv2_cv_in_5> ,
+             <mini/lv2_cv_out_1> ,
+             <mini/lv2_cv_out_2> ,
+             <mini/lv2_cv_out_3> ,
+             <mini/lv2_cv_out_4> ,
+             <mini/lv2_cv_out_5> ,
+             <mini/lv2_events_in> ,
+             <mini/lv2_events_out> ,
+             <mini/:bypass> ;
+    lv2:prototype <https://distrho.kx.studio/plugins/cardinal#mini> ;
+    pedal:instanceNumber 8 ;
+    pedal:preset <> ;
+    a ingen:Block .
+
+<mini/lv2_audio_in_1>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<mini/lv2_audio_in_2>
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<mini/lv2_audio_in_1>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<mini/lv2_audio_in_2>
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<mini/lv2_cv_in_1>
+    a lv2:CVPort ,
+        lv2:InputPort .
+
+<mini/lv2_cv_in_2>
+    a lv2:CVPort ,
+        lv2:InputPort .
+
+<mini/lv2_cv_in_3>
+    a lv2:CVPort ,
+        lv2:InputPort .
+
+<mini/lv2_cv_in_4>
+    a lv2:CVPort ,
+        lv2:InputPort .
+
+<mini/lv2_cv_in_5>
+    a lv2:CVPort ,
+        lv2:InputPort .
+
+<mini/lv2_cv_out_1>
+    a lv2:CVPort ,
+        lv2:OutputPort .
+
+<mini/lv2_cv_out_2>
+    a lv2:CVPort ,
+        lv2:OutputPort .
+
+<mini/lv2_cv_out_3>
+    a lv2:CVPort ,
+        lv2:OutputPort .
+
+<mini/lv2_cv_out_4>
+    a lv2:CVPort ,
+        lv2:OutputPort .
+
+<mini/lv2_cv_out_5>
+    a lv2:CVPort ,
+        lv2:OutputPort .
+
+<mini/lv2_events_in>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<mini/lv2_events_out>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<mini/param_1>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_2>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_3>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_4>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_5>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_6>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_7>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_8>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_9>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_10>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_11>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_12>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_13>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_14>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_15>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_16>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_17>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_18>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_19>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_20>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_21>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_22>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_23>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/param_24>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/lv2_enabled>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/tooltips>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/cableOpacity>
+    ingen:value 50.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/cableTension>
+    ingen:value 75.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/rackBrightness>
+    ingen:value 100.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/haloBrightness>
+    ingen:value 25.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/knobMode>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/knobScroll>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/knobScrollSensitivity>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/lockModules>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/rateLimit>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/browserSort>
+    ingen:value 3.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/browserZoom>
+    ingen:value 50.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/invertZoom>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/squeezeModules>
+    ingen:value 1.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<mini/r_audio_in_1>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_audio_in_2>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_cv_in_1>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_cv_in_2>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_cv_in_3>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_cv_in_4>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_cv_in_5>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_flags>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_bar>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_beat>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_beatsPerBar>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_beatType>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_frame>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_barStartTick>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_bpm>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_tick>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/r_time_ticksPerBeat>
+    a lv2:ControlPort ,
+        lv2:OutputPort .
+
+<mini/:bypass>
+    ingen:value 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpb>
+    ingen:value 4.000000 ;
+    lv2:index 0 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:bpm>
+    ingen:value 120.000000 ;
+    lv2:index 1 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<:rolling>
+    ingen:value 0 ;
+    lv2:index 2 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<control_in>
+    atom:bufferType atom:Sequence ;
+    lv2:index 3 ;
+    lv2:name "Control In" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_in" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<control_out>
+    atom:bufferType atom:Sequence ;
+    lv2:index 4 ;
+    lv2:name "Control Out" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "control_out" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<capture_1>
+    lv2:index 5 ;
+    lv2:name "Capture 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_1" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<capture_2>
+    lv2:index 6 ;
+    lv2:name "Capture 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "capture_2" ;
+    a lv2:AudioPort ,
+        lv2:InputPort .
+
+<playback_1>
+    lv2:index 7 ;
+    lv2:name "Playback 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_1" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<playback_2>
+    lv2:index 8 ;
+    lv2:name "Playback 2" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "playback_2" ;
+    a lv2:AudioPort ,
+        lv2:OutputPort .
+
+<midi_separated_mode>
+    ingen:value 0 ;
+    lv2:index 9 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<midi_loopback>
+    ingen:value 0 ;
+    lv2:index 10 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<>
+    doap:name "Cardinal" ;
+    pedal:unitName "Unknown" ;
+    pedal:unitModel "None" ;
+    pedal:width 4480 ;
+    pedal:height 2238 ;
+    pedal:addressings <addressings.json> ;
+    pedal:screenshot <screenshot.png> ;
+    pedal:thumbnail <thumbnail.png> ;
+    pedal:version 3 ;
+    ingen:polyphony 1 ;
+    ingen:block <mini> ;
+    lv2:port <:bpb> ,
+             <:bpm> ,
+             <:rolling> ,
+             <midi_separated_mode> ,
+             <midi_loopback> ,
+             <control_in> ,
+             <control_out> ,
+             <capture_1> ,
+             <capture_2> ,
+             <playback_1> ,
+             <playback_2> ;
+    lv2:extensionData <http://lv2plug.in/ns/ext/state#interface> ;
+    a lv2:Plugin ,
+        ingen:Graph ,
+        pedal:Pedalboard .
