@@ -97,9 +97,10 @@ const int numDrumSteps = 16;
 // pointer at which step in the drum sequencer we are
 int drumStepPointer = 0;
 
-int keypadMode = 1; //0=play, 1=sequence notes 2=fillXStep, 4=settings
+int keypadMode = 0; //experiment: just use play and add recordDrum switch
+                    //originally: 0=play, 1=sequence notes 2=fillXStep, 4=settings
 bool runDrum = true;
-
+bool recordDrum = true; // if played notes are recorded into the drumSequence
 //bools if a drum sound should be triggered at the selected step
 bool drumSequence [drumInstruments][numDrumSteps] {
   {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
@@ -109,7 +110,7 @@ bool drumSequence [drumInstruments][numDrumSteps] {
 };
 
 int howManyKeypadKeys = 16;
-char drumPadChars [16] = {'1', '2', '3', '+', '4', '5', '6', '>', '7', '8', '9', '!', '*', '0', '#', 'R'};
+char drumPadChars [howManyKeypadKeys] = {'1', '2', '3', '+', '4', '5', '6', '>', '7', '8', '9', '!', '*', '0', '#', 'R'};
 
 
 // ############
