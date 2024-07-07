@@ -70,7 +70,7 @@ void nextStep() {
 
 //buggy, not sure if needed
 void stopLastNote(){
-  usbMIDI.sendNoteOff(lastNoteSent, velocity, 1);
+  usbMIDI.sendNoteOff(lastNoteSent, velocity, synthMidiChannel);
   noteStopped = true;
 
 }
@@ -79,14 +79,14 @@ void startNote(int noteToPlay){
   stopLastNote();
 
   //set slide back to 0
-  usbMIDI.sendControlChange(20, 0, 1); //20 is the slide ctrlr number
+  usbMIDI.sendControlChange(20, 0, synthMidiChannel); //20 is the slide ctrlr number
 
   //if slide for note enabled -> enable slide control
   if (arr_seq_buttons[2][noteToPlay]){
-      usbMIDI.sendControlChange(20, slideAmount, 1); //20 is the slide ctrlr number
+      usbMIDI.sendControlChange(20, slideAmount, synthMidiChannel); //20 is the slide ctrlr number
   }
   noteStart = millis();
-  usbMIDI.sendNoteOn(arr_seq_buttons[0][noteToPlay], velocity, 1);
+  usbMIDI.sendNoteOn(arr_seq_buttons[0][noteToPlay], velocity, synthMidiChannel);
   noteStopped = false;
   lastNoteSent=arr_seq_buttons[0][noteToPlay];
   digitalWrite(I7, HIGH);
@@ -106,7 +106,7 @@ void nextPulse() {
 }
 
 void stopNote(int noteToStop){
-  usbMIDI.sendNoteOff(arr_seq_buttons[0][noteToStop], velocity, 1);
+  usbMIDI.sendNoteOff(arr_seq_buttons[0][noteToStop], velocity, synthMidiChannel);
   noteStopped = true;
   //digitalWrite(I7, LOW);
 }

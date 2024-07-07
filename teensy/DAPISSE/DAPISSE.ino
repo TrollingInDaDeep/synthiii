@@ -53,7 +53,7 @@ int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
 bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
 bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
-
+int synthMidiChannel = 2;
 ///
 /// Variable definitions
 ///
@@ -84,11 +84,13 @@ float tempoModifier = 6; //multiplication value with sequencer tempo to get n-ti
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int drumInstruments = 4;
 // which midi note to play for each instrument
-const int instrumentNotes[] = {60, 75, 63, 67};
+const int instrumentNotes[] = {60, 64, 63, 67}; //60=C, 64 = E, 63 = D#, 67 = G
 // which instrument is currently selected for keypad play mode
-int selectedInstrument = 0;
-
-
+int selectedInstrument = 1;
+int drumMidiChannel = 3;
+bool drumNoteStopped = true; //if drum notes have been stopped for this step already (goes for all drum notes)
+float drumNoteStart = 0; //timestamp when the drum note started
+int drumGateTime = 2; //time in ms how long the drum note should be on
 
 //number of notes / steps the drum sequencer has
 const int numDrumSteps = 16;
@@ -100,10 +102,10 @@ bool runDrum = true;
 
 //bools if a drum sound should be triggered at the selected step
 bool drumSequence [drumInstruments][numDrumSteps] {
-  {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0},
-  {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0},
-  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+  {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
+  {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
+  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, // ?
 };
 
 int howManyKeypadKeys = 16;
@@ -458,7 +460,7 @@ void UpdateSendValues() {
 
         // Type = MIDI CC
         if (!arr_analog_input_type[mux][pin]) {
-          usbMIDI.sendControlChange(arr_send_analog_inputs[mux][pin], arr_read_analog_inputs[mux][pin], 1);
+          usbMIDI.sendControlChange(arr_send_analog_inputs[mux][pin], arr_read_analog_inputs[mux][pin], synthMidiChannel);
         } else {
           //Type = Internal Variable
           //Mapping of Controller Number (from arr_send_analog_inputs) to internal variables
@@ -595,7 +597,7 @@ void UpdateSendValues() {
 
         // Type = MIDI CC
         if (!arr_digital_input_type[mux][pin]) {
-          //usbMIDI.sendControlChange(arr_send_digital_inputs[mux][pin], arr_read_digital_inputs[mux][pin], 1);
+          //usbMIDI.sendControlChange(arr_send_digital_inputs[mux][pin], arr_read_digital_inputs[mux][pin], synthMidiChannel);
         } else {
           //Type = Internal Variable
           //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
@@ -810,6 +812,11 @@ void loop() {
       }
     }
     
+    if (!drumNoteStopped) {
+      if (currentMillis - drumNoteStart >= drumGateTime) {
+        stopAllDrumNotes();
+      }
+    }
   }
 
   isSlowReadCycle = 0; //

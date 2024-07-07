@@ -16,9 +16,7 @@ void nextDrumStep() {
     drumStepPointer = 0;
   }
 
-  for (int i = 0; i < drumInstruments; i++) {
-    stopDrumNote(instrumentNotes[i]);
-  }
+  stopAllDrumNotes();
   
   for (int i = 0; i < drumInstruments; i++) {
     if (drumSequence[i][drumStepPointer]) {
@@ -28,15 +26,24 @@ void nextDrumStep() {
   drumStepPointer++;
 }
 
+void stopAllDrumNotes(){
+  for (int i = 0; i < drumInstruments; i++) {
+    stopDrumNote(instrumentNotes[i]);
+  }
+}
+
 void startDrumNote(int noteToStart) {
-  usbMIDI.sendNoteOn(noteToStart, 127, 2);
+  drumNoteStart = millis();
+  usbMIDI.sendNoteOn(noteToStart, 127, drumMidiChannel);
   //Serial.println(noteToStart);
-  stopDrumNote(noteToStart);
+  //stopDrumNote(noteToStart);
+  drumNoteStopped = false;
 }
 
 void stopDrumNote(int noteToStop) {
-  usbMIDI.sendNoteOff(noteToStop, 127, 2);
+  usbMIDI.sendNoteOff(noteToStop, 127, drumMidiChannel);
   //Serial.println(noteToStop);
+  drumNoteStopped = true;
 }
 
 /// sets the modifier of the drum tempo based on the sequencer clock

@@ -13,3 +13,19 @@ move window: alt+space -> move -> maus oder pfeiltasten -> enter / klick
 
 /usr/bin/pd -rt -alsamidi -nogui -audiobuf 4 /home/patch/synthiii/main.pd
 /usr/bin/pd -rt -alsamidi -nogui -audiobuf 4 /home/patch/synthiii/readComPort.pd
+
+
+DAPISSE Pedalboard:
+midi filter (channel 2, synth) -> Hauptsynth -> Delay -> Out
+
+Midi filter für drum channel (channel 3) 
+-> noteToChannel Map:
+	- C auf channel 1
+	- D# auf channel 2
+	- E auf channel 3
+	- G auf channel 4
+
+dann jeweils für jedes drum instrument
+channel filter (1) -> transpose -> Drum synth
+channel filter (2) -> transpose -> highHat synth
+channel filter (3) -> transpose -> snare synth
