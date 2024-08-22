@@ -1,5 +1,5 @@
 #include <Keypad.h>
-
+#include <ArduinoTapTempo.h>
 
 ///
 /// How to
@@ -54,9 +54,11 @@ bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slo
 bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
 bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
 int synthMidiChannel = 2;
+bool blnTapTempo = 1; //1 = playMode button becomes tapTempo button 
 ///
 /// Variable definitions
 ///
+ArduinoTapTempo tapTempo;
 
 int analogReadDiff = 0;
 int caseNumber = 0;
@@ -100,16 +102,18 @@ int drumStepPointer = 0;
 int keypadMode = 0; //experiment: just use play and add recordDrum switch
                     //originally: 0=play, 1=sequence notes 2=fillXStep, 4=settings
 bool runDrum = true;
-bool recordDrum = true; // if played notes are recorded into the drumSequence
+bool recordDrum = true; // true = played notes are recorded into the drumSequence
 //bools if a drum sound should be triggered at the selected step
 bool drumSequence [drumInstruments][numDrumSteps] {
   {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
-  {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
-  {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1}, // ?
+  //{0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
+  //{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
 };
 
-int howManyKeypadKeys = 16;
+const int howManyKeypadKeys = 16;
 char drumPadChars [howManyKeypadKeys] = {'1', '2', '3', '+', '4', '5', '6', '>', '7', '8', '9', '!', '*', '0', '#', 'R'};
 
 
@@ -329,7 +333,7 @@ void noteButtonPressed(int note);
 void noteButtonReleased(int note);
 void updateDrumTempoModifier(void);
 
-// what happens when a clock signal is received
+// what happens when an external clock signal is received
 void handleClock() {
 
   //Drumstep: only when drum running and NOT synced to sequencer
@@ -628,13 +632,20 @@ void UpdateSendValues() {
                 }
               break;
               case 43:
-                //Sequencer Play Mode
-                if (arr_read_digital_inputs[0][2] && arr_changed_digital_inputs[0][2]){
-                  playMode++;
-                  if (playMode>=numPlayModes){
-                    playMode = 0;
+              if (blnTapTempo){
+                  tapTempo.update(!arr_read_digital_inputs[0][2]);
+                  bpm = long(tapTempo.getBPM());
+                  Serial.println(bpm);
                 }
+              if (arr_read_digital_inputs[0][2] && arr_changed_digital_inputs[0][2]){
+                if (!blnTapTempo){
+                    //Sequencer Play Mode
+                    playMode++;
+                    if (playMode>=numPlayModes){
+                      playMode = 0;
+                  }
                 }
+              }
                 
               break;
               case 44:

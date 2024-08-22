@@ -131,12 +131,12 @@ void readDrumpad() {
                   //$
                   //hier weiter
                   if (keyNumber >= drumInstruments) {
-
+                    //what this should do:
+                    //when "playing" and "record" are enabled, enter played notes into the drumSequence
+                    //do that at the current step so it is quantized
+                    drumSequence[keyNumber][drumStepPointer] = true;
                   }
-                  //what this should do:
-                  //when "playing" and "record" are enabled, enter played notes into the drumSequence
-                  //do that at the current step so it is quantized
-                  drumSequence[keyNumber][drumStepPointer] = true;
+                  
                 }
                 //$
                 startDrumNote(midiC + transpose + keyNumber);
