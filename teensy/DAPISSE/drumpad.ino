@@ -1,10 +1,10 @@
 #include <Keypad.h>
 
-// sets all steps for selected instrument to false
+// sets all steps for given instrument to false
 // means, clear all enabled triggers
-void clearInstrumenSequence() {
+void clearInstrumentSequence(int instrument) {
   for (int i = 0; i < numDrumSteps; i++){
-    drumSequence [selectedInstrument][i] = false;
+    drumSequence [instrument][i] = false;
   }
 }
 
@@ -18,16 +18,18 @@ void nextDrumStep() {
 
   stopAllDrumNotes();
   
-  for (int i = 0; i < drumInstruments; i++) {
+  for (int i = 0; i < numDrumInstruments; i++) {
     if (drumSequence[i][drumStepPointer]) {
+      if (runDrum){
       startDrumNote(instrumentNotes[i]);
+      }
     }
   }
   drumStepPointer++;
 }
 
 void stopAllDrumNotes(){
-  for (int i = 0; i < drumInstruments; i++) {
+  for (int i = 0; i < numDrumInstruments; i++) {
     stopDrumNote(instrumentNotes[i]);
   }
 }
@@ -130,13 +132,24 @@ void readDrumpad() {
                 if (recordDrum && runDrum){
                   //$
                   //hier weiter
-                  if (keyNumber >= drumInstruments) {
+                  Serial.println(keyNumber);
+                  if (keyNumber < numDrumInstruments) {
                     //what this should do:
                     //when "playing" and "record" are enabled, enter played notes into the drumSequence
                     //do that at the current step so it is quantized
                     drumSequence[keyNumber][drumStepPointer] = true;
+                    Serial.print("INST ");
+                    Serial.print(keyNumber);
+                    Serial.print(" @Step ");
+                    Serial.println(drumStepPointer);
                   }
                   
+                }
+                if (keyNumber == 15){
+                  clearInstrumentSequence(0);
+                  clearInstrumentSequence(1);
+                  clearInstrumentSequence(2);
+                  clearInstrumentSequence(3);
                 }
                 //$
                 startDrumNote(midiC + transpose + keyNumber);

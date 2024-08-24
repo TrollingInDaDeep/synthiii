@@ -101,7 +101,9 @@ void nextPulse() {
     pulsePointer = 0;
     nextStep();
   }
-  startNote(stepPointer); // start the note of this pulse
+  if (run) {
+    startNote(stepPointer); // start the note of this pulse
+  }
   pulsePointer++;
 }
 
@@ -150,7 +152,9 @@ void resetSequencer() {
   prevClockStart = millis();
   prevPulseStart = millis();
   if (syncDrumToSequencer){
-    drumStepPointer = -1;
+      drumStepPointer = -1;
+  }
+  if (syncDrumToSequencer){
     nextDrumStep();
   }
   nextPulse();

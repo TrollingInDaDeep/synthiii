@@ -84,9 +84,9 @@ int midiC = 60; // Standard midi C
 int transpose = 0;
 float tempoModifier = 6; //multiplication value with sequencer tempo to get n-times the tempo of the sequencer
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
-const int drumInstruments = 4;
+const int numDrumInstruments = 4;
 // which midi note to play for each instrument
-const int instrumentNotes[] = {60, 64, 63, 67}; //60=C, 64 = E, 63 = D#, 67 = G
+const int instrumentNotes[numDrumInstruments] = {60, 61, 62, 63}; //60=C, 64 = E, 63 = D#, 67 = G
 // which instrument is currently selected for keypad play mode
 int selectedInstrument = 1;
 int drumMidiChannel = 3;
@@ -101,10 +101,10 @@ int drumStepPointer = 0;
 
 int keypadMode = 0; //experiment: just use play and add recordDrum switch
                     //originally: 0=play, 1=sequence notes 2=fillXStep, 4=settings
-bool runDrum = true;
+bool runDrum = false;
 bool recordDrum = true; // true = played notes are recorded into the drumSequence
 //bools if a drum sound should be triggered at the selected step
-bool drumSequence [drumInstruments][numDrumSteps] {
+bool drumSequence [numDrumInstruments][numDrumSteps] {
   {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
   //{0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
   //{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
@@ -612,6 +612,9 @@ void UpdateSendValues() {
                   //Sequencer Play/pause
                   if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
                     run = !run;
+                    if (syncDrumToSequencer){
+                      runDrum = !runDrum;
+                    }
                     if (run){
                       // Serial.println("play");
                       prevClockStart = millis();
@@ -807,7 +810,7 @@ void loop() {
       if (currentMillis - prevPulseStart >= tempo) {
         //save timestamp when pulse started
         prevPulseStart = currentMillis;
-        nextPulse(); //after last pulse, next step will be triggered
+        nextPulse(); //after last pulse of a step, next step will be triggered
         if (syncDrumToSequencer){
           if (runDrum){
             nextDrumStep();
