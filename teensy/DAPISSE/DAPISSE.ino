@@ -54,7 +54,7 @@ bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slo
 bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
 bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
 int synthMidiChannel = 2;
-bool blnTapTempo = 1; //1 = playMode button becomes tapTempo button 
+bool blnTapTempo = true; //1 = playMode button becomes tapTempo button 
 ///
 /// Variable definitions
 ///
@@ -82,17 +82,20 @@ int endLoopMillis = 0;
 // ############
 int midiC = 60; // Standard midi C
 int transpose = 0;
-float tempoModifier = 6; //multiplication value with sequencer tempo to get n-times the tempo of the sequencer
+float tempoModifier = 1; //multiplication value with sequencer tempo to get n-times the tempo of the clock
+bool tempoOperation = false; // False = division (fill each n step), true = multiplication (n notes per step)
+// hehe, it says poop
+
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int numDrumInstruments = 4;
 const int numDrumPatterns = 4; //drum patterns. preset beats to be selected from
 // which midi note to play for each instrument
 
-const int instrumentNotes[3][numDrumInstruments] = {
+double instrumentNotes[3][numDrumInstruments] = {
   {3, 7, 11, 15}, //keynumber
   {63, 67, 71, 75}, //midinote
-  {0, 1, 2, 3} // index
-  }; //if you change this, also change in drumpad.ino  recordKey()
+  {1000, 1000, 1000, 1000} // tempo in ms (1000 = 60bpm)
+};
 //60=C, 64 = E, 63 = D#, 67 = G
 
 // which instrument is currently selected for keypad play mode
@@ -172,7 +175,7 @@ Keypad kpd = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 int rawAnalog = 0;
 bool rawDigital = 0;
 
-long bpm = 90.0;
+long bpm = 60.0;
 long bpmMin=20.0;
 long bpmMax=800.0;
 long tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
@@ -354,12 +357,13 @@ bool arr_digital_input_type [numDigitalInMux][pinPerMux] {
 //Function Prototypes
 void nextDrumStep(void);
 int youFuckenKiddingMe(char);
+int youFuckenKiddingMeToo(char);
 void startNote(int);
 void stopNote(int);
 void selectSeqNoteFunction(void);
-void noteButtonPressed(int note);
-void noteButtonReleased(int note);
-void updateDrumTempoModifier(void);
+void noteButtonPressed(int);
+void noteButtonReleased(int);
+void updateDrumTempoModifier(int);
 void changeDrumPattern(bool);
 void recordKey(int);
 int getDrumNote(int);
@@ -555,9 +559,6 @@ void UpdateSendValues() {
               if (!syncSequencerToClock){
                 bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
               }
-              // if (syncDrumToSequencer) {
-              //   updateDrumTempoModifier(map(arr_read_analog_inputs[2][0],0,127,0,13));
-              // }
             break;
             case 18:
               // number of steps the sequencer should play
@@ -837,17 +838,17 @@ void loop() {
     }
     seqNotesMillis = millis();
     // do next pulse if necessary
-    
     if (!syncSequencerToClock) {
       if (currentMillis - prevPulseStart >= tempo) {
         //save timestamp when pulse started
         prevPulseStart = currentMillis;
         nextPulse(); //after last pulse of a step, next step will be triggered
-        if (syncDrumToSequencer){
-          if (runDrum){
-            nextDrumStep();
-          }
+      }
     }
+    
+    if (syncDrumToSequencer){
+      if (runDrum){
+        nextDrumStep();
       }
     }
     
@@ -868,16 +869,19 @@ void loop() {
 
   isSlowReadCycle = 0; //
   //benchmarking
-//   endLoopMillis = millis();
-//   Serial.print(drumPadMillis - startLoopMillis);
-//   Serial.print("|");
-//   Serial.print(analogReadMillis  - startLoopMillis);
-//   Serial.print("|");
-//   Serial.print(digitalReadMillis - startLoopMillis);
-//   Serial.print("|");
-//   Serial.print(updateValueMillis - startLoopMillis);
-//   Serial.print("|");
-//   Serial.print(seqNotesMillis - startLoopMillis);
-//   Serial.print("|");
-//   Serial.println(endLoopMillis - startLoopMillis);
+  // endLoopMillis = millis();
+  // Serial.print(drumPadMillis - startLoopMillis);
+  // Serial.print("|");
+  // Serial.print(analogReadMillis  - startLoopMillis);
+  // Serial.print("|");
+  // Serial.print(digitalReadMillis - startLoopMillis);
+  // Serial.print("|");
+  // Serial.print(updateValueMillis - startLoopMillis);
+  // Serial.print("|");
+  // Serial.print(seqNotesMillis - startLoopMillis);
+  // Serial.print("|");
+  // Serial.println(endLoopMillis - startLoopMillis);
+
+
+  //28.08.2024: 0|1|17|17|-95237|17
 }

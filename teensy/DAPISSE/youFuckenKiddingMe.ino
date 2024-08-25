@@ -56,3 +56,58 @@ int youFuckenKiddingMe(char input) {
   }
   return returnNumber;
 }
+
+int youFuckenKiddingMeToo(char input) {
+  int returnNumber = 0;
+  switch (input) {
+    case '0':
+      returnNumber = 1;
+      break;
+    case '1':
+      returnNumber = 2;
+      break;
+    case '2':
+      returnNumber = 3;
+      break;
+    case '3':
+      returnNumber = 10; //X
+      break;
+    case '4':
+      returnNumber = 4;
+      break;
+    case '5':
+      returnNumber = 5;
+      break;
+    case '6':
+      returnNumber = 6;
+      break;
+    case '7':
+      returnNumber = 11; // >
+      break;
+    case '8':
+      returnNumber = 7;
+      break;
+    case '9':
+      returnNumber = 8;
+      break;
+    case 'A':
+      returnNumber = 9;
+      break;
+    case 'B':
+      returnNumber = 12; // &
+      break;
+    case 'C':
+      returnNumber = 13; // *
+      break;
+    case 'D':
+      returnNumber = 0;
+      break;
+    case 'E':
+      returnNumber = 14; // #
+      break;
+    case 'F':
+      returnNumber = 15; // R
+      break; 
+  }
+  return returnNumber;
+}

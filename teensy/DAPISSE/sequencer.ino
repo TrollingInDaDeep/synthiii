@@ -12,6 +12,8 @@ void noteButtonReleased(int note){
 void updateTempo(){
   tempo = 1000.0/(bpm/60.0);
   clockInterval = tempo/24;
+  
+  
 }
 
 
