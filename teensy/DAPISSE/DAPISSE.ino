@@ -85,14 +85,24 @@ int transpose = 0;
 float tempoModifier = 6; //multiplication value with sequencer tempo to get n-times the tempo of the sequencer
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int numDrumInstruments = 4;
+const int numDrumPatterns = 4; //drum patterns. preset beats to be selected from
 // which midi note to play for each instrument
-const int instrumentNotes[numDrumInstruments] = {60, 61, 62, 63}; //60=C, 64 = E, 63 = D#, 67 = G
+
+const int instrumentNotes[3][numDrumInstruments] = {
+  {3, 7, 11, 15}, //keynumber
+  {63, 67, 71, 75}, //midinote
+  {0, 1, 2, 3} // index
+  }; //if you change this, also change in drumpad.ino  recordKey()
+//60=C, 64 = E, 63 = D#, 67 = G
+
 // which instrument is currently selected for keypad play mode
 int selectedInstrument = 1;
+int selectedDrumPattern = 0; //which drum pattern is selected
 int drumMidiChannel = 3;
 bool drumNoteStopped = true; //if drum notes have been stopped for this step already (goes for all drum notes)
 float drumNoteStart = 0; //timestamp when the drum note started
 int drumGateTime = 2; //time in ms how long the drum note should be on
+bool holdFired = false; //set to true if a button was holded will suppress release event trigger
 
 //number of notes / steps the drum sequencer has
 const int numDrumSteps = 16;
@@ -104,13 +114,31 @@ int keypadMode = 0; //experiment: just use play and add recordDrum switch
 bool runDrum = false;
 bool recordDrum = true; // true = played notes are recorded into the drumSequence
 //bools if a drum sound should be triggered at the selected step
-bool drumSequence [numDrumInstruments][numDrumSteps] {
-  {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
-  //{0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
-  //{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-  {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+bool drumSequence [numDrumPatterns][numDrumInstruments][numDrumSteps] {
+  { //rock
+    {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
+    {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+  },
+  { //empty / test / DIY
+    {1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0}, //kick
+    {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+  },
+  { //dnb
+    {1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0}, //kick
+    {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0}, // snare
+    {0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1}, // hat
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+  },
+  { //ska
+    {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
+    {0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0}, // snare
+    {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1}, // hat
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+  }
 };
 
 const int howManyKeypadKeys = 16;
@@ -332,6 +360,10 @@ void selectSeqNoteFunction(void);
 void noteButtonPressed(int note);
 void noteButtonReleased(int note);
 void updateDrumTempoModifier(void);
+void changeDrumPattern(bool);
+void recordKey(int);
+int getDrumNote(int);
+int getDrumIndex(int);
 
 // what happens when an external clock signal is received
 void handleClock() {

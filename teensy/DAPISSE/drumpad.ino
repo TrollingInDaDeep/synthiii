@@ -3,9 +3,12 @@
 // sets all steps for given instrument to false
 // means, clear all enabled triggers
 void clearInstrumentSequence(int instrument) {
-  for (int i = 0; i < numDrumSteps; i++){
-    drumSequence [instrument][i] = false;
+  if(selectedDrumPattern == 1){
+    for (int i = 0; i < numDrumSteps; i++){
+      drumSequence[selectedDrumPattern][instrument][i] = false;
+    }
   }
+  
 }
 
 
@@ -19,9 +22,9 @@ void nextDrumStep() {
   stopAllDrumNotes();
   
   for (int i = 0; i < numDrumInstruments; i++) {
-    if (drumSequence[i][drumStepPointer]) {
+    if (drumSequence[selectedDrumPattern][i][drumStepPointer]) {
       if (runDrum){
-      startDrumNote(instrumentNotes[i]);
+      startDrumNote(instrumentNotes[1][i]);
       }
     }
   }
@@ -30,7 +33,7 @@ void nextDrumStep() {
 
 void stopAllDrumNotes(){
   for (int i = 0; i < numDrumInstruments; i++) {
-    stopDrumNote(instrumentNotes[i]);
+    stopDrumNote(instrumentNotes[1][i]);
   }
 }
 
@@ -48,6 +51,23 @@ void stopDrumNote(int noteToStop) {
   drumNoteStopped = true;
 }
 
+/// select the next drum pattern
+/// true = upwards, false = downwards
+void changeDrumPattern(bool direction){
+  if (direction){
+    selectedDrumPattern++;
+  }
+  else {
+    selectedDrumPattern--;
+  }
+
+  if (selectedDrumPattern >= numDrumPatterns && direction) {
+    selectedDrumPattern = 0;
+  }
+  if (selectedDrumPattern < 0 && !direction) {
+    selectedDrumPattern = numDrumPatterns-1;
+  }
+}
 /// sets the modifier of the drum tempo based on the sequencer clock
 /// expects selector number between 0 and 13
 void updateDrumTempoModifier(int modifyNumber) {
@@ -107,10 +127,41 @@ void updateDrumTempoModifier(int modifyNumber) {
   //Serial.println(tempoModifier);
 }
 
+/// finds out which note to play for a key number
+/// returns midi note. returns 0 if key is not a drumpad note
+int getDrumNote(int keyNumber){
+  int midiNote = 0;
+  for (int i = 0; i < numDrumInstruments; i++)
+    {
+      if (keyNumber == instrumentNotes[0][i]){
+        midiNote = instrumentNotes[1][i];
+        selectedInstrument = i;
+      }
+    }
+  return midiNote;
+}
+
+///records key into drum pattern
+/// expects number of key on Keypad
+void recordKey(int keyNumber){
+    if (getDrumNote(keyNumber) != 0 ) {
+      //what this should do:
+      //when "playing" and "record" are enabled, enter played notes into the drumSequence
+      //do that at the current step so it is quantized
+      //works, but not always using the correct step to insert (musically)
+      drumSequence[selectedDrumPattern][selectedInstrument][drumStepPointer] = true;
+      Serial.print("INST ");
+      Serial.print(keyNumber);
+      Serial.print(" @Step ");
+      Serial.println(drumStepPointer);
+    }
+}
+
 //scans through the keypad
 //checks if key is pressed -> runs needed action
 //checks if key is released -> runs needed action
 void readDrumpad() {
+    int drumNote = 0;
     // supports up to ten simultaneous key presses
       if (kpd.getKeys())  
     {
@@ -126,38 +177,23 @@ void readDrumpad() {
           // when keys are pressed
           if (kpd.key[i].kstate == PRESSED) 
           {
+            drumNote = getDrumNote(keyNumber);
             switch (keypadMode) {
               //Play Mode
               case 0:
-                if (recordDrum && runDrum){
-                  //$
-                  //hier weiter
-                  Serial.println(keyNumber);
-                  if (keyNumber < numDrumInstruments) {
-                    //what this should do:
-                    //when "playing" and "record" are enabled, enter played notes into the drumSequence
-                    //do that at the current step so it is quantized
-                    drumSequence[keyNumber][drumStepPointer] = true;
-                    Serial.print("INST ");
-                    Serial.print(keyNumber);
-                    Serial.print(" @Step ");
-                    Serial.println(drumStepPointer);
-                  }
-                  
+                if (recordDrum && runDrum && selectedDrumPattern == 1){
+                  recordKey(keyNumber);
                 }
-                if (keyNumber == 15){
-                  clearInstrumentSequence(0);
-                  clearInstrumentSequence(1);
-                  clearInstrumentSequence(2);
-                  clearInstrumentSequence(3);
+               
+                if (drumNote != 0){
+                  startDrumNote(drumNote + transpose);
                 }
-                //$
-                startDrumNote(midiC + transpose + keyNumber);
+                
               break;
 
               //enable / disable notes sequence Mode
               case 1:
-                drumSequence[selectedInstrument][keyNumber] = !drumSequence[selectedInstrument][keyNumber];
+                drumSequence[selectedDrumPattern][selectedInstrument][keyNumber] = !drumSequence[selectedDrumPattern][selectedInstrument][keyNumber];
               break;
 
               // Fill every x step Mode
@@ -176,11 +212,22 @@ void readDrumpad() {
           // when keys are released
           if (kpd.key[i].kstate == RELEASED)  
           {
-
+            int drumNote = getDrumNote(keyNumber);
             switch (keypadMode) {
               //Play Mode
               case 0:
-                stopDrumNote(midiC + transpose + keyNumber);
+                switch (keyNumber) {
+                  
+                  case 13:
+                    if (!holdFired){
+                      changeDrumPattern(true);
+                    }
+                  break;
+                }
+
+                if (drumNote != 0){
+                  stopDrumNote(drumNote + transpose);
+                }
               break;
 
               //enable / disable notes sequence Mode
@@ -198,7 +245,20 @@ void readDrumpad() {
 
               break;
             }
-            
+            holdFired = false;
+          }
+
+          if (kpd.key[i].kstate == HOLD)  
+          {
+            holdFired = true;
+            switch (keyNumber) {
+              case 13: // R key -> clear
+                clearInstrumentSequence(0);
+                clearInstrumentSequence(1);
+                clearInstrumentSequence(2);
+                clearInstrumentSequence(3);
+              break;
+            }
           }
             
         }
