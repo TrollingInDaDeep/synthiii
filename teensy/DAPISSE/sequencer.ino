@@ -12,8 +12,7 @@ void noteButtonReleased(int note){
 void updateTempo(){
   tempo = 1000.0/(bpm/60.0);
   clockInterval = tempo/24;
-  
-  
+  updateDrumTempo();
 }
 
 
@@ -153,6 +152,12 @@ void resetSequencer() {
   pulsePointer = -1;
   prevClockStart = millis();
   prevPulseStart = millis();
+  if (drumDivMultMode){
+    for (int i = 0; i < numDrumInstruments; i++)
+    {
+      prevDrumNoteStart[i] = millis();
+    }
+  }
   if (syncDrumToSequencer){
       drumStepPointer = -1;
   }

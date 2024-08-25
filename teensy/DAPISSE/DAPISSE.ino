@@ -52,7 +52,8 @@ int maxPulse = 8; //how many pulses at max for sequencer
 int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
 bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
-bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = triggered when external clock received
+bool syncDrumToSequencer = 0; //1 = drum step triggered when sequencer steps | 0 = external clock received
+bool drumDivMultMode = true; // true = trigger drum steps, when "fill each n step" is activated
 int synthMidiChannel = 2;
 bool blnTapTempo = true; //1 = playMode button becomes tapTempo button 
 ///
@@ -80,30 +81,31 @@ int endLoopMillis = 0;
 // ############
 // DRUMS
 // ############
-int midiC = 60; // Standard midi C
-int transpose = 0;
-float tempoModifier = 1; //multiplication value with sequencer tempo to get n-times the tempo of the clock
-bool tempoOperation = false; // False = division (fill each n step), true = multiplication (n notes per step)
-// hehe, it says poop
-
 // number of instruments (0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int numDrumInstruments = 4;
 const int numDrumPatterns = 4; //drum patterns. preset beats to be selected from
-// which midi note to play for each instrument
+int midiC = 60; // Standard midi C
+int transpose = 0;
+float tempoModifier[numDrumInstruments] = {1, 1, 1, 1}; //multiplication value with sequencer tempo to get n-times the tempo of the clock
+bool tempoOperation[numDrumInstruments] = {false, false, false, false}; // False = division (fill each n step), true = multiplication (n notes per step)
+// hehe, it says poop
 
+
+// which midi note to play for each instrument
 double instrumentNotes[3][numDrumInstruments] = {
   {3, 7, 11, 15}, //keynumber
   {63, 67, 71, 75}, //midinote
-  {1000, 1000, 1000, 1000} // tempo in ms (1000 = 60bpm)
+  {0, 0, 0, 0} // tempo in ms (1000 = 60bpm) set to 0ms to disable
 };
 //60=C, 64 = E, 63 = D#, 67 = G
 
 // which instrument is currently selected for keypad play mode
-int selectedInstrument = 1;
+int selectedInstrument = 0;
 int selectedDrumPattern = 0; //which drum pattern is selected
 int drumMidiChannel = 3;
-bool drumNoteStopped = true; //if drum notes have been stopped for this step already (goes for all drum notes)
-float drumNoteStart = 0; //timestamp when the drum note started
+bool drumNoteStopped[numDrumInstruments] = {true, true, true, true}; //if drum notes have been stopped for this step already (goes for all drum notes)
+float drumNoteStart[numDrumInstruments] = {0, 0, 0, 0}; //timestamp when the drum note started
+float prevDrumNoteStart[numDrumInstruments] = {0, 0, 0, 0}; //timestamp when last drum note started
 int drumGateTime = 2; //time in ms how long the drum note should be on
 bool holdFired = false; //set to true if a button was holded will suppress release event trigger
 
@@ -115,7 +117,7 @@ int drumStepPointer = 0;
 int keypadMode = 0; //experiment: just use play and add recordDrum switch
                     //originally: 0=play, 1=sequence notes 2=fillXStep, 4=settings
 bool runDrum = false;
-bool recordDrum = true; // true = played notes are recorded into the drumSequence
+bool recordDrum = false; // true = played notes are recorded into the drumSequence
 //bools if a drum sound should be triggered at the selected step
 bool drumSequence [numDrumPatterns][numDrumInstruments][numDrumSteps] {
   { //rock
@@ -363,7 +365,7 @@ void stopNote(int);
 void selectSeqNoteFunction(void);
 void noteButtonPressed(int);
 void noteButtonReleased(int);
-void updateDrumTempoModifier(int);
+void updateDrumModifier(int);
 void changeDrumPattern(bool);
 void recordKey(int);
 int getDrumNote(int);
@@ -645,7 +647,7 @@ void UpdateSendValues() {
                   //Sequencer Play/pause
                   if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
                     run = !run;
-                    if (syncDrumToSequencer){
+                    if (syncDrumToSequencer || drumDivMultMode){
                       runDrum = !runDrum;
                     }
                     if (run){
@@ -843,13 +845,20 @@ void loop() {
         //save timestamp when pulse started
         prevPulseStart = currentMillis;
         nextPulse(); //after last pulse of a step, next step will be triggered
+        if (syncDrumToSequencer && runDrum && !drumDivMultMode){
+            nextDrumStep();
+        }
       }
     }
-    
-    if (syncDrumToSequencer){
-      if (runDrum){
-        nextDrumStep();
-      }
+
+    if (drumDivMultMode && runDrum){
+        for (int i = 0; i < numDrumInstruments; i++) {
+          
+          if (currentMillis - prevDrumNoteStart[i] >= instrumentNotes[2][i] && instrumentNotes[2][i] != 0){ // note time set to 0ms means disabled
+            prevDrumNoteStart[i] = currentMillis;
+            startDrumNote(instrumentNotes[1][i], i);
+          }
+        }
     }
     
     
@@ -860,11 +869,14 @@ void loop() {
       }
     }
     
-    if (!drumNoteStopped) {
-      if (currentMillis - drumNoteStart >= drumGateTime) {
-        stopAllDrumNotes();
-      }
+    for (int i = 0; i < numDrumInstruments; i++) {
+      if (!drumNoteStopped[i]) {
+        if (currentMillis - drumNoteStart[i] >= drumGateTime) {
+          stopDrumNote(instrumentNotes[1][i], i);
+        }
+      }    
     }
+
   }
 
   isSlowReadCycle = 0; //

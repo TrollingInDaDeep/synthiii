@@ -24,7 +24,7 @@ void nextDrumStep() {
   for (int i = 0; i < numDrumInstruments; i++) {
     if (drumSequence[selectedDrumPattern][i][drumStepPointer]) {
       if (runDrum){
-      startDrumNote(instrumentNotes[1][i]);
+      startDrumNote(instrumentNotes[1][i], i);
       }
     }
   }
@@ -33,22 +33,23 @@ void nextDrumStep() {
 
 void stopAllDrumNotes(){
   for (int i = 0; i < numDrumInstruments; i++) {
-    stopDrumNote(instrumentNotes[1][i]);
+    stopDrumNote(instrumentNotes[1][i], i);
   }
 }
 
-void startDrumNote(int noteToStart) {
-  drumNoteStart = millis();
+/// starts Drum Note
+void startDrumNote(int noteToStart, int noteIndex) {
+  drumNoteStart[noteIndex] = millis();
   usbMIDI.sendNoteOn(noteToStart, 127, drumMidiChannel);
   //Serial.println(noteToStart);
   //stopDrumNote(noteToStart);
-  drumNoteStopped = false;
+  drumNoteStopped[noteIndex] = false;
 }
 
-void stopDrumNote(int noteToStop) {
+void stopDrumNote(int noteToStop, int noteIndex) {
   usbMIDI.sendNoteOff(noteToStop, 127, drumMidiChannel);
   //Serial.println(noteToStop);
-  drumNoteStopped = true;
+  drumNoteStopped[noteIndex] = true;
 }
 
 /// select the next drum pattern
@@ -70,21 +71,21 @@ void changeDrumPattern(bool direction){
 }
 /// sets the modifier of the drum tempo based on the sequencer clock
 /// expects number to multiply or divide clock
-void updateDrumTempoModifier(int modifyNumber) {
-  tempoModifier = modifyNumber;
+void updateDrumTempo() {
+  for (int i = 0; i < numDrumInstruments; i++)
+  {
     // Multiplication of tempo
-    if (tempoOperation){
-      instrumentNotes[2][selectedInstrument] = tempo * tempoModifier;
+    if (tempoOperation[selectedInstrument]){
+      instrumentNotes[2][selectedInstrument] = tempo * tempoModifier[selectedInstrument];
     }
     //Division of tempo
     else
     {
-      instrumentNotes[2][selectedInstrument] = (double)tempo / tempoModifier;
+      instrumentNotes[2][selectedInstrument] = (double)tempo / tempoModifier[selectedInstrument];
     }
+  }
 
-
-
-  Serial.println(tempoModifier);
+  //Serial.println(instrumentNotes[2][selectedInstrument], 6);
 
   // old code, for selector, not the worst idea
   // switch (modifyNumber){
@@ -151,11 +152,25 @@ int getDrumNote(int keyNumber){
       if (keyNumber == instrumentNotes[0][i]){
         midiNote = instrumentNotes[1][i];
         selectedInstrument = i;
+        break;
       }
     }
   return midiNote;
 }
 
+/// finds out which index the current note has
+/// returns index number. returns 99 if key is not a drumpad note
+int getDrumIndex(int keyNumber){
+  int index = 0;
+  for (int i = 0; i < numDrumInstruments; i++)
+    {
+      if (keyNumber == instrumentNotes[0][i]){
+        index = instrumentNotes[2][i];
+        break;
+      }
+    }
+  return index;
+}
 ///records key into drum pattern
 /// expects number of key on Keypad
 void recordKey(int keyNumber){
@@ -177,6 +192,7 @@ void recordKey(int keyNumber){
 //checks if key is released -> runs needed action
 void readDrumpad() {
     int drumNote = 0;
+    int drumIndex = 0;
     // supports up to ten simultaneous key presses
       if (kpd.getKeys())  
     {
@@ -193,6 +209,7 @@ void readDrumpad() {
           if (kpd.key[i].kstate == PRESSED) 
           {
             drumNote = getDrumNote(keyNumber);
+            drumIndex = getDrumIndex(keyNumber);
             switch (keypadMode) {
               //Play Mode
               case 0:
@@ -201,23 +218,23 @@ void readDrumpad() {
                 }
                
                 if (drumNote != 0){
-                  startDrumNote(drumNote + transpose);
+                  startDrumNote(drumNote + transpose, drumIndex);
                 }
 
                 switch (keyValue) {
                 
                 // fill each x step
                 case 1 ... 9:
-                  updateDrumTempoModifier(keyValue);
+                  tempoModifier[selectedInstrument] = keyValue;
                 break;
 
 
                 case 13: // *
-                  tempoOperation = true;
+                  tempoOperation[selectedInstrument] = true;
                 break;
 
                 case 14: // #
-                  tempoOperation = false;
+                  tempoOperation[selectedInstrument] = false;
                 break;
               }
                 
@@ -245,6 +262,7 @@ void readDrumpad() {
           if (kpd.key[i].kstate == RELEASED)  
           {
             int drumNote = getDrumNote(keyNumber);
+            int drumIndex = getDrumIndex(keyNumber);
             switch (keypadMode) {
               //Play Mode
               case 0:
@@ -258,7 +276,7 @@ void readDrumpad() {
                 }
 
                 if (drumNote != 0){
-                  stopDrumNote(drumNote + transpose);
+                  stopDrumNote(drumNote + transpose, drumIndex);
                 }
               break;
 
@@ -284,11 +302,24 @@ void readDrumpad() {
           {
             holdFired = true;
             switch (keyNumber) {
-              case 13: // R key -> clear
+              case 13: // 0 key -> clear
                 clearInstrumentSequence(0);
                 clearInstrumentSequence(1);
                 clearInstrumentSequence(2);
                 clearInstrumentSequence(3);
+              break;
+
+              case 3: // x key -> mute
+                instrumentNotes[2][0] = 0;
+              break;
+              case 7: // > key -> mute
+                instrumentNotes[2][1] = 0;
+              break;
+              case 11: // & key -> mute
+                instrumentNotes[2][2] = 0;
+              break;
+              case 15: // R key -> mute
+                instrumentNotes[2][3] = 0;
               break;
             }
           }
