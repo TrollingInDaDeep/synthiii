@@ -52,8 +52,8 @@ int maxPulse = 8; //how many pulses at max for sequencer
 int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
 bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
-bool syncDrumToSequencer = 0; //1 = drum step triggered when sequencer steps | 0 = external clock received
-bool drumDivMultMode = true; // true = trigger drum steps, when "fill each n step" is activated
+bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = external clock received
+bool drumDivMultMode = false; // true = trigger drum steps, when "fill each n step" is activated
 int synthMidiChannel = 2;
 bool blnTapTempo = true; //1 = playMode button becomes tapTempo button 
 ///
@@ -75,6 +75,11 @@ int digitalReadMillis = 0;
 int updateValueMillis = 0;
 int seqNotesMillis = 0;
 int endLoopMillis = 0;
+
+// ############
+// Clock
+// ############
+
 
 
 
@@ -853,7 +858,7 @@ void loop() {
 
     if (drumDivMultMode && runDrum){
         for (int i = 0; i < numDrumInstruments; i++) {
-          
+
           if (currentMillis - prevDrumNoteStart[i] >= instrumentNotes[2][i] && instrumentNotes[2][i] != 0){ // note time set to 0ms means disabled
             prevDrumNoteStart[i] = currentMillis;
             startDrumNote(instrumentNotes[1][i], i);
