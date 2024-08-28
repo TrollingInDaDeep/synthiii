@@ -80,7 +80,38 @@ int endLoopMillis = 0;
 // Clock
 // ############
 
+//bpm
+int bpm = 10.0;
+float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
+int numTicks = 4; //in how many ticks one beat shall be divided
+float tickMS = tempo/numTicks; //how long a tick is in ms
 
+const int numSubClocks = 5; //how many subClocks with individual mult/division
+
+float clockStart = 0; //millisecond timestamp when current Clock Cycle was started
+float prevClockStart = 0; //previous millisecond timestamp when last clock signal was sent
+float tickStart = tickMS; //millisecond timestamp when current Tick was started
+float prevTickStart = 0; //previous millisecond timestamp when last tick was sent
+
+//
+// 0 index -> index in the subClocks array                   
+// 1 ratio -> ratio multiplied or divided from mainClock
+// 2 divMult -> 1 = division, 0 = multiplication
+// 3 tick -> hat which next tick the subclock should be triggered
+// 4 delay -> how many ticks it should be delayed (off-beat)
+// 5 instrument -> which instrument the clock is connected to (eg. seqencer, bassdrum, etc.)
+// 6 gateTime -> after how many ms the stop signal should be triggered
+// 7 run -> 1 = running, 0 = stopped
+//
+
+float subClocks[numSubClocks][8] {
+  //  index   ratio   divMult   tick    delay   instrument    gateTime   run
+  {   0,      1,      0,        1,       0,       0,          50,        1 }, //sequencer
+  {   1,      1,      0,        1,       0,       1,          2,         0 },
+  {   2,      1,      0,        1,       0,       2,          2,         0 },
+  {   3,      1,      0,        1,       0,       3,          2,         0 },
+  {   4,      1,      0,        1,       0,       4,          2,         0 }
+};
 
 
 // ############
@@ -182,14 +213,11 @@ Keypad kpd = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 int rawAnalog = 0;
 bool rawDigital = 0;
 
-long bpm = 60.0;
 long bpmMin=20.0;
 long bpmMax=800.0;
-long tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
+
 
 float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
-float prevClockStart = 0; //previous millisecond timestamp before last clock signal was sent
-float clockInterval = tempo/24; //number of milliseconds after which to send the midi clock. MIDI spec is to send clock 24 times per quarter note
 float pulseStart = 0; //timestamp when the pulse started
 float noteStart = 0; //timestamp when the note started
 
@@ -801,89 +829,90 @@ void setup() {
   selectMuxOutPin(stepPointer);
   digitalWrite(I7, HIGH);
 
-
 }
 
 void loop() {
-  startLoopMillis = millis();
-  slowReadCycleCount++;
-  if (slowReadCycleCount > digitalSmoother) {
-    isSlowReadCycle = 1;
-    slowReadCycleCount = 0;
-  }
+  // startLoopMillis = millis();
+  // slowReadCycleCount++;
+  // if (slowReadCycleCount > digitalSmoother) {
+  //   isSlowReadCycle = 1;
+  //   slowReadCycleCount = 0;
+  // }
 
-  // save at what millisecond the loop starts, for timing
-  currentMillis = millis();
+  // // save at what millisecond the loop starts, for timing
+  // currentMillis = millis();
 
-  //reading drumpad after every function for lower latency
-  readDrumpad();
-  drumPadMillis = millis();
-  readAnalogPins();
-  analogReadMillis = millis();
-  readDrumpad();
-  readDigitalPins();
-  digitalReadMillis = millis();
-  readDrumpad();
-  usbMIDI.read();
+  // //reading drumpad after every function for lower latency
+  // readDrumpad();
+  // drumPadMillis = millis();
+  // readAnalogPins();
+  // analogReadMillis = millis();
+  // readDrumpad();
+  // readDigitalPins();
+  // digitalReadMillis = millis();
+  // readDrumpad();
+  // usbMIDI.read();
 
-  UpdateSendValues();
-  updateValueMillis = millis();
-  updateTempo();
+  // UpdateSendValues();
+  // updateValueMillis = millis();
+  // updateTempo();
 
-  if (reset){
-    resetSequencer();
-    currentMillis = millis();
-  }
+  // if (reset){
+  //   resetSequencer();
+  //   currentMillis = millis();
+  // }
 
-  //sequencer step trigger
-  if (run) {
-    // send clock if necessary
-    if (currentMillis - prevClockStart >= clockInterval) {
-      //save timestamp when pulse started
-      prevClockStart = currentMillis;
-      usbMIDI.sendClock();
-    }
-    seqNotesMillis = millis();
-    // do next pulse if necessary
-    if (!syncSequencerToClock) {
-      if (currentMillis - prevPulseStart >= tempo) {
-        //save timestamp when pulse started
-        prevPulseStart = currentMillis;
-        nextPulse(); //after last pulse of a step, next step will be triggered
-        if (syncDrumToSequencer && runDrum && !drumDivMultMode){
-            nextDrumStep();
-        }
-      }
-    }
+  // //sequencer step trigger
+  // if (run) {
+  //   // send clock if necessary
+  //   if (currentMillis - prevClockStart >= tickMS) {
+  //     //save timestamp when pulse started
+  //     prevClockStart = currentMillis;
+  //     usbMIDI.sendClock();
+  //   }
+  //   seqNotesMillis = millis();
+  //   // do next pulse if necessary
+  //   if (!syncSequencerToClock) {
+  //     if (currentMillis - prevPulseStart >= tempo) {
+  //       //save timestamp when pulse started
+  //       prevPulseStart = currentMillis;
+  //       nextPulse(); //after last pulse of a step, next step will be triggered
+  //       if (syncDrumToSequencer && runDrum && !drumDivMultMode){
+  //           nextDrumStep();
+  //       }
+  //     }
+  //   }
 
-    if (drumDivMultMode && runDrum){
-        for (int i = 0; i < numDrumInstruments; i++) {
+  //   if (drumDivMultMode && runDrum){
+  //       for (int i = 0; i < numDrumInstruments; i++) {
 
-          if (currentMillis - prevDrumNoteStart[i] >= instrumentNotes[2][i] && instrumentNotes[2][i] != 0){ // note time set to 0ms means disabled
-            prevDrumNoteStart[i] = currentMillis;
-            startDrumNote(instrumentNotes[1][i], i);
-          }
-        }
-    }
+  //         if (currentMillis - prevDrumNoteStart[i] >= instrumentNotes[2][i] && instrumentNotes[2][i] != 0){ // note time set to 0ms means disabled
+  //           prevDrumNoteStart[i] = currentMillis;
+  //           startDrumNote(instrumentNotes[1][i], i);
+  //         }
+  //       }
+  //   }
     
     
-    //stop note if necessary
-    if (!noteStopped) {
-      if (currentMillis - noteStart >= gateTime) {
-        stopLastNote();
-      }
-    }
+  //   //stop note if necessary
+  //   if (!noteStopped) {
+  //     if (currentMillis - noteStart >= gateTime) {
+  //       stopLastNote();
+  //     }
+  //   }
     
-    for (int i = 0; i < numDrumInstruments; i++) {
-      if (!drumNoteStopped[i]) {
-        if (currentMillis - drumNoteStart[i] >= drumGateTime) {
-          stopDrumNote(instrumentNotes[1][i], i);
-        }
-      }    
-    }
+  //   for (int i = 0; i < numDrumInstruments; i++) {
+  //     if (!drumNoteStopped[i]) {
+  //       if (currentMillis - drumNoteStart[i] >= drumGateTime) {
+  //         stopDrumNote(instrumentNotes[1][i], i);
+  //       }
+  //     }    
+  //   }
 
-  }
+  // }
 
+
+  updateClock();
   isSlowReadCycle = 0; //
   //benchmarking
   // endLoopMillis = millis();
