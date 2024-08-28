@@ -83,8 +83,10 @@ int endLoopMillis = 0;
 //bpm
 int bpm = 10.0;
 float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
-int numTicks = 4; //in how many ticks one beat shall be divided
+int numTicks = 24; //in how many ticks one beat shall be divided
 float tickMS = tempo/numTicks; //how long a tick is in ms
+int currentTick = 0; // which tick we're currently at (pointer)
+
 
 const int numSubClocks = 5; //how many subClocks with individual mult/division
 
@@ -97,20 +99,21 @@ float prevTickStart = 0; //previous millisecond timestamp when last tick was sen
 // 0 index -> index in the subClocks array                   
 // 1 ratio -> ratio multiplied or divided from mainClock
 // 2 divMult -> 1 = division, 0 = multiplication
-// 3 tick -> hat which next tick the subclock should be triggered
+// 3 tick -> after how many ticks it should be triggered
 // 4 delay -> how many ticks it should be delayed (off-beat)
-// 5 instrument -> which instrument the clock is connected to (eg. seqencer, bassdrum, etc.)
-// 6 gateTime -> after how many ms the stop signal should be triggered
-// 7 run -> 1 = running, 0 = stopped
+// 5 ticksLeft -> how many ticks left until trigger (tick + delay). decrease every tick and set back to tick+delay after triggered
+// 6 instrument -> which instrument the clock is connected to (eg. seqencer, bassdrum, etc.)
+// 7 gateTime -> after how many ms the stop signal should be triggered
+// 8 run -> 1 = running, 0 = stopped
 //
 
 float subClocks[numSubClocks][8] {
-  //  index   ratio   divMult   tick    delay   instrument    gateTime   run
-  {   0,      1,      0,        1,       0,       0,          50,        1 }, //sequencer
-  {   1,      1,      0,        1,       0,       1,          2,         0 },
-  {   2,      1,      0,        1,       0,       2,          2,         0 },
-  {   3,      1,      0,        1,       0,       3,          2,         0 },
-  {   4,      1,      0,        1,       0,       4,          2,         0 }
+  //  index   ratio   divMult   tick    delay   ticksLeft     instrument    gateTime   run
+  {   0,      1,      1,        1,       0,     0,            0,            50,        1 }, //sequencer
+  {   1,      1,      0,        1,       0,     0,            1,            2,         0 },
+  {   2,      1,      0,        1,       0,     0,            2,            2,         0 },
+  {   3,      1,      0,        1,       0,     0,            3,            2,         0 },
+  {   4,      1,      0,        1,       0,     0,            4,            2,         0 }
 };
 
 
