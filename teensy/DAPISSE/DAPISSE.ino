@@ -87,7 +87,6 @@ int numTicks = 24; //in how many ticks one beat shall be divided
 float tickMS = tempo/numTicks; //how long a tick is in ms
 int currentTick = 0; // which tick we're currently at (pointer)
 
-
 const int numSubClocks = 5; //how many subClocks with individual mult/division
 
 float clockStart = 0; //millisecond timestamp when current Clock Cycle was started
@@ -107,7 +106,7 @@ float prevTickStart = 0; //previous millisecond timestamp when last tick was sen
 // 8 run -> 1 = running, 0 = stopped
 //
 
-float subClocks[numSubClocks][8] {
+float subClocks[numSubClocks][9] {
   //  index   ratio   divMult   tick    delay   ticksLeft     instrument    gateTime   run
   {   0,      1,      1,        1,       0,     0,            0,            50,        1 }, //sequencer
   {   1,      1,      0,        1,       0,     0,            1,            2,         0 },

@@ -33,7 +33,7 @@
 void updateClock() {
   currentMillis = millis();
   currentTick = (currentMillis - clockStart) / tickMS; //division with int will only yield whole numbers.
-
+  updateClockTempo();
 
 
 
@@ -56,23 +56,35 @@ void updateClock() {
     // Serial.println(tempo);
     nextClockCycle();
   }
-  
-
 }
 
 //Run actions needed for next Tick
 void nextTick() {
   prevTickStart = tickStart;
   tickStart = currentMillis;
+  Serial.print("t: ");
   Serial.println(currentTick);
 
   for (int i = 0; i < numSubClocks; i++){
-    subClocks[i][5]--; //decrease the ticks left
-    
-    if (subClocks[i][5]) { // No ticks left -> trigger!
+    if (subClocks[i][8] > 0){// don't decrease when already 0, don't kick downwards pls
+          subClocks[i][5]--; //decrease the ticks left
+    }
+    if (subClocks[i][8] == 1){ // if subclock is running
+      Serial.print("Ticks left: ");
+      Serial.println(subClocks[i][5]);
+    }
+    if (subClocks[i][5] < 1) { // No ticks left -> trigger!
+      if (subClocks[i][8] == 1){ // if subclock is running
+        Serial.print("$$$ NO Ticks left: ");
+        Serial.println(subClocks[i][5]);
+      }
       clockHandler(i);
       //reset tick counter for subclock. Tick + delay
       subClocks[i][5] = subClocks[i][3] + subClocks[i][4];
+      if (subClocks[i][8] == 1){ // if subclock is running
+        Serial.print("Reset to: ");
+        Serial.println(subClocks[i][5]);
+      }
     }
   }
   
@@ -85,7 +97,8 @@ void nextTick() {
 void nextClockCycle() {
   prevClockStart = clockStart;
   clockStart = currentMillis;
-  // Serial.print("clock: ");
+  Serial.println("clock: ");
+  usbMIDI.sendClock();
   // Serial.println(millis());
 }
 
@@ -99,14 +112,15 @@ void updateClockTempo() {
   for (int i = 0; i < numSubClocks; i++)
   {
     // division of tempo
-    if (subClocks[2][i] == 1){
-      subClocks[3][i] = numTicks / subClocks[1][i]; // ticks = numTicks / ratio
+    if (subClocks[i][2] == 1){
+      subClocks[i][3] = numTicks / subClocks[i][1]; // ticks = numTicks / ratio
     }
     //Multiplication of tempo
     else
     {
-      subClocks[3][i] = numTicks * subClocks[1][i]; // ticks = numTicks * ratio
+      subClocks[i][3] = numTicks * subClocks[i][1]; // ticks = numTicks * ratio
     }
+    Serial.println(subClocks[0][3]);
   }
 }
 
@@ -115,11 +129,15 @@ void updateClockTempo() {
  //or drum instrument trigger
  //or note stop -> maybe should be handled via gate time of each instrument by itself
 void clockHandler (int subClockID) {
-  case 0: // sequencer
+  switch (subClockID)
+  {
+    case 0: // sequencer
     if (subClocks[subClockID][8] == 1){ // if subclock is running
       nextPulse();
-      Serial.println("pulse+++");
+      Serial.println("pulse Sequencer");
     }
+  }
+  
 }
 
  // reset
