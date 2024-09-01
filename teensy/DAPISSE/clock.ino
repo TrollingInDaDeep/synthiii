@@ -4,47 +4,23 @@
 // clocked is a great module
 
 
-///Variables
-
-
-
-
 //external clock handler
 //tap tempo
 
 
-// subclocks
-
-
-
-// connect subclocks to
- // a -> the sequencer
- // b -> drum instrument 1
- // c -> drum instrument 2
-
 ///
 /// Functions
 ///
-
 
 // updateClock -> run several times also during digital Read
 // check if any action to do (tick or subtick)
 // update subticks
 void updateClock() {
   currentMillis = millis();
-  currentTick = getCurrentTick(); //(currentMillis - clockStart) / tickMS; //division with int will only yield whole numbers.
+  currentTick = (currentMillis - clockStart) / tickMS; //division with int will only yield whole numbers.
   //Serial.println(currentTick);
   updateClockTempo();
 
-
-
-  // Serial.print("millis:");
-  // Serial.print(currentMillis);
-  // Serial.print(" preTickSTart:");
-  // Serial.println(prevTickStart);
-  //Serial.print(" prevClockStart:");
-  //Serial.println(prevClockStart);
-  
   for (int i = 0; i < numSubClocks; i++){
     if (currentMillis - subClocks[i][11] >= subClocks[i][7] && subClocks[i][10] == 0) { //if gate time is over and stop not yet sent
         subClocks[i][9] = 0; //set note to STOP mode
@@ -62,7 +38,7 @@ void updateClock() {
   }
 }
 
-
+//should get the current tick, maybe shitty
 int getCurrentTick() {
   int counter = 1;
   for (int leftTicks = 1; leftTicks <= numTicks; leftTicks++) {
@@ -72,13 +48,11 @@ int getCurrentTick() {
   }
   return counter;
 }
+
 //Run actions needed for next Tick
 void nextTick() {
-  prevTickStart = tickStart;
-  tickStart = currentMillis;
   lastTick = currentTick;
-  //Serial.print("t: ");
-  //Serial.println(currentTick);
+  Serial.println(currentTick);
   for (int i = 0; i < numSubClocks; i++){
     if (subClocks[i][8] > 0){// don't decrease when already 0, don't kick downwards pls
           subClocks[i][5]--; //decrease the ticks left
@@ -95,8 +69,8 @@ void nextTick() {
 void nextClockCycle() {
   prevClockStart = clockStart;
   clockStart = currentMillis;
-  //Serial.print("clock @");
-  //Serial.println(currentTick);
+  Serial.print("clock @");
+  Serial.println(currentTick);
   usbMIDI.sendClock();
   // Serial.println(millis());
 }
