@@ -32,7 +32,8 @@
 // update subticks
 void updateClock() {
   currentMillis = millis();
-  currentTick = (currentMillis - clockStart) / tickMS; //division with int will only yield whole numbers.
+  currentTick = getCurrentTick(); //(currentMillis - clockStart) / tickMS; //division with int will only yield whole numbers.
+  //Serial.println(currentTick);
   updateClockTempo();
 
 
@@ -43,61 +44,59 @@ void updateClock() {
   // Serial.println(prevTickStart);
   //Serial.print(" prevClockStart:");
   //Serial.println(prevClockStart);
-  if (currentMillis - tickStart >= tickMS) {
-    // Serial.print(currentMillis - tickStart);
-    // Serial.print(">=");
-    // Serial.println(tickMS);
+  
+  for (int i = 0; i < numSubClocks; i++){
+    if (currentMillis - subClocks[i][11] >= subClocks[i][7] && subClocks[i][10] == 0) { //if gate time is over and stop not yet sent
+        subClocks[i][9] = 0; //set note to STOP mode
+        clockHandler(i); // should stop the Note
+        subClocks[i][10] = 1;
+    }
+  }
+  
+  if (currentTick != lastTick) {
     nextTick();
   }
   
   if (currentMillis - clockStart >= tempo) {
-    // Serial.print(millis() - prevClockStart);
-    // Serial.print(">=");
-    // Serial.println(tempo);
     nextClockCycle();
   }
 }
 
+
+int getCurrentTick() {
+  int counter = 1;
+  for (int leftTicks = 1; leftTicks <= numTicks; leftTicks++) {
+    if (((currentMillis - clockStart)-(leftTicks * tickMS)) > 0){
+      counter++;
+    }
+  }
+  return counter;
+}
 //Run actions needed for next Tick
 void nextTick() {
   prevTickStart = tickStart;
   tickStart = currentMillis;
-  Serial.print("t: ");
-  Serial.println(currentTick);
-
+  lastTick = currentTick;
+  //Serial.print("t: ");
+  //Serial.println(currentTick);
   for (int i = 0; i < numSubClocks; i++){
     if (subClocks[i][8] > 0){// don't decrease when already 0, don't kick downwards pls
           subClocks[i][5]--; //decrease the ticks left
     }
-    if (subClocks[i][8] == 1){ // if subclock is running
-      Serial.print("Ticks left: ");
-      Serial.println(subClocks[i][5]);
-    }
     if (subClocks[i][5] < 1) { // No ticks left -> trigger!
-      if (subClocks[i][8] == 1){ // if subclock is running
-        Serial.print("$$$ NO Ticks left: ");
-        Serial.println(subClocks[i][5]);
-      }
       clockHandler(i);
       //reset tick counter for subclock. Tick + delay
       subClocks[i][5] = subClocks[i][3] + subClocks[i][4];
-      if (subClocks[i][8] == 1){ // if subclock is running
-        Serial.print("Reset to: ");
-        Serial.println(subClocks[i][5]);
-      }
     }
   }
-  
-
-  // Serial.print("tick: ");
-  // Serial.println(currentMillis);
 }
 
 //run actions needed for next Clock Cycle (beat)
 void nextClockCycle() {
   prevClockStart = clockStart;
   clockStart = currentMillis;
-  Serial.println("clock: ");
+  //Serial.print("clock @");
+  //Serial.println(currentTick);
   usbMIDI.sendClock();
   // Serial.println(millis());
 }
@@ -120,7 +119,6 @@ void updateClockTempo() {
     {
       subClocks[i][3] = numTicks * subClocks[i][1]; // ticks = numTicks * ratio
     }
-    Serial.println(subClocks[0][3]);
   }
 }
 
@@ -133,8 +131,19 @@ void clockHandler (int subClockID) {
   {
     case 0: // sequencer
     if (subClocks[subClockID][8] == 1){ // if subclock is running
-      nextPulse();
-      Serial.println("pulse Sequencer");
+      if (subClocks[subClockID][9] == 1){ //note Start
+        //nextPulse();
+        usbMIDI.sendNoteOn(60, velocity, synthMidiChannel);
+        Serial.print("pulse Sequencer @");
+        Serial.println(currentTick);
+
+        subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
+        subClocks[subClockID][11] = currentMillis;
+      }
+      else { // note Stop
+        usbMIDI.sendNoteOff(60, velocity, synthMidiChannel);
+        subClocks[subClockID][9] = 1; //set note to START mode
+      }
     }
   }
   

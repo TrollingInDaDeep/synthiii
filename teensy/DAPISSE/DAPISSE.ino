@@ -81,11 +81,12 @@ int endLoopMillis = 0;
 // ############
 
 //bpm
-int bpm = 10.0;
+int bpm = 60.0;
 float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
-int numTicks = 24; //in how many ticks one beat shall be divided
+int numTicks = 2; //in how many ticks one beat shall be divided
 float tickMS = tempo/numTicks; //how long a tick is in ms
 int currentTick = 0; // which tick we're currently at (pointer)
+int lastTick = 0; //which tick we were at before (pointer)
 
 const int numSubClocks = 5; //how many subClocks with individual mult/division
 
@@ -104,17 +105,18 @@ float prevTickStart = 0; //previous millisecond timestamp when last tick was sen
 // 6 instrument -> which instrument the clock is connected to (eg. seqencer, bassdrum, etc.)
 // 7 gateTime -> after how many ms the stop signal should be triggered
 // 8 run -> 1 = running, 0 = stopped
-//
+// 9 isStart -> 1 = Note should be started, 0 = note should be stopped
+//10 stopSent -> 1 = stop has been sent for a note already, 0 = stop not sent yet (otherwise it would spam stop always)
+//11 startMS -> millisecond timestamp when Note start was sent
 
-float subClocks[numSubClocks][9] {
-  //  index   ratio   divMult   tick    delay   ticksLeft     instrument    gateTime   run
-  {   0,      1,      1,        1,       0,     0,            0,            50,        1 }, //sequencer
-  {   1,      1,      0,        1,       0,     0,            1,            2,         0 },
-  {   2,      1,      0,        1,       0,     0,            2,            2,         0 },
-  {   3,      1,      0,        1,       0,     0,            3,            2,         0 },
-  {   4,      1,      0,        1,       0,     0,            4,            2,         0 }
+float subClocks[numSubClocks][12] {
+  //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS
+  {   0,      1,      1,        0,       0,     0,            0,            75,         1,       1,        1,       0}, //sequencer
+  {   1,      1,      0,        0,       0,     0,            1,            2,         0,       1,         1,        0},
+  {   2,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0},
+  {   3,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0},
+  {   4,      1,      0,        0,       0,     0,            4,            2,         0,       1,         1,        0}
 };
-
 
 // ############
 // DRUMS
@@ -405,6 +407,7 @@ void changeDrumPattern(bool);
 void recordKey(int);
 int getDrumNote(int);
 int getDrumIndex(int);
+int getCurrentTick(void);
 
 // what happens when an external clock signal is received
 void handleClock() {
@@ -915,6 +918,7 @@ void loop() {
 
 
   updateClock();
+  delay(200);
   isSlowReadCycle = 0; //
   //benchmarking
   // endLoopMillis = millis();
