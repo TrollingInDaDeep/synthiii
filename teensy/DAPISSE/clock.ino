@@ -57,11 +57,11 @@ int getCurrentTick() {
 //Run actions needed for next Tick
 void nextTick() {
   lastTick = currentTick;
-  Serial.println(currentTick);
+  //Serial.println(subClocks[0][5]); // ticks left
   for (int i = 0; i < numSubClocks; i++){
-    if (subClocks[i][8] > 0){// don't decrease when already 0, don't kick downwards pls
-          subClocks[i][5]--; //decrease the ticks left
-    }
+    //if (subClocks[i][5] > 0){// don't decrease when already 0, don't kick downwards pls
+    subClocks[i][5]--; //decrease the ticks left
+    //}
     if (subClocks[i][5] < 1) { // No ticks left -> trigger!
       clockHandler(i);
       //reset tick counter for subclock. Tick + delay
@@ -81,11 +81,6 @@ void nextClockCycle() {
   Serial.println(currentTick);
   usbMIDI.sendClock();
   // Serial.println(millis());
-
-  // Ensure ticksLeft are correctly initialized for the new cycle
-  for (int i = 0; i < numSubClocks; i++) {
-    subClocks[i][5] = subClocks[i][3] + subClocks[i][4];  // Reset to tick + delay
-  }
 }
 
 
@@ -136,4 +131,21 @@ void clockHandler (int subClockID) {
   
 }
 
- // reset
+// Reset
+void resetClock() {
+  Serial.println("reset Clock");
+  tickMS = tempo/numTicks;
+  currentTick = 0;
+  lastTick = 0;
+  clockStart = 0;
+  prevClockStart = 0;
+  elapsedTime = 0;
+
+  updateClockTempo();
+  //Ensure ticksLeft are correctly initialized for the new cycle
+  for (int i = 0; i < numSubClocks; i++) {
+    subClocks[i][5] = subClocks[i][3] + subClocks[i][4];  // Reset to tick + delay -> +1 to 
+  }
+
+  nextClockCycle();
+}

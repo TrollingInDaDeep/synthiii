@@ -93,6 +93,8 @@ const int numSubClocks = 5; //how many subClocks with individual mult/division
 float clockStart = 0; //millisecond timestamp when current Clock Cycle was started
 float prevClockStart = 0; //previous millisecond timestamp when last clock signal was sent
 float elapsedTime = 0; //how many ms have passed since clock start -> suggested by chatGPT
+bool initialClockReset = true; //used to reset clock at first occurrence, to sync everything
+int initialClockResetTime = 1000; // reset clock after n ms of running to sync everything
 //
 // 0 index -> index in the subClocks array                   
 // 1 ratio -> ratio multiplied or divided from mainClock
@@ -406,6 +408,7 @@ void recordKey(int);
 int getDrumNote(int);
 int getDrumIndex(int);
 int getCurrentTick(void);
+void resetClock(void);
 
 // what happens when an external clock signal is received
 void handleClock() {
@@ -831,7 +834,6 @@ void setup() {
   usbMIDI.setHandleClock(handleClock);
   selectMuxOutPin(stepPointer);
   digitalWrite(I7, HIGH);
-
 }
 
 void loop() {
@@ -918,6 +920,11 @@ void loop() {
   updateClock();
   delay(5);
   isSlowReadCycle = 0; //
+  
+  if (initialClockReset && currentMillis > initialClockResetTime){
+    initialClockReset = false;
+    resetClock();
+  }
   //benchmarking
   // endLoopMillis = millis();
   // Serial.print(drumPadMillis - startLoopMillis);
