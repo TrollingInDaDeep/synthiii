@@ -17,7 +17,12 @@
 // update subticks
 void updateClock() {
   currentMillis = millis();
-  currentTick = (currentMillis - clockStart) / tickMS; //division with int will only yield whole numbers.
+  elapsedTime = currentMillis - clockStart;
+
+  // suggested by ChatGPT to update this more frequently
+  tickMS = tempo / numTicks;
+
+  currentTick = (elapsedTime / tickMS); //division with int will only yield whole numbers.
   //Serial.println(currentTick);
   updateClockTempo();
 
@@ -33,7 +38,7 @@ void updateClock() {
     nextTick();
   }
   
-  if (currentMillis - clockStart >= tempo) {
+  if (elapsedTime >= tempo) {
     nextClockCycle();
   }
 }
@@ -69,10 +74,18 @@ void nextTick() {
 void nextClockCycle() {
   prevClockStart = clockStart;
   clockStart = currentMillis;
+  currentTick = 0;
+  lastTick = 0; //that's the solution++ otherwise it will drift!!!!!
+
   Serial.print("clock @");
   Serial.println(currentTick);
   usbMIDI.sendClock();
   // Serial.println(millis());
+
+  // Ensure ticksLeft are correctly initialized for the new cycle
+  for (int i = 0; i < numSubClocks; i++) {
+    subClocks[i][5] = subClocks[i][3] + subClocks[i][4];  // Reset to tick + delay
+  }
 }
 
 

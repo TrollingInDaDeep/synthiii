@@ -65,7 +65,7 @@ int analogReadDiff = 0;
 int caseNumber = 0;
 int noteNumberDigiRead = 0;
 int noteNumberAnalog = 0;
-unsigned long currentMillis = 0;
+float currentMillis = 0;
 
 //for benchmark purposes
 int startLoopMillis = 0;
@@ -92,7 +92,7 @@ const int numSubClocks = 5; //how many subClocks with individual mult/division
 
 float clockStart = 0; //millisecond timestamp when current Clock Cycle was started
 float prevClockStart = 0; //previous millisecond timestamp when last clock signal was sent
-
+float elapsedTime = 0; //how many ms have passed since clock start -> suggested by chatGPT
 //
 // 0 index -> index in the subClocks array                   
 // 1 ratio -> ratio multiplied or divided from mainClock
@@ -109,7 +109,7 @@ float prevClockStart = 0; //previous millisecond timestamp when last clock signa
 
 float subClocks[numSubClocks][12] {
   //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS
-  {   0,      2,      0,        0,       0,     0,            0,            75,         1,       1,        1,       0}, //sequencer
+  {   0,      1.5,      1,        0,       0,     0,            0,            75,         1,       1,        1,       0}, //sequencer
   {   1,      1,      0,        0,       0,     0,            1,            2,         0,       1,         1,        0},
   {   2,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0},
   {   3,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0},
