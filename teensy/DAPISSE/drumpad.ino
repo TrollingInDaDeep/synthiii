@@ -69,21 +69,23 @@ void changeDrumPattern(bool direction){
     selectedDrumPattern = numDrumPatterns-1;
   }
 }
+
+///OBSOLETE due to new clock++
 /// sets the modifier of the drum tempo based on the sequencer clock
 /// expects number to multiply or divide clock
-void updateDrumTempo() {
-  for (int i = 0; i < numDrumInstruments; i++)
-  {
-    // Multiplication of tempo
-    if (tempoOperation[selectedInstrument]){
-      instrumentNotes[2][selectedInstrument] = tempo * tempoModifier[selectedInstrument];
-    }
-    //Division of tempo
-    else
-    {
-      instrumentNotes[2][selectedInstrument] = (double)tempo / tempoModifier[selectedInstrument];
-    }
-  }
+// void updateDrumTempo() {
+//   for (int i = 0; i < numDrumInstruments; i++)
+//   {
+//     // Multiplication of tempo
+//     if (tempoOperation[selectedInstrument]){
+//       instrumentNotes[2][selectedInstrument] = tempo * tempoModifier[selectedInstrument];
+//     }
+//     //Division of tempo
+//     else
+//     {
+//       instrumentNotes[2][selectedInstrument] = (double)tempo / tempoModifier[selectedInstrument];
+//     }
+//   }
 
   //Serial.println(instrumentNotes[2][selectedInstrument], 6);
 
@@ -141,7 +143,7 @@ void updateDrumTempo() {
   //     tempoModifier = 0.0625;
   //   break;
   // }
-}
+//}
 
 /// finds out which note to play for a key number
 /// returns midi note. returns 0 if key is not a drumpad note

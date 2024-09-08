@@ -89,7 +89,9 @@ void nextClockCycle() {
 /// sets the tempo modifier of the subclock
 /// expects number to multiply or divide clock
 void updateClockTempo() {
-  //bug: might lead to always start at 2nd tick
+  tempo = 1000.0/(bpm/60.0);
+  tickMS = tempo/numTicks;
+
   for (int i = 0; i < numSubClocks; i++)
   {
     // division of tempo
@@ -114,16 +116,20 @@ void clockHandler (int subClockID) {
     case 0: // sequencer
     if (subClocks[subClockID][8] == 1){ // if subclock is running
       if (subClocks[subClockID][9] == 1){ //note Start
-        //nextPulse();
-        usbMIDI.sendNoteOn(60, velocity, synthMidiChannel);
+        nextPulse();
+        
+        //usbMIDI.sendNoteOn(60, velocity, synthMidiChannel);
         Serial.print("pulse Sequencer @");
         Serial.println(currentTick);
-
+        
         subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
         subClocks[subClockID][11] = currentMillis;
       }
       else { // note Stop
-        usbMIDI.sendNoteOff(60, velocity, synthMidiChannel);
+        if (!noteStopped) {
+          stopLastNote();
+        }
+        //usbMIDI.sendNoteOff(60, velocity, synthMidiChannel);
         subClocks[subClockID][9] = 1; //set note to START mode
       }
     }
@@ -140,6 +146,7 @@ void resetClock() {
   clockStart = 0;
   prevClockStart = 0;
   elapsedTime = 0;
+  currentMillis = millis();
 
   updateClockTempo();
   //Ensure ticksLeft are correctly initialized for the new cycle

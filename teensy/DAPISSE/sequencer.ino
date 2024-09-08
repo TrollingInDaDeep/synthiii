@@ -8,12 +8,13 @@ void noteButtonReleased(int note){
   stopNote(note);
 }
 
-// functions
-void updateTempo(){
-  tempo = 1000.0/(bpm/60.0);
-  tickMS = tempo/24;
-  updateDrumTempo();
-}
+///obsolete due to new clock
+// // functions
+// void updateTempo(){
+//   tempo = 1000.0/(bpm/60.0);
+//   tickMS = tempo/24;
+//   updateDrumTempo();
+// }
 
 
 void nextStep() {
@@ -86,7 +87,7 @@ void startNote(int noteToPlay){
   if (arr_seq_buttons[2][noteToPlay]){
       usbMIDI.sendControlChange(20, slideAmount, synthMidiChannel); //20 is the slide ctrlr number
   }
-  noteStart = millis();
+  //noteStart = millis();
   usbMIDI.sendNoteOn(arr_seq_buttons[0][noteToPlay], velocity, synthMidiChannel);
   noteStopped = false;
   lastNoteSent=arr_seq_buttons[0][noteToPlay];
@@ -95,7 +96,7 @@ void startNote(int noteToPlay){
 
 void nextPulse() {
   //go to next pulse
-  pulseStart = millis();
+  //pulseStart = millis();
 
   //go first pulse, first step if last pulse is reached or reset is triggered (pulsePointer = -1)
   if (pulsePointer >= pulseCount[stepPointer] || pulsePointer < 0) {
@@ -150,21 +151,24 @@ void selectSeqNoteFunction(){
 void resetSequencer() {
   stepPointer = -1;
   pulsePointer = -1;
-  prevClockStart = millis();
-  prevPulseStart = millis();
-  if (drumDivMultMode){
-    for (int i = 0; i < numDrumInstruments; i++)
-    {
-      prevDrumNoteStart[i] = millis();
-    }
-  }
-  if (syncDrumToSequencer){
-      drumStepPointer = -1;
-  }
-  if (syncDrumToSequencer){
-    nextDrumStep();
-  }
-  nextPulse();
-  reset=0;
+  //nextPulse(); //experimental, might need to uncomment again
+  reset = false;
+
+  ///OBSOLETE
+  //prevClockStart = millis();
+  //prevPulseStart = millis();
+  // if (drumDivMultMode){
+  //   for (int i = 0; i < numDrumInstruments; i++)
+  //   {
+  //     prevDrumNoteStart[i] = millis();
+  //   }
+  // }
+  // if (syncDrumToSequencer){
+  //     drumStepPointer = -1;
+  // }
+  // if (syncDrumToSequencer){
+  //   nextDrumStep();
+  // }
+  
 }
 

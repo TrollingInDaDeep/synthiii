@@ -51,9 +51,10 @@ int minPulse = 1; //how many pulses at least for sequencer
 int maxPulse = 8; //how many pulses at max for sequencer
 int slowReadCycleCount = 0;
 bool isSlowReadCycle = 1; //set to 1 if we have a slow read cycle (also read slow buttons)
-bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
-bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = external clock received
-bool drumDivMultMode = false; // true = trigger drum steps, when "fill each n step" is activated
+//bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
+//bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = external clock received
+//bool drumDivMultMode = false; // true = trigger drum steps, when "fill each n step" is activated
+bool syncClockToExt = false; //trigger next clock cycle if midi Clock is received (untested)
 int synthMidiChannel = 2;
 bool blnTapTempo = true; //1 = playMode button becomes tapTempo button 
 ///
@@ -111,7 +112,7 @@ int initialClockResetTime = 1000; // reset clock after n ms of running to sync e
 
 float subClocks[numSubClocks][12] {
   //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS
-  {   0,      1.5,      1,        0,       0,     0,            0,            75,         1,       1,        1,       0}, //sequencer
+  {   0,      1,      1,        0,       0,     0,            0,            75,         0,       1,        1,       0}, //sequencer
   {   1,      1,      0,        0,       0,     0,            1,            2,         0,       1,         1,        0},
   {   2,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0},
   {   3,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0},
@@ -221,9 +222,9 @@ long bpmMin=20.0;
 long bpmMax=800.0;
 
 
-float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
-float pulseStart = 0; //timestamp when the pulse started
-float noteStart = 0; //timestamp when the note started
+//float prevPulseStart = 0; //previous millisecond timestamp before last pulse was started
+//float pulseStart = 0; //timestamp when the pulse started
+//float noteStart = 0; //timestamp when the note started
 
 
 
@@ -413,17 +414,24 @@ void resetClock(void);
 // what happens when an external clock signal is received
 void handleClock() {
 
-  //Drumstep: only when drum running and NOT synced to sequencer
-  if (runDrum) {
-    if (!syncDrumToSequencer) {
-      nextDrumStep();
+  if (syncClockToExt) {
+    if (run){
+      nextPulse();
     }
   }
 
-  //SEQ step: only when synced to external clock
-  if (syncSequencerToClock) {
-    nextPulse();
-  }
+  ///OBSOLETE
+  // //Drumstep: only when drum running and NOT synced to sequencer
+  // if (runDrum) {
+  //   if (!syncDrumToSequencer) {
+  //     nextDrumStep();
+  //   }
+  // }
+
+  // //SEQ step: only when synced to external clock
+  // if (syncSequencerToClock) {
+    
+  // }
 
 }
 // selects the pin on input multiplexer
@@ -597,9 +605,9 @@ void UpdateSendValues() {
             // break;
             case 17:
               //Clock / BPM
-              if (!syncSequencerToClock){
-                bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
-              }
+              //if (!syncSequencerToClock){
+              bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
+              //}
             break;
             case 18:
               // number of steps the sequencer should play
@@ -682,22 +690,20 @@ void UpdateSendValues() {
           //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
           switch (arr_send_digital_inputs[mux][pin]){
               case 41:
-                if (!syncSequencerToClock){
-                  //Sequencer Play/pause
-                  if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
-                    run = !run;
-                    if (syncDrumToSequencer || drumDivMultMode){
-                      runDrum = !runDrum;
-                    }
-                    if (run){
-                      // Serial.println("play");
-                      prevClockStart = millis();
-                      prevPulseStart = millis();
-                    } else {
-                      // Serial.println("pause");
-                      stopLastNote();
-                      stopNote(stepPointer);
-                    }
+                //Sequencer Play/pause
+                if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
+                  run = !run;
+                  for (int i = 0; i < numSubClocks; i++) {
+                    subClocks[i][8] = !subClocks[i][8];  // toggle Run 
+                  }
+                  if (run){
+                    // Serial.println("play");
+                    //prevClockStart = millis();
+                    //prevPulseStart = millis();
+                  } else {
+                    // Serial.println("pause");
+                    stopLastNote();
+                    stopNote(stepPointer);
                   }
                 }
                 
@@ -775,7 +781,7 @@ void UpdateSendValues() {
                 switch (seqButtonFunction) {
                   case 0:
                     //only play notes when sequencer is not running, and not synced to ext clock
-                    if (!run && !syncSequencerToClock){
+                    if (!run && !syncClockToExt){
                      if (arr_read_digital_inputs[1][noteNumberDigiRead]){
                         noteButtonPressed(noteNumberDigiRead);
                       } else {
@@ -837,39 +843,36 @@ void setup() {
 }
 
 void loop() {
-  // startLoopMillis = millis();
-  // slowReadCycleCount++;
-  // if (slowReadCycleCount > digitalSmoother) {
-  //   isSlowReadCycle = 1;
-  //   slowReadCycleCount = 0;
-  // }
+  startLoopMillis = millis();
+  slowReadCycleCount++;
+  if (slowReadCycleCount > digitalSmoother) {
+    isSlowReadCycle = 1;
+    slowReadCycleCount = 0;
+  }
+  //reading drumpad after every function for lower latency
+  readDrumpad();
+  drumPadMillis = millis();
+  readAnalogPins();
+  analogReadMillis = millis();
+  readDrumpad();
+  readDigitalPins();
+  digitalReadMillis = millis();
+  readDrumpad();
+  usbMIDI.read();
 
-  // // save at what millisecond the loop starts, for timing
-  // currentMillis = millis();
+  UpdateSendValues();
+  updateValueMillis = millis();
+  updateClockTempo();
 
-  // //reading drumpad after every function for lower latency
-  // readDrumpad();
-  // drumPadMillis = millis();
-  // readAnalogPins();
-  // analogReadMillis = millis();
-  // readDrumpad();
-  // readDigitalPins();
-  // digitalReadMillis = millis();
-  // readDrumpad();
-  // usbMIDI.read();
+  if (reset){
+    resetSequencer();
+    resetClock();
+  }
 
-  // UpdateSendValues();
-  // updateValueMillis = millis();
-  // updateTempo();
-
-  // if (reset){
-  //   resetSequencer();
-  //   currentMillis = millis();
-  // }
-
-  // //sequencer step trigger
-  // if (run) {
-  //   // send clock if necessary
+  ///OBSOLETE due to new clock
+  //sequencer step trigger
+  //if (run) {
+  //  // send clock if necessary
   //   if (currentMillis - prevClockStart >= tickMS) {
   //     //save timestamp when pulse started
   //     prevClockStart = currentMillis;
