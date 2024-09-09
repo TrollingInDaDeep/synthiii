@@ -34,7 +34,7 @@ void updateClock() {
           subClocks[i][10] = 1;
       }
     }
-    
+    //Serial.println(currentTick);
     if (currentTick != lastTick) {
       nextTick();
     }
@@ -59,7 +59,7 @@ int getCurrentTick() {
 //Run actions needed for next Tick
 void nextTick() {
   lastTick = currentTick;
-  Serial.println(subClocks[0][5]); // ticks left
+  //Serial.println(subClocks[0][5]); // ticks left
   for (int i = 0; i < numSubClocks; i++){
     //if (subClocks[i][5] > 0){// don't decrease when already 0, don't kick downwards pls
     subClocks[i][5]--; //decrease the ticks left
@@ -91,17 +91,6 @@ void nextClockCycle() {
 /// sets the tempo modifier of the subclock
 /// expects number to multiply or divide clock
 void updateClockTempo() {
-  
-  if (oldBPM != bpm){ //only update if bpm changed
-    oldBPM = bpm;
-    tempo = 1000.0/(bpm/60.0);
-    tickMS = tempo/numTicks;
-
-    for (int i = 0; i < numSubClocks; i++)
-    {
-      subClocks[i][5] = subClocks[i][3] + subClocks[i][4]; // Reset ticks left for each subclock
-    }
-  }
 
   //calculate the tempo division and multiplication
   for (int i = 0; i < numSubClocks; i++)
@@ -116,6 +105,27 @@ void updateClockTempo() {
         subClocks[i][3] = numTicks * subClocks[i][1]; // ticks = numTicks * ratio
       }
     }
+
+  if (oldBPM != bpm){ //only update if bpm changed
+    oldBPM = bpm;
+    tempo = 1000.0/(bpm/60.0);
+    tickMS = tempo/numTicks;
+
+    for (int i = 0; i < numSubClocks; i++)
+    {
+      subClocks[i][5] = subClocks[i][3] + subClocks[i][4]; // Reset ticks left for each subclock
+    }
+
+  
+    Serial.print("BPM: ");
+    Serial.print(bpm);
+    Serial.print("¦ tickMS: ");
+    Serial.print(tickMS);
+    Serial.print("¦ ticksLeft: ");
+    Serial.println(subClocks[0][5]);
+  }
+
+ 
   
 }
 

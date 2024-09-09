@@ -698,6 +698,7 @@ void UpdateSendValues() {
                     // Serial.println("play");
                     //prevClockStart = millis();
                     //prevPulseStart = millis();
+                    resetClock();
                   } else {
                     // Serial.println("pause");
                     stopLastNote();
