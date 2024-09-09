@@ -82,7 +82,8 @@ int endLoopMillis = 0;
 // ############
 
 //bpm
-int bpm = 60.0;
+int oldBPM = 0; //store last bpm to see if we actually had a bpm change
+int bpm = 60.0; 
 float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
 int numTicks = 24; //in how many ticks one beat shall be divided
 float tickMS = tempo/numTicks; //how long a tick is in ms
@@ -112,7 +113,7 @@ int initialClockResetTime = 1000; // reset clock after n ms of running to sync e
 
 float subClocks[numSubClocks][12] {
   //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS
-  {   0,      1,      1,        0,       0,     0,            0,            75,         0,       1,        1,       0}, //sequencer
+  {   0,      1,      1,        0,       0,     0,            0,            75,         1,       1,        1,       0}, //sequencer
   {   1,      1,      0,        0,       0,     0,            1,            2,         0,       1,         1,        0},
   {   2,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0},
   {   3,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0},
@@ -693,9 +694,6 @@ void UpdateSendValues() {
                 //Sequencer Play/pause
                 if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
                   run = !run;
-                  for (int i = 0; i < numSubClocks; i++) {
-                    subClocks[i][8] = !subClocks[i][8];  // toggle Run 
-                  }
                   if (run){
                     // Serial.println("play");
                     //prevClockStart = millis();
@@ -706,7 +704,6 @@ void UpdateSendValues() {
                     stopNote(stepPointer);
                   }
                 }
-                
               break;
               case 42:
                 //Sequencer Reset
@@ -849,23 +846,36 @@ void loop() {
     isSlowReadCycle = 1;
     slowReadCycleCount = 0;
   }
-  //reading drumpad after every function for lower latency
+  //reading drumpad and updating clock after every function for lower latency
   readDrumpad();
+  updateClock();
+  
   drumPadMillis = millis();
   readAnalogPins();
   analogReadMillis = millis();
+
   readDrumpad();
+  updateClock();
   readDigitalPins();
   digitalReadMillis = millis();
+  
   readDrumpad();
+  updateClock();
   usbMIDI.read();
 
   UpdateSendValues();
   updateValueMillis = millis();
-  updateClockTempo();
 
   if (reset){
     resetSequencer();
+    resetClock();
+  }
+
+  updateClock();
+  isSlowReadCycle = 0; //
+  
+  if (initialClockReset && currentMillis > initialClockResetTime){
+    initialClockReset = false;
     resetClock();
   }
 
@@ -919,15 +929,6 @@ void loop() {
 
   // }
 
-
-  updateClock();
-  delay(5);
-  isSlowReadCycle = 0; //
-  
-  if (initialClockReset && currentMillis > initialClockResetTime){
-    initialClockReset = false;
-    resetClock();
-  }
   //benchmarking
   // endLoopMillis = millis();
   // Serial.print(drumPadMillis - startLoopMillis);

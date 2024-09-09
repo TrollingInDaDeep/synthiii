@@ -151,7 +151,7 @@ void selectSeqNoteFunction(){
 void resetSequencer() {
   stepPointer = -1;
   pulsePointer = -1;
-  //nextPulse(); //experimental, might need to uncomment again
+  nextPulse(); //experimental, might need to uncomment again
   reset = false;
 
   ///OBSOLETE

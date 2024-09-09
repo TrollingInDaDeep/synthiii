@@ -16,30 +16,32 @@
 // check if any action to do (tick or subtick)
 // update subticks
 void updateClock() {
-  currentMillis = millis();
-  elapsedTime = currentMillis - clockStart;
+  if (run){
+    currentMillis = millis();
+    elapsedTime = currentMillis - clockStart;
 
-  // suggested by ChatGPT to update this more frequently
-  tickMS = tempo / numTicks;
+    // suggested by ChatGPT to update this more frequently
+    tickMS = tempo / numTicks;
 
-  currentTick = (elapsedTime / tickMS); //division with int will only yield whole numbers.
-  //Serial.println(currentTick);
-  updateClockTempo();
+    currentTick = (elapsedTime / tickMS); //division with int will only yield whole numbers.
+    //Serial.println(currentTick);
+    updateClockTempo();
 
-  for (int i = 0; i < numSubClocks; i++){
-    if (currentMillis - subClocks[i][11] >= subClocks[i][7] && subClocks[i][10] == 0) { //if gate time is over and stop not yet sent
-        subClocks[i][9] = 0; //set note to STOP mode
-        clockHandler(i); // should stop the Note
-        subClocks[i][10] = 1;
+    for (int i = 0; i < numSubClocks; i++){
+      if (currentMillis - subClocks[i][11] >= subClocks[i][7] && subClocks[i][10] == 0) { //if gate time is over and stop not yet sent
+          subClocks[i][9] = 0; //set note to STOP mode
+          clockHandler(i); // should stop the Note
+          subClocks[i][10] = 1;
+      }
     }
-  }
-  
-  if (currentTick != lastTick) {
-    nextTick();
-  }
-  
-  if (elapsedTime >= tempo) {
-    nextClockCycle();
+    
+    if (currentTick != lastTick) {
+      nextTick();
+    }
+    
+    if (elapsedTime >= tempo) {
+      nextClockCycle();
+    }    
   }
 }
 
@@ -57,7 +59,7 @@ int getCurrentTick() {
 //Run actions needed for next Tick
 void nextTick() {
   lastTick = currentTick;
-  //Serial.println(subClocks[0][5]); // ticks left
+  Serial.println(subClocks[0][5]); // ticks left
   for (int i = 0; i < numSubClocks; i++){
     //if (subClocks[i][5] > 0){// don't decrease when already 0, don't kick downwards pls
     subClocks[i][5]--; //decrease the ticks left
@@ -89,21 +91,32 @@ void nextClockCycle() {
 /// sets the tempo modifier of the subclock
 /// expects number to multiply or divide clock
 void updateClockTempo() {
-  tempo = 1000.0/(bpm/60.0);
-  tickMS = tempo/numTicks;
+  
+  if (oldBPM != bpm){ //only update if bpm changed
+    oldBPM = bpm;
+    tempo = 1000.0/(bpm/60.0);
+    tickMS = tempo/numTicks;
 
-  for (int i = 0; i < numSubClocks; i++)
-  {
-    // division of tempo
-    if (subClocks[i][2] == 1){
-      subClocks[i][3] = numTicks / subClocks[i][1]; // ticks = numTicks / ratio
-    }
-    //Multiplication of tempo
-    else
+    for (int i = 0; i < numSubClocks; i++)
     {
-      subClocks[i][3] = numTicks * subClocks[i][1]; // ticks = numTicks * ratio
+      subClocks[i][5] = subClocks[i][3] + subClocks[i][4]; // Reset ticks left for each subclock
     }
   }
+
+  //calculate the tempo division and multiplication
+  for (int i = 0; i < numSubClocks; i++)
+    {
+      // division of tempo
+      if (subClocks[i][2] == 1){
+        subClocks[i][3] = numTicks / subClocks[i][1]; // ticks = numTicks / ratio
+      }
+      //Multiplication of tempo
+      else
+      {
+        subClocks[i][3] = numTicks * subClocks[i][1]; // ticks = numTicks * ratio
+      }
+    }
+  
 }
 
  //trigger actions for each subclock
@@ -126,6 +139,7 @@ void clockHandler (int subClockID) {
         subClocks[subClockID][11] = currentMillis;
       }
       else { // note Stop
+        Serial.println("noteStopMode");
         if (!noteStopped) {
           stopLastNote();
         }
@@ -151,7 +165,7 @@ void resetClock() {
   updateClockTempo();
   //Ensure ticksLeft are correctly initialized for the new cycle
   for (int i = 0; i < numSubClocks; i++) {
-    subClocks[i][5] = subClocks[i][3] + subClocks[i][4];  // Reset to tick + delay -> +1 to 
+    subClocks[i][5] = subClocks[i][3] + subClocks[i][4];  // Reset to tick + delay 
   }
 
   nextClockCycle();
