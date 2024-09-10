@@ -1,6 +1,6 @@
 #include <Keypad.h>
 #include <ArduinoTapTempo.h>
-
+#include <math.h>
 ///
 /// How to
 ///
@@ -85,10 +85,13 @@ int endLoopMillis = 0;
 int oldBPM = 0; //store last bpm to see if we actually had a bpm change
 int bpm = 60.0; 
 float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
-int numTicks = 24; //in how many ticks one beat shall be divided
-float tickMS = tempo/numTicks; //how long a tick is in ms
+int subTicks = 24; //in how many ticks one beat shall be divided
+float tickMS = tempo/subTicks; //how long a tick is in ms
 int currentTick = 0; // which tick we're currently at (pointer)
 int lastTick = 0; //which tick we were at before (pointer)
+float lastTickTime = 0; //timestamp when last tick happened
+float timeSinceLastTick = 0; //to calculate if more than 1 tick happened since last calculation
+int missedTicks = 0; //missed ticks if clock not updated fast enough
 
 const int numSubClocks = 5; //how many subClocks with individual mult/division
 
@@ -110,14 +113,15 @@ int initialClockResetTime = 1000; // reset clock after n ms of running to sync e
 // 9 isStart -> 1 = Note should be started, 0 = note should be stopped
 //10 stopSent -> 1 = stop has been sent for a note already, 0 = stop not sent yet (otherwise it would spam stop always)
 //11 startMS -> millisecond timestamp when Note start was sent
+//12 tickCounter -> how many ticks have passed for subclock
 
-float subClocks[numSubClocks][12] {
-  //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS
-  {   0,      1,      1,        0,       0,     0,            0,            75,         1,       1,        1,       0}, //sequencer
-  {   1,      1,      0,        0,       0,     0,            1,            2,         0,       1,         1,        0},
-  {   2,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0},
-  {   3,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0},
-  {   4,      1,      0,        0,       0,     0,            4,            2,         0,       1,         1,        0}
+float subClocks[numSubClocks][13] {
+  //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS   tickCounter
+  {   0,      1,      1,        0,       0,     0,            0,            75,         1,       1,        1,       0,        0}, //sequencer
+  {   1,      1,      0,        0,       0,     0,            1,            2,         0,       1,         1,        0,       0},
+  {   2,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0,       0},
+  {   3,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0,       0},
+  {   4,      1,      0,        0,       0,     0,            4,            2,         0,       1,         1,        0,       0}
 };
 
 // ############

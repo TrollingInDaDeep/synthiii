@@ -18,12 +18,45 @@
 void updateClock() {
   if (run){
     currentMillis = millis();
+    timeSinceLastTick = currentMillis - lastTickTime;
+    missedTicks = timeSinceLastTick / tickMS; // how many ticks missed since last read
+
+    if (missedTicks > 0) {
+
+      for (int i = 0; i < missedTicks; i++){
+        //old working code//currentTick = (elapsedTime / tickMS); //division with int will only yield whole numbers.
+        currentTick = (currentTick + 1) % subTicks; //move to next tick, reset to 0 when subTicks reached
+      
+        if (currentTick == 0){
+          nextClockCycle();
+        }
+
+        for (int j = 0; j < numSubClocks; j++){
+          subClocks[i][12]++;
+
+
+          if (subClocks[j][12] >= subClocks[j][5]) { //if "ticksleft" reached
+            clockHandler(j);
+            subClocks[j][12] = 0;
+          }
+        
+        }      
+      
+      }
+      
+      //update based on how many ticks have been processed
+      lastTickTime = currentMillis - fmod(timeSinceLastTick, tickMS);
+
+
+
+    }
+ 
     elapsedTime = currentMillis - clockStart;
 
     // suggested by ChatGPT to update this more frequently
-    tickMS = tempo / numTicks;
+    tickMS = tempo / subTicks;
 
-    currentTick = (elapsedTime / tickMS); //division with int will only yield whole numbers.
+    
     //Serial.println(currentTick);
     updateClockTempo();
 
@@ -39,16 +72,16 @@ void updateClock() {
       nextTick();
     }
     
-    if (elapsedTime >= tempo) {
-      nextClockCycle();
-    }    
+    // if (elapsedTime >= tempo) {
+      
+    // }    
   }
 }
 
 //should get the current tick, maybe shitty
 int getCurrentTick() {
   int counter = 1;
-  for (int leftTicks = 1; leftTicks <= numTicks; leftTicks++) {
+  for (int leftTicks = 1; leftTicks <= subTicks; leftTicks++) {
     if (((currentMillis - clockStart)-(leftTicks * tickMS)) > 0){
       counter++;
     }
@@ -97,19 +130,19 @@ void updateClockTempo() {
     {
       // division of tempo
       if (subClocks[i][2] == 1){
-        subClocks[i][3] = numTicks / subClocks[i][1]; // ticks = numTicks / ratio
+        subClocks[i][3] = subTicks / subClocks[i][1]; // ticks = subTicks / ratio
       }
       //Multiplication of tempo
       else
       {
-        subClocks[i][3] = numTicks * subClocks[i][1]; // ticks = numTicks * ratio
+        subClocks[i][3] = subTicks * subClocks[i][1]; // ticks = subTicks * ratio
       }
     }
 
   if (oldBPM != bpm){ //only update if bpm changed
     oldBPM = bpm;
     tempo = 1000.0/(bpm/60.0);
-    tickMS = tempo/numTicks;
+    tickMS = tempo/subTicks;
 
     for (int i = 0; i < numSubClocks; i++)
     {
@@ -117,12 +150,12 @@ void updateClockTempo() {
     }
 
   
-    Serial.print("BPM: ");
-    Serial.print(bpm);
-    Serial.print("¦ tickMS: ");
-    Serial.print(tickMS);
-    Serial.print("¦ ticksLeft: ");
-    Serial.println(subClocks[0][5]);
+    // Serial.print("BPM: ");
+    // Serial.print(bpm);
+    // Serial.print("¦ tickMS: ");
+    // Serial.print(tickMS);
+    // Serial.print("¦ ticksLeft: ");
+    // Serial.println(subClocks[0][5]);
   }
 
  
@@ -164,9 +197,10 @@ void clockHandler (int subClockID) {
 // Reset
 void resetClock() {
   Serial.println("reset Clock");
-  tickMS = tempo/numTicks;
+  tickMS = tempo/subTicks;
   currentTick = 0;
   lastTick = 0;
+  lastTickTime = millis();
   clockStart = 0;
   prevClockStart = 0;
   elapsedTime = 0;
@@ -175,7 +209,8 @@ void resetClock() {
   updateClockTempo();
   //Ensure ticksLeft are correctly initialized for the new cycle
   for (int i = 0; i < numSubClocks; i++) {
-    subClocks[i][5] = subClocks[i][3] + subClocks[i][4];  // Reset to tick + delay 
+    subClocks[i][5] = subClocks[i][3] + subClocks[i][4];  // Reset to tick + delay
+    subClocks[i][12] = 0; //reset the clock Counter
   }
 
   nextClockCycle();
