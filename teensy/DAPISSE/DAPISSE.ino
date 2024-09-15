@@ -123,9 +123,9 @@ float subClocks[numSubClocks][14] {
   //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS   tickCounter   delayBuffer
   {   0,      4,      1,        0,       0,     0,            10,            75,         1,       1,        1,       0,       0,            0}, //sequencer
   {   1,      2,      0,        0,       0,     0,            0,            2,         1,       1,         1,        0,       0,            0},
-  {   2,      1,      0,        0,       12,     0,            1,            2,         1,       1,         1,        0,      0,            0},
-  {   3,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0,       0,            0},
-  {   4,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0,       0,            0}
+  {   2,      1,      0,        0,       0,     0,            1,            2,         1,       1,         1,        0,      0,            0},
+  {   3,      1,      0,        0,       0,     0,            2,            2,         1,       1,         1,        0,       0,            0},
+  {   4,      1,      0,        0,       0,     0,            3,            2,         1,       1,         1,        0,       0,            0}
 };
 
 // ############

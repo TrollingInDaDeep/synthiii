@@ -165,7 +165,7 @@ int getDrumNote(int keyNumber){
 /// finds out which index the current note has
 /// returns index number. returns 0 if key is not a drumpad note
 int getDrumIndex(int keyNumber){
-  int index = 0;
+  int index = 99;
   for (int i = 0; i < numDrumInstruments; i++)
     {
       if (keyNumber == instrumentNotes[0][i]){
@@ -213,7 +213,6 @@ void recordKey(int keyNumber){
 void readDrumpad() {
     int drumNote = 0;
     int drumIndex = 0;
-    int subClockID = 0;
     // supports up to ten simultaneous key presses
       if (kpd.getKeys())  
     {
@@ -231,11 +230,15 @@ void readDrumpad() {
           {
             drumNote = getDrumNote(keyNumber);
             drumIndex = getDrumIndex(keyNumber);
-            subClockID = getSubClockIndexByInstrument(drumIndex);
+            Serial.println(drumIndex);
+            if (drumIndex != 99){
+              getSubClockIndexByInstrument(drumIndex);
+            }
+            
             switch (keypadMode) {
               //Play Mode
               case 0:
-                if (recordDrum && runDrum && selectedDrumPattern == 1 && drumNote != 0){
+                if (recordDrum && runDrum && selectedDrumPattern == 1 && drumNote != 99){
                   recordKey(keyNumber); // not implemented
                 }
                
@@ -285,7 +288,9 @@ void readDrumpad() {
           {
             int drumNote = getDrumNote(keyNumber);
             int drumIndex = getDrumIndex(keyNumber);
-            int subClockID = getSubClockIndexByInstrument(drumIndex);
+            if (drumIndex != 99){
+              getSubClockIndexByInstrument(drumIndex);
+            }
             switch (keypadMode) {
               //Play Mode
               case 0:

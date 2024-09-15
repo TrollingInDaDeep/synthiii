@@ -91,8 +91,8 @@ void nextClockCycle() {
   currentTick = 0;
   lastTick = 0; //that's the solution++ otherwise it will drift!!!!!
 
-  Serial.print("clock @");
-  Serial.println(currentTick);
+  //Serial.print("clock @");
+  //Serial.println(currentTick);
   usbMIDI.sendClock();
   // Serial.println(millis());
 }
@@ -149,60 +149,82 @@ void clockHandler (int subClockID) {
   switch (subClockID)
   {
     case 0: // sequencer
-    if (subClocks[subClockID][8] == 1){ // if subclock is running
-      if (subClocks[subClockID][9] == 1){ //note Start
-        nextPulse();
-        
-        //Serial.print("pulse Sequencer @");
-        //Serial.println(currentTick);
-        
-        subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
-        subClocks[subClockID][11] = currentMillis;
-      }
-      else { // note Stop
-        //Serial.println("noteStopMode");
-        if (!noteStopped) {
-          stopLastNote();
+      if (subClocks[subClockID][8] == 1){ // if subclock is running
+        if (subClocks[subClockID][9] == 1){ //note Start
+          nextPulse();
+          
+          //Serial.print("pulse Sequencer @");
+          //Serial.println(currentTick);
+          
+          subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
+          subClocks[subClockID][11] = currentMillis;
         }
-        subClocks[subClockID][9] = 1; //set note to START mode
+        else { // note Stop
+          //Serial.println("noteStopMode");
+          if (!noteStopped) {
+            stopLastNote();
+          }
+          subClocks[subClockID][9] = 1; //set note to START mode
+        }
       }
-    }
+    break;
 
-    case 1: // kick
-    if (subClocks[subClockID][8] == 1){ // if subclock is running
-      if (subClocks[subClockID][9] == 1){ //note Start
-        startDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
-        //Serial.print("pulse Kick @");
-        //Serial.println(currentTick);
-        
-        subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
-        subClocks[subClockID][11] = currentMillis;
-      }
-      else { // note Stop
-        if (!drumNoteStopped[0]) { //kick
-          stopDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
+    case 1 ... 3: // kick
+      if (subClocks[subClockID][8] == 1){ // if subclock is running
+        if (subClocks[subClockID][9] == 1){ //note Start
+          startDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
+          //Serial.print("pulse Kick @");
+          //Serial.println(currentTick);
+          
+          subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
+          subClocks[subClockID][11] = currentMillis;
         }
-        subClocks[subClockID][9] = 1; //set note to START mode
+        else { // note Stop
+          if (!drumNoteStopped[0]) { //kick
+            stopDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
+          }
+          subClocks[subClockID][9] = 1; //set note to START mode
+        }
       }
-    }
+    break;
 
-    case 2: // snare
-    if (subClocks[subClockID][8] == 1){ // if subclock is running
-      if (subClocks[subClockID][9] == 1){ //note Start
-        startDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
-        Serial.print("pulse snare @");
-        Serial.println(currentTick);
-        
-        subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
-        subClocks[subClockID][11] = currentMillis;
-      }
-      else { // note Stop
-        if (!drumNoteStopped[0]) { //snare
-          stopDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
-        }
-        subClocks[subClockID][9] = 1; //set note to START mode
-      }
-    }
+    // case 2: // snare
+    //   if (subClocks[subClockID][8] == 1){ // if subclock is running
+    //     if (subClocks[subClockID][9] == 1){ //note Start
+    //       startDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
+    //       //Serial.print("pulse snare @");
+    //       //Serial.println(currentTick);
+          
+    //       subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
+    //       subClocks[subClockID][11] = currentMillis;
+    //     }
+    //     else { // note Stop
+    //       if (!drumNoteStopped[0]) { //snare
+    //         stopDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
+    //       }
+    //       subClocks[subClockID][9] = 1; //set note to START mode
+    //     }
+    //   }
+    // break;
+
+    // case 3: // hat
+    //   if (subClocks[subClockID][8] == 1){ // if subclock is running
+    //     if (subClocks[subClockID][9] == 1){ //note Start
+    //       startDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
+    //       //Serial.print("pulse snare @");
+    //       //Serial.println(currentTick);
+          
+    //       subClocks[subClockID][10] = 0; //tell that stop hasn't been sent yet
+    //       subClocks[subClockID][11] = currentMillis;
+    //     }
+    //     else { // note Stop
+    //       if (!drumNoteStopped[0]) { //snare
+    //         stopDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
+    //       }
+    //       subClocks[subClockID][9] = 1; //set note to START mode
+    //     }
+    //   }
+    // break;
   }
   
 }
