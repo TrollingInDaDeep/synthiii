@@ -114,14 +114,15 @@ int initialClockResetTime = 1000; // reset clock after n ms of running to sync e
 //10 stopSent -> 1 = stop has been sent for a note already, 0 = stop not sent yet (otherwise it would spam stop always)
 //11 startMS -> millisecond timestamp when Note start was sent
 //12 tickCounter -> how many ticks have passed for subclock
+//13 delayBuffer -> store actual delay value to restore when delay has been set to 0
 
-float subClocks[numSubClocks][13] {
-  //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS   tickCounter
-  {   0,      1,      1,        0,       0,     0,            0,            75,         1,       1,        1,       0,        0}, //sequencer
-  {   1,      1,      0,        0,       0,     0,            1,            2,         0,       1,         1,        0,       0},
-  {   2,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0,       0},
-  {   3,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0,       0},
-  {   4,      1,      0,        0,       0,     0,            4,            2,         0,       1,         1,        0,       0}
+float subClocks[numSubClocks][14] {
+  //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS   tickCounter   delayBuffer
+  {   0,      4,      1,        0,       0,     0,            10,            75,         1,       1,        1,       0,       0,            0}, //sequencer
+  {   1,      2,      0,        0,       0,     0,            0,            2,         1,       1,         1,        0,       0,            0},
+  {   2,      1,      0,        0,       12,     0,            1,            2,         1,       1,         1,        0,      0,            0},
+  {   3,      1,      0,        0,       0,     0,            2,            2,         0,       1,         1,        0,       0,            0},
+  {   4,      1,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0,       0,            0}
 };
 
 // ############
@@ -138,10 +139,10 @@ bool tempoOperation[numDrumInstruments] = {false, false, false, false}; // False
 
 
 // which midi note to play for each instrument
-double instrumentNotes[3][numDrumInstruments] = {
+int instrumentNotes[2][numDrumInstruments] = {
   {3, 7, 11, 15}, //keynumber
   {63, 67, 71, 75}, //midinote
-  {0, 0, 0, 0} // tempo in ms (1000 = 60bpm) set to 0ms to disable
+  //{0, 0, 0, 0} // tempo in ms (1000 = 60bpm) set to 0ms to disable
 };
 //60=C, 64 = E, 63 = D#, 67 = G
 
@@ -842,6 +843,10 @@ void setup() {
   usbMIDI.setHandleClock(handleClock);
   selectMuxOutPin(stepPointer);
   digitalWrite(I7, HIGH);
+
+  for (int i = 0; i < numSubClocks; i++) {
+    subClocks[i][13] = subClocks[i][4];  // Store set delay to delay buffer
+  }
 }
 
 void loop() {

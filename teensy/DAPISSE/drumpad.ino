@@ -38,6 +38,8 @@ void stopAllDrumNotes(){
 }
 
 /// starts Drum Note
+/// int midi note to start
+/// int index in instrumentNotes
 void startDrumNote(int noteToStart, int noteIndex) {
   drumNoteStart[noteIndex] = millis();
   usbMIDI.sendNoteOn(noteToStart, 127, drumMidiChannel);
@@ -167,7 +169,7 @@ int getDrumIndex(int keyNumber){
   for (int i = 0; i < numDrumInstruments; i++)
     {
       if (keyNumber == instrumentNotes[0][i]){
-        index = instrumentNotes[2][i];
+        index = i;
         break;
       }
     }
@@ -312,16 +314,40 @@ void readDrumpad() {
               break;
 
               case 3: // x key -> mute
-                instrumentNotes[2][0] = 0;
+                if (subClocks[1][8] == 0) {
+                  subClocks[1][8] = 1;
+                }
+                else {
+                  subClocks[1][8] = 1;
+                }
+                
               break;
+
               case 7: // > key -> mute
-                instrumentNotes[2][1] = 0;
+                if (subClocks[2][8] == 0) {
+                  subClocks[2][8] = 1;
+                }
+                else {
+                  subClocks[2][8] = 1;
+                }
               break;
+
               case 11: // & key -> mute
-                instrumentNotes[2][2] = 0;
+                if (subClocks[3][8] == 0) {
+                  subClocks[3][8] = 1;
+                }
+                else {
+                  subClocks[3][8] = 1;
+                }
               break;
+
               case 15: // R key -> mute
-                instrumentNotes[2][3] = 0;
+                if (subClocks[4][8] == 0) {
+                  subClocks[4][8] = 1;
+                }
+                else {
+                  subClocks[4][8] = 1;
+                }
               break;
             }
           }
