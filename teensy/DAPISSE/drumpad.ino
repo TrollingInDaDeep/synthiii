@@ -163,7 +163,7 @@ int getDrumNote(int keyNumber){
 }
 
 /// finds out which index the current note has
-/// returns index number. returns 99 if key is not a drumpad note
+/// returns index number. returns 0 if key is not a drumpad note
 int getDrumIndex(int keyNumber){
   int index = 0;
   for (int i = 0; i < numDrumInstruments; i++)
@@ -175,6 +175,21 @@ int getDrumIndex(int keyNumber){
     }
   return index;
 }
+
+///returns subClock ID
+///expects instrument Index
+///returns 99 if not found
+int getSubClockIndexByInstrument(int instrumentIndex){
+  int idx = 99;
+  for (int i = 0; i < numSubClocks; i++) {
+    if (subClocks[i][6] == instrumentIndex){ //compares subClock instrument with given index
+      idx = i;
+      selectedSubClock = i;
+    }
+  }
+  return idx;
+}
+
 ///records key into drum pattern
 /// expects number of key on Keypad
 void recordKey(int keyNumber){
@@ -191,12 +206,14 @@ void recordKey(int keyNumber){
     }
 }
 
+//TODO update to new clock mode
 //scans through the keypad
 //checks if key is pressed -> runs needed action
 //checks if key is released -> runs needed action
 void readDrumpad() {
     int drumNote = 0;
     int drumIndex = 0;
+    int subClockID = 0;
     // supports up to ten simultaneous key presses
       if (kpd.getKeys())  
     {
@@ -214,11 +231,12 @@ void readDrumpad() {
           {
             drumNote = getDrumNote(keyNumber);
             drumIndex = getDrumIndex(keyNumber);
+            subClockID = getSubClockIndexByInstrument(drumIndex);
             switch (keypadMode) {
               //Play Mode
               case 0:
                 if (recordDrum && runDrum && selectedDrumPattern == 1 && drumNote != 0){
-                  recordKey(keyNumber);
+                  recordKey(keyNumber); // not implemented
                 }
                
                 if (drumNote != 0){
@@ -227,19 +245,19 @@ void readDrumpad() {
 
                 switch (keyValue) {
                 
-                // fill each x step
-                case 1 ... 9:
-                  tempoModifier[selectedInstrument] = keyValue;
-                break;
+                  // fill each x step
+                  case 1 ... 9:
+                    subClocks[selectedSubClock][1] = keyValue;
+                  break;
 
 
-                case 13: // *
-                  tempoOperation[selectedInstrument] = true;
-                break;
+                  case 13: // * -> multiplication
+                    subClocks[selectedSubClock][2] = 0;
+                  break;
 
-                case 14: // #
-                  tempoOperation[selectedInstrument] = false;
-                break;
+                  case 14: // # -> division
+                    subClocks[selectedSubClock][2] = 1;
+                  break;
               }
                 
               break;
@@ -267,6 +285,7 @@ void readDrumpad() {
           {
             int drumNote = getDrumNote(keyNumber);
             int drumIndex = getDrumIndex(keyNumber);
+            int subClockID = getSubClockIndexByInstrument(drumIndex);
             switch (keypadMode) {
               //Play Mode
               case 0:
@@ -316,9 +335,11 @@ void readDrumpad() {
               case 3: // x key -> mute
                 if (subClocks[1][8] == 0) {
                   subClocks[1][8] = 1;
+                  Serial.println("mute Kick");
                 }
                 else {
                   subClocks[1][8] = 1;
+                  Serial.println("unmute Kick");
                 }
                 
               break;

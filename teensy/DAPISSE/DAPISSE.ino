@@ -100,6 +100,9 @@ float prevClockStart = 0; //previous millisecond timestamp when last clock signa
 float elapsedTime = 0; //how many ms have passed since clock start -> suggested by chatGPT
 bool initialClockReset = true; //used to reset clock at first occurrence, to sync everything
 int initialClockResetTime = 1000; // reset clock after n ms of running to sync everything
+
+int selectedSubClock = 0; // which subclock is currently selected (which drum note has been triggered last)
+
 //
 // 0 index -> index in the subClocks array                   
 // 1 ratio -> ratio multiplied or divided from mainClock
@@ -416,6 +419,7 @@ int getDrumNote(int);
 int getDrumIndex(int);
 int getCurrentTick(void);
 void resetClock(void);
+int getSubClockIndexByInstrument(int);
 
 // what happens when an external clock signal is received
 void handleClock() {
