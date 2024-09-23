@@ -73,7 +73,7 @@ void nextStep() {
 //buggy, not sure if needed
 void stopLastNote(){
   usbMIDI.sendNoteOff(lastNoteSent, velocity, synthMidiChannel);
-  noteStopped = true;
+  subClocks[0][10] = 1; //select sequencer, set "stopSent" to true
 
 }
 
@@ -89,7 +89,7 @@ void startNote(int noteToPlay){
   }
   //noteStart = millis();
   usbMIDI.sendNoteOn(arr_seq_buttons[0][noteToPlay], velocity, synthMidiChannel);
-  noteStopped = false;
+  subClocks[0][10] = 0; //select sequencer, set "stopSent" to false
   lastNoteSent=arr_seq_buttons[0][noteToPlay];
   digitalWrite(I7, HIGH);
 }
@@ -111,7 +111,7 @@ void nextPulse() {
 
 void stopNote(int noteToStop){
   usbMIDI.sendNoteOff(arr_seq_buttons[0][noteToStop], velocity, synthMidiChannel);
-  noteStopped = true;
+  subClocks[0][10] = 1; //select sequencer, set "stopSent" to true
   //digitalWrite(I7, LOW);
 }
 

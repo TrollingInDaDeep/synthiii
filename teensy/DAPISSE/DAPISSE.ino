@@ -122,10 +122,10 @@ int selectedSubClock = 0; // which subclock is currently selected (which drum no
 float subClocks[numSubClocks][14] {
   //  index   ratio   divMult   tick     delay  ticksLeft     instrument    gateTime   run      isStart   stopSent  startMS   tickCounter   delayBuffer
   {   0,      4,      1,        0,       0,     0,            10,            75,         1,       1,        1,       0,       0,            0}, //sequencer
-  {   1,      1,      0,        0,       0,     0,            0,            2,         1,       1,         1,        0,       0,            0},
-  {   2,      1,      0,        0,       12,     0,            1,            2,         1,       1,         1,        0,      0,            0},
-  {   3,      8,      1,        0,       0,     0,            2,            2,         1,       1,         1,        0,       0,            0},
-  {   4,      2,      0,        0,       0,     0,            3,            2,         1,       1,         1,        0,       0,            0}
+  {   1,      1,      0,        0,       0,     0,            0,            2,         0,       1,         1,        0,       0,            0},
+  {   2,      1,      0,        0,       12,     0,            1,            2,         0,       1,         1,        0,      0,            0},
+  {   3,      8,      1,        0,       0,     0,            2,            2,         0,       1,         1,        0,       0,            0},
+  {   4,      2,      0,        0,       0,     0,            3,            2,         0,       1,         1,        0,       0,            0}
 };
 
 // ############
@@ -136,8 +136,8 @@ const int numDrumInstruments = 4;
 const int numDrumPatterns = 4; //drum patterns. preset beats to be selected from
 int midiC = 60; // Standard midi C
 int transpose = 0;
-float tempoModifier[numDrumInstruments] = {1, 1, 1, 1}; //multiplication value with sequencer tempo to get n-times the tempo of the clock
-bool tempoOperation[numDrumInstruments] = {false, false, false, false}; // False = division (fill each n step), true = multiplication (n notes per step)
+//float tempoModifier[numDrumInstruments] = {1, 1, 1, 1}; //multiplication value with sequencer tempo to get n-times the tempo of the clock
+//bool tempoOperation[numDrumInstruments] = {false, false, false, false}; // False = division (fill each n step), true = multiplication (n notes per step)
 // hehe, it says poop
 
 
@@ -150,50 +150,116 @@ int instrumentNotes[2][numDrumInstruments] = {
 //60=C, 64 = E, 63 = D#, 67 = G
 
 // which instrument is currently selected for keypad play mode
+
 int selectedInstrument = 0;
-int selectedDrumPattern = 0; //which drum pattern is selected
+int selectedDrumPattern = 1; //which drum pattern is selected
 int drumMidiChannel = 3;
-bool drumNoteStopped[numDrumInstruments] = {true, true, true, true}; //if drum notes have been stopped for this step already (goes for all drum notes)
-float drumNoteStart[numDrumInstruments] = {0, 0, 0, 0}; //timestamp when the drum note started
-float prevDrumNoteStart[numDrumInstruments] = {0, 0, 0, 0}; //timestamp when last drum note started
-int drumGateTime = 2; //time in ms how long the drum note should be on
+//bool drumNoteStopped[numDrumInstruments] = {true, true, true, true}; //if drum notes have been stopped for this step already (goes for all drum notes)
+//float drumNoteStart[numDrumInstruments] = {0, 0, 0, 0}; //timestamp when the drum note started
+//float prevDrumNoteStart[numDrumInstruments] = {0, 0, 0, 0}; //timestamp when last drum note started
+//int drumGateTime = 2; //time in ms how long the drum note should be on
 bool holdFired = false; //set to true if a button was holded will suppress release event trigger
 
 //number of notes / steps the drum sequencer has
-const int numDrumSteps = 16;
+const int numDrumSteps = 96; // use whatever subtick was defined and multiply by 4 for 4 beats
+// 24*4 = 96
+
 // pointer at which step in the drum sequencer we are
 int drumStepPointer = 0;
 
-int keypadMode = 0; //experiment: just use play and add recordDrum switch
+int keypadMode = 2; //0 = play and fill each x step
+                    //1 = enable/disable by keynumber
+                    //2 = play and record
+                    //experiment: just use play and add recordDrum switch
                     //originally: 0=play, 1=sequence notes 2=fillXStep, 4=settings
-bool runDrum = false;
-bool recordDrum = false; // true = played notes are recorded into the drumSequence
+bool runDrum = true;
+bool recordDrum = true; // true = played notes are recorded into the drumSequence
 //bools if a drum sound should be triggered at the selected step
 bool drumSequence [numDrumPatterns][numDrumInstruments][numDrumSteps] {
   { //rock
-    {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
-    {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //kick
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //snare
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //hat
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //cymbal
   },
   { //empty / test / DIY
-    {1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0}, //kick
-    {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0}, // snare
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}, // hat
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+    {0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 1, 0, 0, 0, 0}, //kick
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 1, 0, 0, 0, 0}, //snare
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 1, 0, 0, 0, 0}, //hat
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    0, 1, 0, 0, 0, 0}, //cymbal
   },
   { //dnb
-    {1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0}, //kick
-    {0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0}, // snare
-    {0, 1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 1, 1, 0, 0, 1}, // hat
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
+    {0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}, //kick
+
+    {0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}, //snare
+
+    {0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}, //hat
+
+    {0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,
+     0, 0, 0, 0, 0, 0,     0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}, //cymbal
   },
   { //ska
-    {1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0}, //kick
-    {0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0}, // snare
-    {0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1}, // hat
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1} // ?
-  }
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //kick
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //snare
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //hat
+
+    {1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,
+     1, 0, 0, 0, 0, 0,     1, 0, 0, 0, 0, 0,    1, 0, 0, 0, 0, 0,    1, 1, 0, 0, 0, 0}, //cymbal
+  },
 };
 
 const int howManyKeypadKeys = 16;
@@ -272,7 +338,7 @@ int arr_seq_buttons [numSeqBanks][maxSteps] {
   {0, 0, 0, 0, 0, 0, 0, 0}    // Hold
 };
 
-bool noteStopped = true; //if note has been stopped for this step already
+//bool noteStopped = true; //if note has been stopped for this step already
 
 int stepPointer = 0; //pointer, points to current step that we're at
 
@@ -414,7 +480,7 @@ void noteButtonPressed(int);
 void noteButtonReleased(int);
 void updateDrumModifier(int);
 void changeDrumPattern(bool);
-void recordKey(int);
+void recordKey(int, int);
 int getDrumNote(int);
 int getDrumIndex(int);
 int getCurrentTick(void);
@@ -926,21 +992,21 @@ void loop() {
   //   }
     
     
-  //   //stop note if necessary
-  //   if (!noteStopped) {
-  //     if (currentMillis - noteStart >= gateTime) {
-  //       stopLastNote();
-  //     }
-  //   }
-    
-  //   for (int i = 0; i < numDrumInstruments; i++) {
-  //     if (!drumNoteStopped[i]) {
-  //       if (currentMillis - drumNoteStart[i] >= drumGateTime) {
-  //         stopDrumNote(instrumentNotes[1][i], i);
-  //       }
-  //     }    
-  //   }
-
+  //stop notes if necessary (in case clock is not running)
+  for (int i = 0; i < numSubClocks; i++){
+    if (subClocks[i][11] > (currentMillis + subClocks[i][7])) { //if gate time is over
+      if (subClocks[i][10] == 0) { //stop not sent
+        if (subClocks[i][6] > 10){ //sequencer instrument
+          stopLastNote(); 
+        }
+        else // drum instrument
+        {
+          stopDrumNote(instrumentNotes[1][int(subClocks[i][6])],(i-1)); //hacky, i-1 only currently is correct
+        }
+        
+      }
+    }
+  }
   // }
 
   //benchmarking

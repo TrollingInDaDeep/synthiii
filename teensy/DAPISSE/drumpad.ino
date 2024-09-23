@@ -24,7 +24,7 @@ void nextDrumStep() {
   for (int i = 0; i < numDrumInstruments; i++) {
     if (drumSequence[selectedDrumPattern][i][drumStepPointer]) {
       if (runDrum){
-      startDrumNote(instrumentNotes[1][i], i);
+        startDrumNote(instrumentNotes[1][i], i);
       }
     }
   }
@@ -41,17 +41,22 @@ void stopAllDrumNotes(){
 /// int midi note to start
 /// int index in instrumentNotes
 void startDrumNote(int noteToStart, int noteIndex) {
-  drumNoteStart[noteIndex] = millis();
+  //drumNoteStart[noteIndex] = millis();
+  subClocks[getSubClockIndexByInstrument(noteIndex)][11] = millis(); //set startMS to now
   usbMIDI.sendNoteOn(noteToStart, 127, drumMidiChannel);
   //Serial.println(noteToStart);
   //stopDrumNote(noteToStart);
-  drumNoteStopped[noteIndex] = false;
+  //drumNoteStopped[noteIndex] = false;
+  subClocks[getSubClockIndexByInstrument(noteIndex)][10] = 0; //set stopSent to 0
 }
 
+/// stops a drum note
+/// expects int midi note number and
+/// index in instrument array
 void stopDrumNote(int noteToStop, int noteIndex) {
   usbMIDI.sendNoteOff(noteToStop, 127, drumMidiChannel);
   //Serial.println(noteToStop);
-  drumNoteStopped[noteIndex] = true;
+  subClocks[getSubClockIndexByInstrument(noteIndex)][10] = 1; //set stopSent to 1
 }
 
 /// select the next drum pattern
@@ -70,6 +75,8 @@ void changeDrumPattern(bool direction){
   if (selectedDrumPattern < 0 && !direction) {
     selectedDrumPattern = numDrumPatterns-1;
   }
+  Serial.print("Drumpattern ");
+  Serial.println(selectedDrumPattern);
 }
 
 ///OBSOLETE due to new clock++
@@ -192,8 +199,8 @@ int getSubClockIndexByInstrument(int instrumentIndex){
 
 ///records key into drum pattern
 /// expects number of key on Keypad
-void recordKey(int keyNumber){
-    if (getDrumNote(keyNumber) != 0 ) {
+void recordKey(int keyNumber, int drumNote){
+    if (drumNote != 0 ) {
       //what this should do:
       //when "playing" and "record" are enabled, enter played notes into the drumSequence
       //do that at the current step so it is quantized
@@ -230,18 +237,15 @@ void readDrumpad() {
           {
             drumNote = getDrumNote(keyNumber);
             drumIndex = getDrumIndex(keyNumber);
-            Serial.println(drumIndex);
             if (drumIndex != 99){
+              Serial.println(drumIndex);
               getSubClockIndexByInstrument(drumIndex);
             }
             
             switch (keypadMode) {
               //Play Mode
               case 0:
-                if (recordDrum && runDrum && selectedDrumPattern == 1 && drumNote != 99){
-                  recordKey(keyNumber); // not implemented
-                }
-               
+                //play
                 if (drumNote != 0){
                   startDrumNote(drumNote + transpose, drumIndex);
                 }
@@ -266,7 +270,7 @@ void readDrumpad() {
                     Serial.print(selectedSubClock);
                     Serial.println(" -> Div");
                   break;
-              }
+                }
                 
               break;
 
@@ -275,9 +279,27 @@ void readDrumpad() {
                 drumSequence[selectedDrumPattern][selectedInstrument][keyNumber] = !drumSequence[selectedDrumPattern][selectedInstrument][keyNumber];
               break;
 
-              // Fill every x step Mode
+              // play and record
               case 2:
+                //play
+                if (drumNote != 0){
+                  startDrumNote(drumNote + transpose, drumIndex);
+                }
 
+                //record
+                if (recordDrum && runDrum && selectedDrumPattern == 1 && drumNote != 0){
+                  recordKey(keyNumber, drumNote); // not implemented
+                }
+
+                switch (keyValue) {
+                  case 13: // * -> drumpattern down
+                    changeDrumPattern(false);
+                  break;
+
+                  case 14: // # -> drumpattern up
+                    changeDrumPattern(true);
+                  break;
+                }
               break;
 
               //Settings mode
@@ -318,7 +340,7 @@ void readDrumpad() {
 
               break;
 
-              // Fill every x step Mode
+              // play and record
               case 2:
 
               break;
