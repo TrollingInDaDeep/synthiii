@@ -91,6 +91,16 @@ void nextClockCycle() {
   currentTick = 0;
   lastTick = 0; //that's the solution++ otherwise it will drift!!!!!
 
+  for (int i = 0; i < numSubClocks; i++)
+  {
+    if (subClocks[i][12] < subClocks[i][5]) { // if still ticks left, don't use delay
+      subClocks[i][4] = 0;
+    }
+    else
+    {
+      subClocks[i][4] = subClocks[i][13]; //load delay from buffer if no ticks left 
+    }
+  }
   //Serial.print("clock @");
   //Serial.println(currentTick);
   usbMIDI.sendClock();
@@ -169,7 +179,7 @@ void clockHandler (int subClockID) {
       }
     break;
 
-    case 1 ... 3: // kick
+    case 1 ... 4:
       if (subClocks[subClockID][8] == 1){ // if subclock is running
         if (subClocks[subClockID][9] == 1){ //note Start
           startDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
@@ -180,7 +190,7 @@ void clockHandler (int subClockID) {
           subClocks[subClockID][11] = currentMillis;
         }
         else { // note Stop
-          if (!drumNoteStopped[0]) { //kick
+          if (!drumNoteStopped[0]) {
             stopDrumNote(instrumentNotes[1][int(subClocks[subClockID][6])],0); //take the instrument note from field 6 (instrument) from subClocks Array
           }
           subClocks[subClockID][9] = 1; //set note to START mode

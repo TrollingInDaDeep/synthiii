@@ -251,15 +251,20 @@ void readDrumpad() {
                   // fill each x step
                   case 1 ... 9:
                     subClocks[selectedSubClock][1] = keyValue;
+                    Serial.println(keyValue);
                   break;
 
 
                   case 13: // * -> multiplication
                     subClocks[selectedSubClock][2] = 0;
+                    Serial.print(selectedSubClock);
+                    Serial.println(" -> Mult");
                   break;
 
                   case 14: // # -> division
                     subClocks[selectedSubClock][2] = 1;
+                    Serial.print(selectedSubClock);
+                    Serial.println(" -> Div");
                   break;
               }
                 
