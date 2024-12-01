@@ -3,6 +3,10 @@ wlan setup via lan
 user: patch
 pw: ras
 
+LAN IP: 192.168.0.152
+WLAN IP: 172.24.1.1
+WLAN SSID: Dapisse
+PSK: Dapisse69
 sudo systemctl start mec
 sudo systemctl stop orac
 
