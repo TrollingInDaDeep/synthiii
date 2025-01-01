@@ -136,7 +136,7 @@ void selectSeqNoteFunction(){
     seqButtonFunction = 2;
   }
   if (!fuSel0 && !fuSel1){
-    //Hold mode
+    //Hold mode --> idea: play between pressed buttons mode
     seqButtonFunction = 3;
     if (!run) {
     //make the faders a midi cc control

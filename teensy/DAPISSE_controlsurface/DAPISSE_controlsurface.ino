@@ -1,5 +1,7 @@
 #include <Control_Surface.h>
-
+#include <Arduino_Helpers.h>
+#include <AH/Hardware/ExtendedInputOutput/AnalogMultiplex.hpp>
+#include <AH/Hardware/FilteredAnalog.hpp>
 // Instantiate a MIDI Interface to use
 USBMIDI_Interface midi;
 
@@ -112,11 +114,51 @@ CCPotentiometer I8_POTS[] {
     { muxI8.pin(6), {0x3E, Channel_1} },
     { muxI8.pin(7), {0x3F, Channel_1} },
 };
+
+//test vars
+bool run = 0;
+int bpm = 0;
+
+//single button
+Button testButton {muxI8.pin(1)};
+
+//button matrix
+Button testButtons[] {
+  muxI8.pin(1),
+  muxI8.pin(2),
+  muxI8.pin(3)
+  };
+
+//Potentiometer matrix (could be done by Analog or FilteredAnalog but I didn't get it to work)
+// so sending to a generic controller on a probably unused channel
+CCPotentiometer internalPots[] {
+  {muxI8.pin(1), {MIDI_CC::General_Purpose_Controller_1, Channel_14} },
+  {muxI8.pin(2), {MIDI_CC::General_Purpose_Controller_1, Channel_14} },
+  {muxI8.pin(3), {MIDI_CC::General_Purpose_Controller_1, Channel_14} }
+};
+//analog matrix
+// auto potCollection = copyAs<FilteredAnalog<>>(
+//   muxI8.pin(1),
+//   muxI8.pin(2),
+//   muxI8.pin(3)
+//   );
+
 void setup() {
   Control_Surface.begin();
 }
 
 void loop() {
   Control_Surface.loop();
+  
+  updateInternalVariables();
+}
 
+//writes the potentiometer pins
+void updateInternalVariables() {
+  run = testButton.getState();
+
+  run = testButtons[0].getState();
+
+  bpm = internalPots[0].getValue();
+  bpm = internalPots[1].getValue();
 }
