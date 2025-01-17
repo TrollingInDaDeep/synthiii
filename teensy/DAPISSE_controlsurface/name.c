@@ -2,13 +2,13 @@
 // placed into a .c file (its own tab).  It can not be in
 // a .cpp file or your main sketch (the .ino file).
 
-// #include "usb_names.h"
+#include "usb_names.h"
 
 // // Edit these lines to create your own name.  The length must
 // // match the number of characters in your custom name.
 
 // #define MIDI_NAME   {'D','a','p','i','s','s','e'}
-// #define MIDI_NAME_LEN  7
+// #define MIDI_NAME_LEN  8
 
 // // Do not change this part.  This exact format is required by USB.
 
