@@ -176,6 +176,26 @@ CCPotentiometer I12_POTS[] {
 bool run = 0;
 int bpm = 0;
 
+
+
+///
+/// Keypad
+///
+
+const AddressMatrix<4, 4> keypadNotes = {{
+  {60, 61, 62, 63},
+  {64, 65, 66, 67},
+  {68, 69, 70, 71},
+  {72, 73, 74, 75}
+}};
+
+const NoteButtonMatrix<4, 4> keypadMatrix {
+  {5,6,12,11}, //output LOW
+  {7,8,9,10}, //input pullup
+  keypadNotes,
+  Channel_1
+};
+
 // //single button
 // Button testButton {muxI8.pin(1)};
 
