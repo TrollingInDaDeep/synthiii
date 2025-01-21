@@ -174,7 +174,9 @@ CCPotentiometer I12_POTS[] {
     //{ muxI12.pin(7), {0x5F, Channel_1} },
 };
 
-FilteredAnalog<12,3,uint32_t> I13_POTS[] {
+//all potentiometers that don't send midi directly
+//but are used for internal variables
+FilteredAnalog<12,3,uint32_t> internalPots[] {
     { muxI13.pin(0)},
     { muxI13.pin(1)},
     { muxI13.pin(2)},
@@ -185,10 +187,15 @@ FilteredAnalog<12,3,uint32_t> I13_POTS[] {
     { muxI13.pin(7)}
 };
 
+//all buttons (digital inputs) that don't send midi directly
+//but are used for internal variables
+Button internalButtons[] {
+  { muxI13.pin(7)}
+};
+
 //test vars
 bool run = 0;
 int bpm = 0;
-
 
 
 ///
@@ -227,12 +234,57 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
 //   {muxI8.pin(3), {MIDI_CC::General_Purpose_Controller_1, Channel_14} }
 // };
 
+///
+///Functions
+///
+
+///maps the value of input pot val to a range from 0 to 2
+analog_t mapAnalog2(analog_t val, int min, int max) {
+  return map(val, 0, 4096, 0, 2);
+}
+
+/// reads all internal analog and digital inputs
+void readInternalInputs() {
+  for (byte i = 0; i < (sizeof(internalPots) / sizeof(internalPots[0])); i++) {
+      internalPots[i].update();
+    }
+
+  for (byte i = 0; i < (sizeof(internalButtons) / sizeof(internalButtons[0])); i++) {
+      internalButtons[i].update();
+    }
+}
+
+
+
+/// and stores the value to the correct variable
+void UpdateInternalVars(){
+
+  //Analog
+  for (byte i = 0; i < (sizeof(internalPots) / sizeof(internalPots[0])); i++) {
+      switch (i){
+        case 0:
+          bpm = internalPots[i].getValue();
+        break;
+      }
+    }
+
+  //Digital
+  for (byte i = 0; i < (sizeof(internalButtons) / sizeof(internalButtons[0])); i++) {
+      switch (i){
+        case 7:
+          run = internalButtons[i].getState();
+        break;
+      }
+    }
+}
 
 void setup() {
+  //WEITER: mapping von potentiometer (0-2, analog2)
+  //elegant: seq 1-8 in loop, sonst muss einzeln gemappt werden -> evtl. ok, hauptsache it works
   Control_Surface.begin();
   FilteredAnalog<>::setupADC();
   Serial.begin(9600);
-
+ 
   // disable unconected for troubleshooting
   // for (int i = 0; i<8; i++){
   //   I9_POTS[i].disable();
@@ -244,35 +296,44 @@ void setup() {
 
 void loop() {
   Control_Surface.loop();
-
+  readInternalInputs();
+  UpdateInternalVars();
   //testPot.update();
   //Serial.println(testPot.getValue());
 
 
 
-  for (int i = 0; i<6; i++){////DIRTY HACK!!!!!!!!!!!!
-    Serial.print(I1_POTS[i].getValue());
-    Serial.print("|");
-  }
-  Serial.print("**");
-  for (int i = 0; i<8; i++){ 
-    Serial.print(I2_POTS[i].getValue());
-    Serial.print("|");
-  }
-  Serial.print("**");
-  for (int i = 0; i<8; i++){
-    Serial.print(I6_POTS[i].getValue());
-    Serial.print("|");
-  }
-  Serial.print("**");
-  for (int i = 0; i<8; i++){ 
-    I13_POTS[i].update();
-    Serial.print(I13_POTS[i].getValue());
-    Serial.print("|");
-  }
-  Serial.println();
+  // for (int i = 0; i<6; i++){////DIRTY HACK!!!!!!!!!!!!
+  //   Serial.print(I1_POTS[i].getValue());
+  //   Serial.print("|");
+  // }
+  // Serial.print("**");
+  // for (int i = 0; i<8; i++){ 
+  //   Serial.print(I2_POTS[i].getValue());
+  //   Serial.print("|");
+  // }
+  // Serial.print("**");
+  // for (int i = 0; i<8; i++){
+  //   Serial.print(I6_POTS[i].getValue());
+  //   Serial.print("|");
+  // }
+  // Serial.print("**");
+  // for (int i = 0; i<8; i++){ 
+  //   I13_POTS[i].update();
+  //   Serial.print(I13_POTS[i].getValue());
+  //   Serial.print("|");
+  // }
+  // Serial.println();
   //updateInternalVariables();
+  Serial.print("BPM: ");
+  Serial.print(bpm);
+  Serial.print("| RUN: ");
+  Serial.println(run);
+
 }
+
+
+
 
 //writes the potentiometer pins
 // void updateInternalVariables() {

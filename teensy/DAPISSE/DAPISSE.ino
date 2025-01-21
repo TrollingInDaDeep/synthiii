@@ -312,7 +312,7 @@ int seqDirection = 1; // Sequencer step direction. 1=up, 0=down
 int pulsePointer = 0; //points to the pulse within the step we're currently in
 int lastStepPointer = 0; //previous step, to trigger note off
 int lastNoteSent = 0; //previous note sent, to trigger note off on time
-int pulseCount [] {1, 1, 1, 1, 1, 1, 1, 1}; // how many times a step should be played
+int pulseCount[] {1, 1, 1, 1, 1, 1, 1, 1}; // how many times a step should be played
 int gateMode [maxSteps] {2, 2, 2, 2, 2, 2, 2, 2}; //0=no gate, 1=first gate, 2=every gate
 bool skipStep [maxSteps] {0, 0, 0, 0, 0, 0, 0, 0}; //1=skip a step, 0=don't skip
 int playMode = 0; // Sequencer play order. 0=forwards, 1=backwards, 2=ping-pong,3=drunk
