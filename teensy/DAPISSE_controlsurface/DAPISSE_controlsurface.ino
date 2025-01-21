@@ -7,18 +7,19 @@
 USBMIDI_Interface midi;
 
 // PINS
-const int I1 = 38;    //Analog In -> synth rechts
-const int I2 = 41;    //Analog In -> synth links
-const int I3 = 40;    //Analog In -> seq links pot
-const int I4 = 39;    //Digital In -> seq links btn
-const int I5 = 25;    //Analog In -> seq faders
-const int I6 = 26;    //Analog In -> seq pulse
-const int I7 = 11;    //Digital Out -> seq LEDs
-const int I8 = 12;    //Digital In -> seq btn triggers
-const int I9 = 24;    //Analog In -> topPlate pots 1
-const int I10 = 25;    //Analog In -> topPlate pots 2
-const int I11 = 26;    //Analog In -> topPlate pots 3
-const int I12 = 27;    //Analog In -> topPlate pots 4
+const int I1 = 38;    //Analog In 2 -> synth rechts
+const int I2 = 41;    //Analog In 2 -> synth links
+//const int I3 = 40;    //Analog In -> seq links pot
+//const int I4 = 39;    //Digital In -> seq links btn
+//const int I5 = 25;    //Analog In -> seq faders
+const int I6 = 39;    //Analog In 2 -> seq pulse
+//const int I7 = 11;    //Digital Out -> seq LEDs
+//const int I8 = 12;    //Digital In -> seq btn triggers
+const int I9 = 24;    //Analog In 1 -> topPlate pots 1
+const int I10 = 25;    //Analog In 1 -> topPlate pots 2
+const int I11 = 26;    //Analog In 1-> topPlate pots 3
+const int I12 = 27;    //Analog In 1-> topPlate pots 4
+const int I13 = 40;   //Analog In 2 -> seq Gatemode
 const int A = 33;     //Digital Out
 const int B = 34;     //Digital Out
 const int C = 35;     //Digital Out
@@ -27,12 +28,12 @@ const int Bout = 31;  //Digital Out
 const int Cout = 32;  //Digital Out
 
 //Multiplexers
-//CD74HC4051 muxI1 {I1, {A, B, C} };
-//CD74HC4051 muxI2 {I2, {A, B, C} };
+CD74HC4051 muxI1 {I1, {A, B, C} };
+CD74HC4051 muxI2 {I2, {A, B, C} };
 //CD74HC4051 muxI3 {I3, {A, B, C} };
 //CD74HC4051 muxI4 {I4, {A, B, C} };
 //CD74HC4051 muxI5 {I5, {A, B, C} };
-//CD74HC4051 muxI6 {I6, {A, B, C} };
+CD74HC4051 muxI6 {I6, {A, B, C} };
 //CD74HC4051 muxI7 {I7, {Aout, Bout, Cout} };
 
 //CD74HC4051 muxI8 {I8, {A, B, C} };
@@ -40,32 +41,33 @@ CD74HC4051 muxI9 {I9, {A, B, C} };
 CD74HC4051 muxI10 {I10, {A, B, C} };
 CD74HC4051 muxI11 {I11, {A, B, C} };
 CD74HC4051 muxI12 {I12, {A, B, C} };
+CD74HC4051 muxI13 {I13, {A, B, C} };
 
-FilteredAnalog<12,3,uint32_t> testPot = muxI9.pin(4);
+//FilteredAnalog<12,3,uint32_t> testPot = muxI13.pin(4);
 
 
 // Controls
 //CCPotentiometer
-// CCPotentiometer I1_POTS[] {
-//     { muxI1.pin(0), {0x00, Channel_1} },
-//     { muxI1.pin(1), {0x01, Channel_1} },
-//     { muxI1.pin(2), {0x02, Channel_1} },
-//     { muxI1.pin(3), {0x03, Channel_1} },
-//     { muxI1.pin(4), {0x04, Channel_1} },
-//     { muxI1.pin(5), {0x05, Channel_1} },
-//     { muxI1.pin(6), {0x06, Channel_1} },
-//     { muxI1.pin(7), {0x07, Channel_1} },
-// };
-// CCPotentiometer I2_POTS[] {
-//     { muxI2.pin(0), {0x08, Channel_1} },
-//     { muxI2.pin(1), {0x09, Channel_1} },
-//     { muxI2.pin(2), {0x0A, Channel_1} },
-//     { muxI2.pin(3), {0x0B, Channel_1} },
-//     { muxI2.pin(4), {0x0C, Channel_1} },
-//     { muxI2.pin(5), {0x0D, Channel_1} },
-//     { muxI2.pin(6), {0x0E, Channel_1} },
-//     { muxI2.pin(7), {0x0F, Channel_1} },
-// };
+CCPotentiometer I1_POTS[] {
+    { muxI1.pin(0), {0x00, Channel_1} },
+    { muxI1.pin(1), {0x01, Channel_1} },
+    { muxI1.pin(2), {0x02, Channel_1} },
+    { muxI1.pin(3), {0x03, Channel_1} },
+    { muxI1.pin(4), {0x04, Channel_1} },
+    { muxI1.pin(5), {0x05, Channel_1} },
+    //{ muxI1.pin(6), {0x06, Channel_1} }, //not Connected
+    //{ muxI1.pin(7), {0x07, Channel_1} }
+};
+CCPotentiometer I2_POTS[] {
+    { muxI2.pin(0), {0x08, Channel_1} },
+    { muxI2.pin(1), {0x09, Channel_1} },
+    { muxI2.pin(2), {0x0A, Channel_1} },
+    { muxI2.pin(3), {0x0B, Channel_1} },
+    { muxI2.pin(4), {0x0C, Channel_1} },
+    { muxI2.pin(5), {0x0D, Channel_1} },
+    { muxI2.pin(6), {0x0E, Channel_1} },
+    { muxI2.pin(7), {0x0F, Channel_1} }
+};
 // CCPotentiometer I3_POTS[] {
 //     { muxI3.pin(0), {0x10, Channel_1} },
 //     { muxI3.pin(1), {0x11, Channel_1} },
@@ -96,16 +98,16 @@ FilteredAnalog<12,3,uint32_t> testPot = muxI9.pin(4);
 //     { muxI5.pin(6), {0x26, Channel_1} },
 //     { muxI5.pin(7), {0x27, Channel_1} },
 // };
-// CCPotentiometer I6_POTS[] {
-//     { muxI6.pin(0), {0x28, Channel_1} },
-//     { muxI6.pin(1), {0x29, Channel_1} },
-//     { muxI6.pin(2), {0x2A, Channel_1} },
-//     { muxI6.pin(3), {0x2B, Channel_1} },
-//     { muxI6.pin(4), {0x2C, Channel_1} },
-//     { muxI6.pin(5), {0x2D, Channel_1} },
-//     { muxI6.pin(6), {0x2E, Channel_1} },
-//     { muxI6.pin(7), {0x2F, Channel_1} },
-// };
+CCPotentiometer I6_POTS[] {
+    { muxI6.pin(0), {0x28, Channel_1} },
+    { muxI6.pin(1), {0x29, Channel_1} },
+    { muxI6.pin(2), {0x2A, Channel_1} },
+    { muxI6.pin(3), {0x2B, Channel_1} },
+    { muxI6.pin(4), {0x2C, Channel_1} },
+    { muxI6.pin(5), {0x2D, Channel_1} },
+    { muxI6.pin(6), {0x2E, Channel_1} },
+    { muxI6.pin(7), {0x2F, Channel_1} }
+};
 // CCPotentiometer I7_POTS[] {
 //     { muxI7.pin(0), {0x30, Channel_1} },
 //     { muxI7.pin(1), {0x31, Channel_1} },
@@ -172,6 +174,17 @@ CCPotentiometer I12_POTS[] {
     //{ muxI12.pin(7), {0x5F, Channel_1} },
 };
 
+FilteredAnalog<12,3,uint32_t> I13_POTS[] {
+    { muxI13.pin(0)},
+    { muxI13.pin(1)},
+    { muxI13.pin(2)},
+    { muxI13.pin(3)},
+    { muxI13.pin(4)},
+    { muxI13.pin(5)},
+    { muxI13.pin(6)},
+    { muxI13.pin(7)}
+};
+
 //test vars
 bool run = 0;
 int bpm = 0;
@@ -219,32 +232,42 @@ void setup() {
   Control_Surface.begin();
   FilteredAnalog<>::setupADC();
   Serial.begin(9600);
+
+  // disable unconected for troubleshooting
+  // for (int i = 0; i<8; i++){
+  //   I9_POTS[i].disable();
+  //   I10_POTS[i].disable();
+  //   I11_POTS[i].disable();
+  //   I12_POTS[i].disable();
+  // }
 }
 
 void loop() {
   Control_Surface.loop();
 
-  testPot.update();
-  //GetValue not working, check that and troubleshoot further...
+  //testPot.update();
   //Serial.println(testPot.getValue());
 
-  for (int i = 0; i<8; i++){
-    Serial.print(I9_POTS[i].getValue());
+
+
+  for (int i = 0; i<6; i++){////DIRTY HACK!!!!!!!!!!!!
+    Serial.print(I1_POTS[i].getValue());
+    Serial.print("|");
+  }
+  Serial.print("**");
+  for (int i = 0; i<8; i++){ 
+    Serial.print(I2_POTS[i].getValue());
     Serial.print("|");
   }
   Serial.print("**");
   for (int i = 0; i<8; i++){
-    Serial.print(I10_POTS[i].getValue());
+    Serial.print(I6_POTS[i].getValue());
     Serial.print("|");
   }
   Serial.print("**");
-  for (int i = 0; i<8; i++){
-    Serial.print(I11_POTS[i].getValue());
-    Serial.print("|");
-  }
-  Serial.print("**");
-  for (int i = 0; i<6; i++){ ////DIRTY HACK!!!!!!!!!!!!
-    Serial.print(I12_POTS[i].getValue());
+  for (int i = 0; i<8; i++){ 
+    I13_POTS[i].update();
+    Serial.print(I13_POTS[i].getValue());
     Serial.print("|");
   }
   Serial.println();
