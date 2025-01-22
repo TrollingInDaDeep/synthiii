@@ -17,3 +17,6 @@ Groups in use order:
   RX/TX: {0,1}
   #Dout1: {2,3,4,32}
   #4x4 Keypad: {5,6,7,8,9,10,11,12}
+
+rows 5,6,12,11
+cols 7,8,9,10

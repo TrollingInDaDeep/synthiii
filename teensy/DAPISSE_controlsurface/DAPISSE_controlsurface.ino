@@ -176,7 +176,7 @@ CCPotentiometer I12_POTS[] {
 
 //all potentiometers that don't send midi directly
 //but are used for internal variables
-FilteredAnalog<12,3,uint32_t> internalPots[] {
+FilteredAnalog<12,3,uint32_t> internalAnalog[] {
     { muxI13.pin(0)},
     { muxI13.pin(1)},
     { muxI13.pin(2)},
@@ -189,20 +189,154 @@ FilteredAnalog<12,3,uint32_t> internalPots[] {
 
 //all buttons (digital inputs) that don't send midi directly
 //but are used for internal variables
-Button internalButtons[] {
+Button internalDigital[] {
   { muxI13.pin(7)}
 };
 
-//test vars
-bool run = 0;
-int bpm = 0;
+
+
 
 // normal variables in an array
 //how to update values
 //all normal vars in one array according to order in filteredAnalog []
 //filteredanalog[i] = variableArray[i]
 
-//sequencer or drum attributes as struct
+//sequencer or drum attributes
+
+// all general variables of the sequencer that are not bound to an input
+struct sequencer {
+  const uint8_t velocity = 127; // standard velocity for notes
+  long bpmMin=20.0; //minimum BPM value (for mapping)
+  long bpmMax=800.0; //maximum BPM value (for mapping)
+  int gateTime = 50; //time in ms how long the note should be on
+  int gateMin = 5; //minimum gate time in ms for pot selection
+  int gateMax = 1000; //maximum gate time in ms for pot selection
+  int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
+  int minSeqNote = 20; //minimal Midi Note of sequencer fader
+  int maxSeqNote = 80; //minimal Midi Note of sequencer fader
+  int minPulse = 1; //how many pulses at least for sequencer
+  int maxPulse = 8; //how many pulses at max for sequencer
+  int maxGateMode = 2; //How Many gate Modes there are (0-indexed)
+  bool run = false; // if sequencer is running
+  bool reset = false; //if reset was pressed
+  int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
+  int seqDirection = 1; // Sequencer step direction. 1=up, 0=down
+  int pulsePointer = 0; //points to the pulse within the step we're currently in
+  int lastStepPointer = 0; //previous step, to trigger note off
+  int lastNoteSent = 0; //previous note sent, to trigger note off on time
+  int playMode = 0; // Sequencer play order. 0=forwards, 1=backwards, 2=ping-pong,3=drunk
+  const int numPlayModes = 4; // how many play modes there are of the sequencer
+  bool fuSel0 = 0; // Sequencer button Function Selectors. Act as 2bit input field to select
+  bool fuSel1 = 0; // what the sequencer buttons do. 
+  int stepPointer = 0; //pointer, points to current step that we're at
+};
+//constant values below
+const int maxSteps = 8; // Maximum number of Steps of your sequencer
+
+
+// all variables that apply to every sequencer step
+struct seqStep {
+  int pulseCount = 1; // how many times a step should be played
+  int gateMode = 2; //0=no gate, 1=first gate, 2=every gate
+  bool skip = 0; //1=skip a step, 0=don't skip
+  bool slide = 0; //1=slide, 0= don't slide
+  int buttonFunction = 0; //Int representation of the selected function. 0=Play, 1=Skip, 2=Slide, 3=hold
+  // 0=play/trigger pulse/step
+  // 1=enable/disable skip step
+  // 2=enable/disable slide step
+  // 3=?? open for ideas: hold button=skip all others,play only this note | play between the two held buttons | arp mode
+  int note = 0; //Note or Value of the Slider
+  bool hold = 0; //for hold mode, if note shall be sent individually
+};
+
+//all variables for the main clock
+struct mainClock {
+  int bpm = 60.0;
+  int oldBPM = 0; //store last bpm to see if we actually had a bpm change
+  float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
+  int subTicks = 24; //in how many ticks one beat shall be divided
+  float tickMS = tempo/subTicks; //how long a tick is in ms
+  int currentTick = 0; // which tick we're currently at (pointer)
+  int lastTick = 0; //which tick we were at before (pointer)
+  float lastTickTime = 0; //timestamp when last tick happened
+  float timeSinceLastTick = 0; //to calculate if more than 1 tick happened since last calculation
+  int missedTicks = 0; //missed ticks if clock not updated fast enough
+  float clockStart = 0; //millisecond timestamp when current Clock Cycle was started
+  float prevClockStart = 0; //previous millisecond timestamp when last clock signal was sent
+  float elapsedTime = 0; //how many ms have passed since clock start -> suggested by chatGPT
+  bool initialClockReset = true; //used to reset clock at first occurrence, to sync everything
+  int initialClockResetTime = 1000; // reset clock after n ms of running to sync everything
+  int selectedSubClock = 0; // which subclock is currently selected (which drum note has been triggered last)
+};
+//const values below
+  const int numSubClocks = 5; //how many subClocks with individual mult/division
+
+
+//all variables that every subclock has
+struct subClock {
+  int index = 0; //index in the subClocks array
+  int ratio = 1; //ratio multiplied or divided from mainClock
+  bool divMult = 0; //1 = division, 0 = multiplication
+  int tick = 0; //after how many ticks it should be triggered
+  int delay = 0; //how many ticks it should be delayed (off-beat)
+  int ticksLeft = 0; //how many ticks left until trigger (tick + delay). not happening? ->$decrease every tick and set back to tick+delay after triggered
+  int instrument = 10; //which instrument the clock is connected to (eg. seqencer, bassdrum, etc.)
+  float gateTime = 75; //after how many ms the stop signal should be triggered
+  bool run = 1; //1 = running, 0 = stopped
+  bool isStart = 1; //1 = Note should be started, 0 = note should be stopped
+  bool stopSent = 1; //1 = stop has been sent for a note already, 0 = stop not sent yet (otherwise it would spam stop always)
+  float startMS = 0; //Millisecond timestamp when Note start was sent
+  float tickCounter = 0; //how many ticks have passed for subclock: increase every tick
+  int delayBuffer = 0; //store actual delay value to restore when delay has been set to 0
+};
+
+sequencer Metropolis[1]; //initializes a struct with the sequencer variables
+seqStep seqSteps[maxSteps]; //initializes a struct with the variables for each step. length defined by maxSteps of Sequencer
+mainClock mainClocks[1]; //the main clock is initialized
+subClock subClocks[numSubClocks]; //initialize subClocks based on number in mainClock
+
+//sets the default settings of all subclock/instruments
+void setDefaultClockSettings(){
+
+  //Default subClock Settings
+  subClocks[0].index = 0;
+  subClocks[1].index = 1;
+  subClocks[2].index = 2;
+  subClocks[3].index = 3;
+  subClocks[4].index = 4;
+
+  subClocks[0].ratio = 4;
+  subClocks[1].ratio = 1;
+  subClocks[2].ratio = 1;
+  subClocks[3].ratio = 8;
+  subClocks[4].ratio = 2;
+
+  subClocks[0].divMult = 1;
+  subClocks[1].divMult = 0;
+  subClocks[2].divMult = 0;
+  subClocks[3].divMult = 1;
+  subClocks[4].divMult = 0;
+
+  subClocks[0].instrument = 10;
+  subClocks[1].instrument = 0;
+  subClocks[2].instrument = 1;
+  subClocks[3].instrument = 2;
+  subClocks[4].instrument = 3;
+
+  subClocks[0].gateTime = 75;
+  subClocks[1].gateTime = 2;
+  subClocks[2].gateTime = 2;
+  subClocks[3].gateTime = 2;
+  subClocks[4].gateTime = 2;
+
+  subClocks[0].run = 1;
+  subClocks[1].run = 0;
+  subClocks[2].run = 0;
+  subClocks[3].run = 0;
+  subClocks[4].run = 0;
+}
+
+
 //all seq inputs in one struct according to order in filteredAnalog[]
 //loop through struct, access through struct[i].pulsecount
 //how to update values
@@ -249,19 +383,16 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
 ///Functions
 ///
 
-///maps the value of input pot val to a range from 0 to 2
-analog_t mapAnalog2(analog_t val, int min, int max) {
-  return map(val, 0, 4096, 0, 2);
-}
 
-/// reads all internal analog and digital inputs
+
+/// reads/updates all internal analog and digital inputs
 void readInternalInputs() {
-  for (byte i = 0; i < (sizeof(internalPots) / sizeof(internalPots[0])); i++) {
-      internalPots[i].update();
+  for (byte i = 0; i < (sizeof(internalAnalog) / sizeof(internalAnalog[0])); i++) {
+      internalAnalog[i].update();
     }
 
-  for (byte i = 0; i < (sizeof(internalButtons) / sizeof(internalButtons[0])); i++) {
-      internalButtons[i].update();
+  for (byte i = 0; i < (sizeof(internalDigital) / sizeof(internalDigital[0])); i++) {
+      internalDigital[i].update();
     }
 }
 
@@ -271,27 +402,49 @@ void readInternalInputs() {
 void UpdateInternalVars(){
 
   //Analog
-  for (byte i = 0; i < (sizeof(internalPots) / sizeof(internalPots[0])); i++) {
-      switch (i){
-        case 0:
-          bpm = internalPots[i].getValue();
-        break;
-      }
-    }
+  // for (byte i = 0; i < (sizeof(internalPots) / sizeof(internalPots[0])); i++) {
+  //     switch (i){
+  //       case 0:
+  //         bpm = internalPots[i].getValue();
+  //       break;
+  //     }
+  //   }
 
-  //Digital
-  for (byte i = 0; i < (sizeof(internalButtons) / sizeof(internalButtons[0])); i++) {
-      switch (i){
-        case 7:
-          run = internalButtons[i].getState();
-        break;
-      }
-    }
+  // //Digital
+  // for (byte i = 0; i < (sizeof(internalButtons) / sizeof(internalButtons[0])); i++) {
+  //     switch (i){
+  //       case 7:
+  //         run = internalButtons[i].getState();
+  //       break;
+  //     }
+  //   }
+}
+
+//mappingfunctions to be used by potMappings()
+///maps the value of input pot val Gate Mode
+analog_t mapGateMode(analog_t val) {  return map(val, 0, 4096, 0, Metropolis[0].maxGateMode);}
+///maps the value of input pot val Gate Time
+analog_t mapGateTime(analog_t val) {  return map(val, 0, 4096, Metropolis[0].gateMin, Metropolis[0].gateMax);}
+///maps the value of input pot val BPM
+analog_t mapBpm(analog_t val) {  return map(val, 0, 4096, Metropolis[0].bpmMin, Metropolis[0].bpmMax);}
+///maps the value of input pot val pulse
+analog_t mapPulse(analog_t val) {  return map(val, 0, 4096, Metropolis[0].minPulse, Metropolis[0].maxPulse);}
+
+///assigns correct pot Mappings to
+///Analog inputs
+/// <input>.map(mappingfunction)
+/// available mapping functions see above
+void potMappings() {
+
+  internalAnalog[6].map(mapGateMode);
+  
 }
 
 void setup() {
   //WEITER: mapping von potentiometer (0-2, analog2)
   //elegant: seq 1-8 in loop, sonst muss einzeln gemappt werden -> evtl. ok, hauptsache it works
+  potMappings();
+
   Control_Surface.begin();
   FilteredAnalog<>::setupADC();
   Serial.begin(9600);
@@ -303,15 +456,17 @@ void setup() {
   //   I11_POTS[i].disable();
   //   I12_POTS[i].disable();
   // }
+  setDefaultClockSettings();
+
 }
 
 void loop() {
   Control_Surface.loop();
   readInternalInputs();
-  UpdateInternalVars();
-  //testPot.update();
+    
+    
+      //testPot.update();
   //Serial.println(testPot.getValue());
-
 
 
   // for (int i = 0; i<6; i++){////DIRTY HACK!!!!!!!!!!!!
@@ -336,22 +491,6 @@ void loop() {
   // }
   // Serial.println();
   //updateInternalVariables();
-  Serial.print("BPM: ");
-  Serial.print(bpm);
-  Serial.print("| RUN: ");
-  Serial.println(run);
+
 
 }
-
-
-
-
-//writes the potentiometer pins
-// void updateInternalVariables() {
-//   run = testButton.getState();
-
-//   run = testButtons[0].getState();
-
-//   bpm = internalPots[0].getValue();
-//   bpm = internalPots[1].getValue();
-// }
