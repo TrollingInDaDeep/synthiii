@@ -197,6 +197,17 @@ Button internalButtons[] {
 bool run = 0;
 int bpm = 0;
 
+// normal variables in an array
+//how to update values
+//all normal vars in one array according to order in filteredAnalog []
+//filteredanalog[i] = variableArray[i]
+
+//sequencer or drum attributes as struct
+//all seq inputs in one struct according to order in filteredAnalog[]
+//loop through struct, access through struct[i].pulsecount
+//how to update values
+// reference values
+// int &bpm = inputPots[1].getValue();
 
 ///
 /// Keypad
