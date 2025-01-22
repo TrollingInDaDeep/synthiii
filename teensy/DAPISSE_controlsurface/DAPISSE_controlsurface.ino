@@ -177,6 +177,41 @@ CCPotentiometer I12_POTS[] {
 //all potentiometers that don't send midi directly
 //but are used for internal variables
 FilteredAnalog<12,3,uint32_t> internalAnalog[] {
+    { muxI13.pin(7)},
+    { muxI13.pin(6)},
+    { muxI13.pin(5)},
+    { muxI13.pin(4)},
+    { muxI13.pin(3)},
+    { muxI13.pin(1)},
+    { muxI13.pin(2)},
+    { muxI13.pin(0)}
+};
+
+// IMPORTANT: insert in the order they will be used in the sequencer
+// first pot at [0], second pot at [1] etc...
+FilteredAnalog<12,3,uint32_t> seqPulseCountPot[] {
+    { muxI13.pin(0)},
+    { muxI13.pin(1)},
+    { muxI13.pin(2)},
+    { muxI13.pin(3)},
+    { muxI13.pin(4)},
+    { muxI13.pin(5)},
+    { muxI13.pin(6)},
+    { muxI13.pin(7)}
+};
+
+FilteredAnalog<12,3,uint32_t> seqSliderPot[] {
+    { muxI13.pin(0)},
+    { muxI13.pin(1)},
+    { muxI13.pin(2)},
+    { muxI13.pin(3)},
+    { muxI13.pin(4)},
+    { muxI13.pin(5)},
+    { muxI13.pin(6)},
+    { muxI13.pin(7)}
+};
+
+FilteredAnalog<12,3,uint32_t> seqGateModePot[] {
     { muxI13.pin(0)},
     { muxI13.pin(1)},
     { muxI13.pin(2)},
@@ -194,29 +229,26 @@ Button internalDigital[] {
 };
 
 
+Button seqButtons[] {
+  { muxI13.pin(7)}
+};
 
-
-// normal variables in an array
-//how to update values
-//all normal vars in one array according to order in filteredAnalog []
-//filteredanalog[i] = variableArray[i]
-
-//sequencer or drum attributes
 
 // all general variables of the sequencer that are not bound to an input
+//const = global settings
 struct sequencer {
   const uint8_t velocity = 127; // standard velocity for notes
-  long bpmMin=20.0; //minimum BPM value (for mapping)
-  long bpmMax=800.0; //maximum BPM value (for mapping)
+  const long bpmMin=20.0; //minimum BPM value (for mapping)
+  const long bpmMax=800.0; //maximum BPM value (for mapping)
   int gateTime = 50; //time in ms how long the note should be on
-  int gateMin = 5; //minimum gate time in ms for pot selection
-  int gateMax = 1000; //maximum gate time in ms for pot selection
-  int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
-  int minSeqNote = 20; //minimal Midi Note of sequencer fader
-  int maxSeqNote = 80; //minimal Midi Note of sequencer fader
-  int minPulse = 1; //how many pulses at least for sequencer
-  int maxPulse = 8; //how many pulses at max for sequencer
-  int maxGateMode = 2; //How Many gate Modes there are (0-indexed)
+  const int gateMin = 5; //minimum gate time in ms for pot selection
+  const int gateMax = 1000; //maximum gate time in ms for pot selection
+  const int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
+  const int minSeqNote = 20; //minimal Midi Note of sequencer fader
+  const int maxSeqNote = 80; //minimal Midi Note of sequencer fader
+  const int minPulse = 1; //how many pulses at least for sequencer
+  const int maxPulse = 8; //how many pulses at max for sequencer
+  const int maxGateMode = 2; //How Many gate Modes there are (0-indexed)
   bool run = false; // if sequencer is running
   bool reset = false; //if reset was pressed
   int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
@@ -254,7 +286,7 @@ struct mainClock {
   int bpm = 60.0;
   int oldBPM = 0; //store last bpm to see if we actually had a bpm change
   float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
-  int subTicks = 24; //in how many ticks one beat shall be divided
+  const int subTicks = 24; //in how many ticks one beat shall be divided
   float tickMS = tempo/subTicks; //how long a tick is in ms
   int currentTick = 0; // which tick we're currently at (pointer)
   int lastTick = 0; //which tick we were at before (pointer)
@@ -336,13 +368,6 @@ void setDefaultClockSettings(){
   subClocks[4].run = 0;
 }
 
-
-//all seq inputs in one struct according to order in filteredAnalog[]
-//loop through struct, access through struct[i].pulsecount
-//how to update values
-// reference values
-// int &bpm = inputPots[1].getValue();
-
 ///
 /// Keypad
 ///
@@ -361,29 +386,9 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
   Channel_1
 };
 
-// //single button
-// Button testButton {muxI8.pin(1)};
-
-// //button matrix
-// Button testButtons[] {
-//   muxI8.pin(1),
-//   muxI8.pin(2),
-//   muxI8.pin(3)
-//   };
-
-//Potentiometer matrix (could be done by Analog or FilteredAnalog but I didn't get it to work)
-// so sending to a generic controller on a probably unused channel
-// CCPotentiometer internalPots[] {
-//   {muxI8.pin(1), {MIDI_CC::General_Purpose_Controller_1, Channel_14} },
-//   {muxI8.pin(2), {MIDI_CC::General_Purpose_Controller_1, Channel_14} },
-//   {muxI8.pin(3), {MIDI_CC::General_Purpose_Controller_1, Channel_14} }
-// };
-
 ///
 ///Functions
 ///
-
-
 
 /// reads/updates all internal analog and digital inputs
 void readInternalInputs() {
@@ -398,26 +403,33 @@ void readInternalInputs() {
 
 
 
-/// and stores the value to the correct variable
+/// stores read values to the correct variables
 void UpdateInternalVars(){
 
-  //Analog
-  // for (byte i = 0; i < (sizeof(internalPots) / sizeof(internalPots[0])); i++) {
-  //     switch (i){
-  //       case 0:
-  //         bpm = internalPots[i].getValue();
-  //       break;
-  //     }
-  //   }
+  //Metropolis[0];
+  Metropolis[0].gateTime = internalAnalog[0].getValue();
+  Metropolis[0].run = false;//
+  Metropolis[0].reset = false;//
+  Metropolis[0].numSteps = internalAnalog[0].getValue();
+  Metropolis[0].seqDirection = 1;// 
+  Metropolis[0].playMode = 0; //
+  Metropolis[0].fuSel0 = internalDigital[0].getState(); 
+  Metropolis[0].fuSel1 = internalDigital[0].getState();
 
-  // //Digital
-  // for (byte i = 0; i < (sizeof(internalButtons) / sizeof(internalButtons[0])); i++) {
-  //     switch (i){
-  //       case 7:
-  //         run = internalButtons[i].getState();
-  //       break;
-  //     }
-  //   }
+  //seqSteps[0];
+
+  for (int i = 0; i > Metropolis[0].numSteps; i++){
+    seqSteps[i].pulseCount = seqPulseCountPot[i].getValue();
+    seqSteps[i].gateMode = seqGateModePot[i].getValue();
+    seqSteps[i].note = seqSliderPot[i].getValue();
+    
+  }
+  //seqSteps[0].buttonFunction = 0; 
+  //seqSteps[0].hold = 0; 
+
+  //mainClocks[0];
+  mainClocks[0].bpm = internalAnalog[0].getValue();
+
 }
 
 //mappingfunctions to be used by potMappings()
@@ -463,7 +475,7 @@ void setup() {
 void loop() {
   Control_Surface.loop();
   readInternalInputs();
-    
+  UpdateInternalVars();
     
       //testPot.update();
   //Serial.println(testPot.getValue());
