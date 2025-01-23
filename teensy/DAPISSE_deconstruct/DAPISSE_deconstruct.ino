@@ -723,37 +723,6 @@ void UpdateSendValues() {
                 //-49, so 49 will be 0, 50 will be 1 etc...
                 noteNumberDigiRead = caseNumber-49;
 
-                switch (seqButtonFunction) {
-                  case 0:
-                    //only play notes when sequencer is not running, and not synced to ext clock
-                    if (!run && !syncClockToExt){
-                     if (arr_read_digital_inputs[1][noteNumberDigiRead]){
-                        noteButtonPressed(noteNumberDigiRead);
-                      } else {
-                        noteButtonReleased(noteNumberDigiRead);
-                      } 
-                    }
-                    
-                  break;
-                  case 1: //skip step
-                    if (arr_read_digital_inputs[1][noteNumberDigiRead] && arr_changed_digital_inputs[1][noteNumberDigiRead]){
-                      arr_seq_buttons[1][noteNumberDigiRead] = !arr_seq_buttons[1][noteNumberDigiRead];
-                    }
-                  break;
-                  case 2: //slide step
-                    if (arr_read_digital_inputs[1][noteNumberDigiRead] && arr_changed_digital_inputs[1][noteNumberDigiRead]){
-                      arr_seq_buttons[2][noteNumberDigiRead] = !arr_seq_buttons[2][noteNumberDigiRead];
-                    }
-                  break;
-                  case 3: //hold step
-                    if (arr_read_digital_inputs[1][noteNumberDigiRead] && arr_changed_digital_inputs[1][noteNumberDigiRead]){
-                      arr_seq_buttons[3][noteNumberDigiRead] = !arr_seq_buttons[3][noteNumberDigiRead];
-                    }
-                    
-                    
-                    break;
-                  }
-              break;
   //5 -> typo, but a sweet one :) stay a dreamer!
 
           }

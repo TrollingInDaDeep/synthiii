@@ -181,6 +181,18 @@ CCPotentiometer I12_POTS[] {
     //{ muxI12.pin(7), {0x5F, Channel_1} },
 };
 
+// all used internally
+// CCPotentiometer I13_POTS[] {
+//     { muxI13.pin(0), {0x60, Channel_1} },
+//     { muxI13.pin(1), {0x61, Channel_1} },
+//     { muxI13.pin(2), {0x62, Channel_1} },
+//     { muxI13.pin(3), {0x63, Channel_1} },
+//     { muxI13.pin(4), {0x64, Channel_1} },
+//     { muxI13.pin(5), {0x65, Channel_1} },
+//     { muxI13.pin(6), {0x66, Channel_1} },
+//     { muxI13.pin(7), {0x67, Channel_1} },
+// };
+
 
 // all general variables of the sequencer that are not bound to an input
 //const = global settings
@@ -210,6 +222,11 @@ struct sequencer {
   bool fuSel0 = 0; // Sequencer button Function Selectors. Act as 2bit input field to select
   bool fuSel1 = 0; // what the sequencer buttons do. 
   int stepPointer = 0; //pointer, points to current step that we're at
+  int buttonFunction = 0; //Int representation of the selected function. 0=Play, 1=Skip, 2=Slide, 3=hold
+  // 0=play/trigger pulse/step
+  // 1=enable/disable skip step
+  // 2=enable/disable slide step
+  // 3=?? open for ideas: hold button=skip all others,play only this note | play between the two held buttons | arp mode
 };
 //constant values below
 const int maxSteps = 8; // Maximum number of Steps of your sequencer
@@ -221,11 +238,6 @@ struct seqStep {
   int gateMode = 2; //0=no gate, 1=first gate, 2=every gate
   bool skip = 0; //1=skip a step, 0=don't skip
   bool slide = 0; //1=slide, 0= don't slide
-  int buttonFunction = 0; //Int representation of the selected function. 0=Play, 1=Skip, 2=Slide, 3=hold
-  // 0=play/trigger pulse/step
-  // 1=enable/disable skip step
-  // 2=enable/disable slide step
-  // 3=?? open for ideas: hold button=skip all others,play only this note | play between the two held buttons | arp mode
   int note = 0; //Note or Value of the Slider
   bool hold = 0; //for hold mode, if note shall be sent individually
 };
@@ -335,15 +347,6 @@ FilteredAnalog<12,3,uint32_t> internalAnalog[] {
     { muxI3.pin(3)},
     { muxI3.pin(4)},
     { muxI3.pin(5)},
-    { muxI13.pin(7)},
-    { muxI13.pin(6)},
-    { muxI13.pin(5)},
-    { muxI13.pin(4)},
-    { muxI13.pin(3)},
-    { muxI13.pin(1)},
-    { muxI13.pin(2)},
-    { muxI13.pin(0)},
-
 };
 
 // IMPORTANT: insert in the order they will be used in the sequencer
@@ -392,7 +395,7 @@ Button internalDigital[] {
   { muxI4.pin(5)}
 };
 
-Bank<4> seqButtonBank {Metropolis[0].maxStepCount}; //4 Banks with as many buttons as there are Steps
+// Button objects, digital inputs of the Sequencer buttons
 Button seqButtons[] {
   muxI8.pin(7),
   muxI8.pin(6),
@@ -403,7 +406,6 @@ Button seqButtons[] {
   muxI8.pin(1),
   muxI8.pin(0)
 };
-
 
 ///
 /// Keypad
@@ -429,16 +431,35 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
 
 /// reads/updates all internal analog and digital inputs
 void readInternalInputs() {
+
+  //analog
   for (byte i = 0; i < (sizeof(internalAnalog) / sizeof(internalAnalog[0])); i++) {
       internalAnalog[i].update();
     }
 
+  for (byte i = 0; i < (sizeof(testAnalogInput) / sizeof(testAnalogInput[0])); i++) {
+      testAnalogInput[i].update();
+  }
+
+  for (byte i = 0; i < (sizeof(seqPulseCountPot) / sizeof(seqPulseCountPot[0])); i++) {
+      seqPulseCountPot[i].update();
+  }
+
+  for (byte i = 0; i < (sizeof(seqSliderPot) / sizeof(seqSliderPot[0])); i++) {
+      seqSliderPot[i].update();
+  }
+
+  for (byte i = 0; i < (sizeof(seqGateModePot) / sizeof(seqGateModePot[0])); i++) {
+      seqGateModePot[i].update();
+  }
+
+// Ditital
   for (byte i = 0; i < (sizeof(internalDigital) / sizeof(internalDigital[0])); i++) {
       internalDigital[i].update();
     }
 
-  for (byte i = 0; i < (sizeof(testAnalogInput) / sizeof(testAnalogInput[0])); i++) {
-      testAnalogInput[i].update();
+  for (byte i = 0; i < (sizeof(seqButtons) / sizeof(seqButtons[0])); i++) {
+      seqButtons[i].update();
   }
     
 }
@@ -466,11 +487,44 @@ void UpdateInternalVars(){
     seqSteps[i].note = seqSliderPot[i].getValue();
     
   }
-  //seqSteps[0].buttonFunction = 0; 
-  //seqSteps[0].hold = 0; 
 
   //mainClocks[0];
   mainClocks[0].bpm = internalAnalog[0].getValue();
+
+  //Sequencer Buttons
+  for (int i = 0; i > Metropolis[0].maxStepCount; i++){
+    switch (Metropolis[0].buttonFunction) {
+      case 0: //Play
+          //only play notes when sequencer is not running, and not synced to ext clock
+          if (Metropolis[0].run) {//&& !syncClockToExt
+            if (seqButtons[0].getState() == Button::State::Falling){
+              //startnote or notebuttonpressed (seqSteps[i].note);
+            }
+            if (seqButtons[0].getState() == Button::State::Rising){
+              //stopnote or notebuttonreleased (seqSteps[i].note);
+            }
+          }
+      break;
+
+      case 1: //Skip
+        if (seqButtons[0].getState() == Button::State::Falling) {
+            seqSteps[i].skip = !seqSteps[i].skip;
+          }
+      break;
+
+      case 2: //Slide
+      if (seqButtons[0].getState() == Button::State::Falling) {
+        seqSteps[i].slide= !seqSteps[i].slide;
+      }
+      break;
+
+      case 3: //hold
+      if (seqButtons[0].getState() == Button::State::Falling) {
+        seqSteps[i].hold = !seqSteps[i].hold;
+      }
+      break;
+    }
+  }
 
 }
 
