@@ -126,16 +126,18 @@ CCButton I4_BUTTONS[] {
 
 //NoteButton functionality if enabled for seq trigger buttons
 // initialize with default value
-NoteButton SEQ_NoteButtons[] {
-    { muxI8.pin(7), {MIDI_Notes::C[4], Channel_1} },
-    { muxI8.pin(6), {MIDI_Notes::C[4], Channel_1} },
-    { muxI8.pin(5), {MIDI_Notes::C[4], Channel_1} },
-    { muxI8.pin(4), {MIDI_Notes::C[4], Channel_1} },
-    { muxI8.pin(3), {MIDI_Notes::C[4], Channel_1} },
-    { muxI8.pin(2), {MIDI_Notes::C[4], Channel_1} },
-    { muxI8.pin(1), {MIDI_Notes::C[4], Channel_1} },
-    { muxI8.pin(0), {MIDI_Notes::C[4], Channel_1} },
-};
+//would be great but notebuttons only work with a fixed value
+
+// NoteButton SEQ_NoteButtons[] {
+//     { muxI8.pin(7), {MIDI_Notes::C[4], Channel_1} },
+//     { muxI8.pin(6), {MIDI_Notes::C[4], Channel_1} },
+//     { muxI8.pin(5), {MIDI_Notes::C[4], Channel_1} },
+//     { muxI8.pin(4), {MIDI_Notes::C[4], Channel_1} },
+//     { muxI8.pin(3), {MIDI_Notes::C[4], Channel_1} },
+//     { muxI8.pin(2), {MIDI_Notes::C[4], Channel_1} },
+//     { muxI8.pin(1), {MIDI_Notes::C[4], Channel_1} },
+//     { muxI8.pin(0), {MIDI_Notes::C[4], Channel_1} },
+// };
 
 
 CCPotentiometer I9_POTS[] {
@@ -196,6 +198,10 @@ CCPotentiometer I12_POTS[] {
 // };
 
 
+///
+/// Variables
+///
+
 // all general variables of the sequencer that are not bound to an input
 //const = global settings
 struct sequencer {
@@ -232,7 +238,8 @@ struct sequencer {
 };
 //constant values below
 const int maxSteps = 8; // Maximum number of Steps of your sequencer
-
+const int minAnalog = 2; //minimum readings of analog inputs
+const int maxAnalog = 4088; //maximum readings of analog inputs. both used for mapping
 
 // all variables that apply to every sequencer step
 struct seqStep {
@@ -475,16 +482,18 @@ void UpdateInternalVars(){
   //Metropolis[0];
 
    //update bpm only if it changed
-  if (mainClocks[0].bpm != internalAnalog[2].getValue()){
-    mainClocks[0].bpm = internalAnalog[2].getValue();
+  if (mainClocks[0].bpm != map(internalAnalog[0].getValue(),minAnalog,maxAnalog,Metropolis[0].bpmMin,Metropolis[0].bpmMax)){
+    mainClocks[0].bpm = map(internalAnalog[0].getValue(),minAnalog,maxAnalog,Metropolis[0].bpmMin,Metropolis[0].bpmMax);
     mainClocks[0].bpmChanged = true;
+    //Serial.print("BPM: ");
+    //Serial.println(mainClocks[0].bpm);
   }
   else {
     mainClocks[0].bpmChanged = false;
   }
 
-  Metropolis[0].numSteps = internalAnalog[1].getValue();
-  Metropolis[0].gateTime = internalAnalog[2].getValue();
+  Metropolis[0].numSteps = map(internalAnalog[1].getValue(),minAnalog,maxAnalog,1,Metropolis[0].maxStepCount);
+  Metropolis[0].gateTime = map(internalAnalog[2].getValue(),minAnalog,maxAnalog,Metropolis[0].gateMin,Metropolis[0].gateMax);
 
   if (internalDigital[0].getState() == Button::State::Falling) {
     Metropolis[0].run = !Metropolis[0].run; // Toggle Start/Stop
@@ -522,20 +531,12 @@ void UpdateInternalVars(){
   }
 
   //mainClocks[0];
-  mainClocks[0].bpm = internalAnalog[0].getValue();
 
   //Sequencer Buttons
   for (int i = 0; i > Metropolis[0].maxStepCount; i++){
     switch (Metropolis[0].buttonFunction) {
       case 0: //Play
 
-          //only do when button not pressed, as this has unexpected consequences according to manual
-          if (seqButtons[i].getState() != Button::State::Pressed){
-            // set the Note of the button to the currently dialed
-            // note from the fader
-            SEQ_NoteButtons[i].setAddressUnsafe({seqSteps[i].note, Channel_1});
-          }
-          
           //only play notes when sequencer is not running, and not synced to ext clock
           if (Metropolis[0].run) {//&& !syncClockToExt
             if (seqButtons[i].getState() == Button::State::Falling){
@@ -585,46 +586,15 @@ void UpdateInternalVars(){
 
 }
 
-//mappingfunctions to be used by potMappings()
-///maps the value of input pot val Gate Mode
-analog_t mapGateMode(analog_t val) {  return map(val, 0, 4096, 0, Metropolis[0].maxGateMode);}
-///maps the value of input pot val Gate Time
-analog_t mapGateTime(analog_t val) {  return map(val, 0, 4096, Metropolis[0].gateMin, Metropolis[0].gateMax);}
-///maps the value of input pot val BPM
-analog_t mapBpm(analog_t val) {  return map(val, 0, 4096, Metropolis[0].bpmMin, Metropolis[0].bpmMax);}
-///maps the value of input pot val pulse
-analog_t mapPulse(analog_t val) {  return map(val, 0, 4096, Metropolis[0].minPulse, Metropolis[0].maxPulse);}
-///maps the value of input pot val number of steps
-analog_t mapNumSteps(analog_t val) {  return map(val, 0, 4096, 1, Metropolis[0].maxStepCount);}
-///maps the value of input pot val sliders
-analog_t mapSliderNotes(analog_t val) {  return map(val, 0, 4096, Metropolis[0].minSeqNote, Metropolis[0].maxSeqNote);}
 
-///assigns correct pot Mappings to
-///Analog inputs
-/// <input>.map(mappingfunction)
-/// available mapping functions see above
-void potMappings() {
-  internalAnalog[0].map(mapBpm);
-  internalAnalog[1].map(mapNumSteps);
-  internalAnalog[2].map(mapGateTime);
 
-  //mapping of all sequencer pots
-  for (int i = 0; i < Metropolis[0].maxStepCount; i++){
-    seqSliderPot[i].map(mapSliderNotes);
-    seqPulseCountPot[i].map(mapPulse);
-    seqGateModePot[i].map(mapGateMode);
-  }
-}
 
 void setup() {
-  //WEITER: mapping von potentiometer (0-2, analog2)
-  //elegant: seq 1-8 in loop, sonst muss einzeln gemappt werden -> evtl. ok, hauptsache it works
-  potMappings();
+
+
 
   Control_Surface.begin();
-  FilteredAnalog<>::setupADC();
   Serial.begin(9600);
- 
   // disable unconected for troubleshooting
   // for (int i = 0; i<8; i++){
   //   I9_POTS[i].disable();
@@ -640,4 +610,18 @@ void loop() {
   Control_Surface.loop();
   readInternalInputs();
   UpdateInternalVars();
+
+  //for (int i = 0; i < 3; i ++){
+  //  Serial.print(internalAnalog[i].getValue());
+    // Serial.print("->");
+    // Serial.print(mainClocks[0].bpm);
+    // Serial.print(" | ");
+
+  //}
+  Serial.print(mainClocks[0].bpm);
+  Serial.print(" | ");
+  Serial.print(Metropolis[0].numSteps);
+  Serial.print(" | ");
+  Serial.print(Metropolis[0].gateTime);
+  Serial.println();
 }
