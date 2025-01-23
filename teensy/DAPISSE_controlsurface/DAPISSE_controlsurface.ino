@@ -11,12 +11,12 @@ USBMIDI_Interface midi;
 // PINS
 const int I1 = 38;    //Analog In 2 -> synth rechts
 const int I2 = 39;    //Analog In 2 -> synth links
-const int I3 = 41;    //Analog In -> seq links pot
-const int I4 = 17;    //Digital In -> seq links btn
-const int I5 = 15;    //Analog In -> seq faders
+const int I3 = 41;    //Analog In 2 -> seq links pot
+const int I4 = 17;    //Analog In 3 -> seq links btn
+const int I5 = 15;    //Analog In 3 -> seq faders
 const int I6 = 16;    //Analog In 3 -> seq pulse
 const int I7 = 2;    //Digital Out -> seq LEDs //WARNING: ADD RESISTOR BEFORE LEDS
-const int I8 = 14;    //Digital In -> seq btn triggers
+const int I8 = 14;    //Analog In 3 -> seq btn triggers
 const int I9 = 24;    //Analog In 1 -> topPlate pots 1
 const int I10 = 25;    //Analog In 1 -> topPlate pots 2
 const int I11 = 26;    //Analog In 1-> topPlate pots 3
@@ -70,44 +70,49 @@ CCPotentiometer I2_POTS[] {
 
 CCPotentiometer I3_POTS[] {
     //{ muxI3.pin(0), {0x10, Channel_1} },
-    //{ muxI3.pin(1), {0x11, Channel_1} },
+    //{ muxI3.pin(1), {0x11, Channel_1} },//unused
     //{ muxI3.pin(2), {0x12, Channel_1} },
-    { muxI3.pin(3), {0x13, Channel_1} },
-    { muxI3.pin(4), {0x14, Channel_1} },
-    { muxI3.pin(5), {0x15, Channel_1} },
+
+    // { muxI3.pin(3), {0x13, Channel_1} },
+    // { muxI3.pin(4), {0x14, Channel_1} }, //used internally
+    // { muxI3.pin(5), {0x15, Channel_1} },
     { muxI3.pin(6), {0x16, Channel_1} }
-    //{ muxI3.pin(7), {0x17, Channel_1} },
+    //{ muxI3.pin(7), {0x17, Channel_1} }, //unused
 };
-CCPotentiometer I4_POTS[] {
-    { muxI4.pin(0), {0x18, Channel_1} },
-    { muxI4.pin(1), {0x19, Channel_1} },
-    { muxI4.pin(2), {0x1A, Channel_1} },
-    { muxI4.pin(3), {0x1B, Channel_1} },
-    { muxI4.pin(4), {0x1C, Channel_1} },
-    { muxI4.pin(5), {0x1D, Channel_1} },
-    { muxI4.pin(6), {0x1E, Channel_1} },
-    { muxI4.pin(7), {0x1F, Channel_1} },
+CCButton I4_BUTTONS[] {
+    // { muxI4.pin(0), {0x18, Channel_1} },
+    // { muxI4.pin(1), {0x19, Channel_1} },
+    // { muxI4.pin(2), {0x1A, Channel_1} },
+    // { muxI4.pin(3), {0x1B, Channel_1} }, //all used internally
+    // { muxI4.pin(4), {0x1C, Channel_1} },
+    // { muxI4.pin(5), {0x1D, Channel_1} },
+    { muxI4.pin(6), {0x1E, Channel_1} }
+    //{ muxI4.pin(7), {0x1F, Channel_1} } //not connected
 };
-CCPotentiometer I5_POTS[] {
-    { muxI5.pin(7), {0x20, Channel_1} },
-    { muxI5.pin(6), {0x21, Channel_1} },
-    { muxI5.pin(5), {0x22, Channel_1} },
-    { muxI5.pin(4), {0x23, Channel_1} },
-    { muxI5.pin(3), {0x24, Channel_1} },
-    { muxI5.pin(2), {0x25, Channel_1} }, // not working, buggy
-    { muxI5.pin(1), {0x26, Channel_1} },
-    { muxI5.pin(0), {0x27, Channel_1} },
-};
-CCPotentiometer I6_POTS[] {
-    { muxI6.pin(0), {0x28, Channel_1} },
-    { muxI6.pin(1), {0x29, Channel_1} },
-    { muxI6.pin(2), {0x2A, Channel_1} },
-    { muxI6.pin(3), {0x2B, Channel_1} },
-    { muxI6.pin(4), {0x2C, Channel_1} },
-    { muxI6.pin(5), {0x2D, Channel_1} },
-    { muxI6.pin(6), {0x2E, Channel_1} },
-    { muxI6.pin(7), {0x2F, Channel_1} }
-};
+
+//used internally
+// CCPotentiometer I5_POTS[] {
+//     { muxI5.pin(7), {0x20, Channel_1} },
+//     { muxI5.pin(6), {0x21, Channel_1} },
+//     { muxI5.pin(5), {0x22, Channel_1} },
+//     { muxI5.pin(4), {0x23, Channel_1} },
+//     { muxI5.pin(3), {0x24, Channel_1} },
+//     { muxI5.pin(2), {0x25, Channel_1} }, // not working, buggy
+//     { muxI5.pin(1), {0x26, Channel_1} },
+//     { muxI5.pin(0), {0x27, Channel_1} },
+// };
+
+//used internally
+// CCPotentiometer I6_POTS[] {
+//     { muxI6.pin(0), {0x28, Channel_1} },
+//     { muxI6.pin(1), {0x29, Channel_1} },
+//     { muxI6.pin(2), {0x2A, Channel_1} },
+//     { muxI6.pin(3), {0x2B, Channel_1} },
+//     { muxI6.pin(4), {0x2C, Channel_1} },
+//     { muxI6.pin(5), {0x2D, Channel_1} },
+//     { muxI6.pin(6), {0x2E, Channel_1} },
+//     { muxI6.pin(7), {0x2F, Channel_1} }
+// };
 // CCPotentiometer I7_POTS[] {
 //     { muxI7.pin(0), {0x30, Channel_1} },
 //     { muxI7.pin(1), {0x31, Channel_1} },
@@ -118,16 +123,18 @@ CCPotentiometer I6_POTS[] {
 //     { muxI7.pin(6), {0x36, Channel_1} },
 //     { muxI7.pin(7), {0x37, Channel_1} },
 // };
-CCPotentiometer I8_POTS[] {
-    { muxI8.pin(7), {0x38, Channel_1} },
-    { muxI8.pin(6), {0x39, Channel_1} },
-    { muxI8.pin(5), {0x3A, Channel_1} },
-    { muxI8.pin(4), {0x3B, Channel_1} },
-    { muxI8.pin(3), {0x3C, Channel_1} },
-    { muxI8.pin(2), {0x3D, Channel_1} },
-    { muxI8.pin(1), {0x3E, Channel_1} },
-    { muxI8.pin(0), {0x3F, Channel_1} },
-};
+
+//all used internally
+// CCPotentiometer I8_POTS[] {
+//     { muxI8.pin(7), {0x38, Channel_1} },
+//     { muxI8.pin(6), {0x39, Channel_1} },
+//     { muxI8.pin(5), {0x3A, Channel_1} },
+//     { muxI8.pin(4), {0x3B, Channel_1} },
+//     { muxI8.pin(3), {0x3C, Channel_1} },
+//     { muxI8.pin(2), {0x3D, Channel_1} },
+//     { muxI8.pin(1), {0x3E, Channel_1} },
+//     { muxI8.pin(0), {0x3F, Channel_1} },
+// };
 
 CCPotentiometer I9_POTS[] {
     { muxI9.pin(0), {0x40, Channel_1} },
@@ -174,76 +181,6 @@ CCPotentiometer I12_POTS[] {
     //{ muxI12.pin(7), {0x5F, Channel_1} },
 };
 
-FilteredAnalog<12,3,uint32_t> testAnalogInput[] {
-  { muxI8.pin(0)},
-  { muxI8.pin(1)},
-  { muxI8.pin(2)},
-  { muxI8.pin(3)},
-  { muxI8.pin(4)},
-  { muxI8.pin(5)},
-  { muxI8.pin(6)},
-  { muxI8.pin(7)}
-};
-
-//all potentiometers that don't send midi directly
-//but are used for internal variables
-FilteredAnalog<12,3,uint32_t> internalAnalog[] {
-    { muxI13.pin(7)},
-    { muxI13.pin(6)},
-    { muxI13.pin(5)},
-    { muxI13.pin(4)},
-    { muxI13.pin(3)},
-    { muxI13.pin(1)},
-    { muxI13.pin(2)},
-    { muxI13.pin(0)}
-};
-
-// IMPORTANT: insert in the order they will be used in the sequencer
-// first pot at [0], second pot at [1] etc...
-FilteredAnalog<12,3,uint32_t> seqPulseCountPot[] {
-    { muxI13.pin(0)},
-    { muxI13.pin(1)},
-    { muxI13.pin(2)},
-    { muxI13.pin(3)},
-    { muxI13.pin(4)},
-    { muxI13.pin(5)},
-    { muxI13.pin(6)},
-    { muxI13.pin(7)}
-};
-
-FilteredAnalog<12,3,uint32_t> seqSliderPot[] {
-    { muxI13.pin(0)},
-    { muxI13.pin(1)},
-    { muxI13.pin(2)},
-    { muxI13.pin(3)},
-    { muxI13.pin(4)},
-    { muxI13.pin(5)},
-    { muxI13.pin(6)},
-    { muxI13.pin(7)}
-};
-
-FilteredAnalog<12,3,uint32_t> seqGateModePot[] {
-    { muxI13.pin(0)},
-    { muxI13.pin(1)},
-    { muxI13.pin(2)},
-    { muxI13.pin(3)},
-    { muxI13.pin(4)},
-    { muxI13.pin(5)},
-    { muxI13.pin(6)},
-    { muxI13.pin(7)}
-};
-
-//all buttons (digital inputs) that don't send midi directly
-//but are used for internal variables
-Button internalDigital[] {
-  { muxI13.pin(7)}
-};
-
-
-Button seqButtons[] {
-  { muxI13.pin(7)}
-};
-
 
 // all general variables of the sequencer that are not bound to an input
 //const = global settings
@@ -262,7 +199,8 @@ struct sequencer {
   const int maxGateMode = 2; //How Many gate Modes there are (0-indexed)
   bool run = false; // if sequencer is running
   bool reset = false; //if reset was pressed
-  int numSteps = 8; // how many steps should be done. Jumps back to first step after numSteps
+  const int maxStepCount = 8; //How many steps the sequencer has
+  int numSteps = maxStepCount; // how many steps should be done. Jumps back to first step after numSteps
   int seqDirection = 1; // Sequencer step direction. 1=up, 0=down
   int pulsePointer = 0; //points to the pulse within the step we're currently in
   int lastStepPointer = 0; //previous step, to trigger note off
@@ -379,6 +317,94 @@ void setDefaultClockSettings(){
   subClocks[4].run = 0;
 }
 
+
+FilteredAnalog<12,3,uint32_t> testAnalogInput[] {
+  { muxI8.pin(0)},
+  { muxI8.pin(1)},
+  { muxI8.pin(2)},
+  { muxI8.pin(3)},
+  { muxI8.pin(4)},
+  { muxI8.pin(5)},
+  { muxI8.pin(6)},
+  { muxI8.pin(7)}
+};
+
+//all potentiometers that don't send midi directly
+//but are used for internal variables
+FilteredAnalog<12,3,uint32_t> internalAnalog[] {
+    { muxI3.pin(3)},
+    { muxI3.pin(4)},
+    { muxI3.pin(5)},
+    { muxI13.pin(7)},
+    { muxI13.pin(6)},
+    { muxI13.pin(5)},
+    { muxI13.pin(4)},
+    { muxI13.pin(3)},
+    { muxI13.pin(1)},
+    { muxI13.pin(2)},
+    { muxI13.pin(0)},
+
+};
+
+// IMPORTANT: insert in the order they will be used in the sequencer
+// first pot at [0], second pot at [1] etc...
+FilteredAnalog<12,3,uint32_t> seqPulseCountPot[] {
+    { muxI6.pin(0)},
+    { muxI6.pin(1)},
+    { muxI6.pin(2)},
+    { muxI6.pin(3)},
+    { muxI6.pin(4)},
+    { muxI6.pin(5)},
+    { muxI6.pin(6)},
+    { muxI6.pin(7)}
+};
+
+FilteredAnalog<12,3,uint32_t> seqSliderPot[] {
+    { muxI5.pin(7)},
+    { muxI5.pin(6)},
+    { muxI5.pin(5)},
+    { muxI5.pin(4)},
+    { muxI5.pin(3)},
+    { muxI5.pin(2)},
+    { muxI5.pin(1)},
+    { muxI5.pin(0)}
+};
+
+FilteredAnalog<12,3,uint32_t> seqGateModePot[] {
+    { muxI13.pin(0)},
+    { muxI13.pin(1)},
+    { muxI13.pin(2)},
+    { muxI13.pin(3)},
+    { muxI13.pin(4)},
+    { muxI13.pin(5)},
+    { muxI13.pin(6)},
+    { muxI13.pin(7)}
+};
+
+//all buttons (digital inputs) that don't send midi directly
+//but are used for internal variables
+Button internalDigital[] {
+  { muxI4.pin(0)},
+  { muxI4.pin(1)},
+  { muxI4.pin(2)},
+  { muxI4.pin(3)},
+  { muxI4.pin(4)},
+  { muxI4.pin(5)}
+};
+
+Bank<4> seqButtonBank {Metropolis[0].maxStepCount}; //4 Banks with as many buttons as there are Steps
+Button seqButtons[] {
+  muxI8.pin(7),
+  muxI8.pin(6),
+  muxI8.pin(5),
+  muxI8.pin(4),
+  muxI8.pin(3),
+  muxI8.pin(2),
+  muxI8.pin(1),
+  muxI8.pin(0)
+};
+
+
 ///
 /// Keypad
 ///
@@ -434,7 +460,7 @@ void UpdateInternalVars(){
 
   //seqSteps[0];
 
-  for (int i = 0; i > Metropolis[0].numSteps; i++){
+  for (int i = 0; i > Metropolis[0].maxStepCount; i++){
     seqSteps[i].pulseCount = seqPulseCountPot[i].getValue();
     seqSteps[i].gateMode = seqGateModePot[i].getValue();
     seqSteps[i].note = seqSliderPot[i].getValue();
