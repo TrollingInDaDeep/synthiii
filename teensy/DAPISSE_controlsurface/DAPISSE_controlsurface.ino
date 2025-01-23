@@ -128,16 +128,18 @@ CCButton I4_BUTTONS[] {
 // initialize with default value
 //would be great but notebuttons only work with a fixed value
 
-// NoteButton SEQ_NoteButtons[] {
-//     { muxI8.pin(7), {MIDI_Notes::C[4], Channel_1} },
-//     { muxI8.pin(6), {MIDI_Notes::C[4], Channel_1} },
-//     { muxI8.pin(5), {MIDI_Notes::C[4], Channel_1} },
-//     { muxI8.pin(4), {MIDI_Notes::C[4], Channel_1} },
-//     { muxI8.pin(3), {MIDI_Notes::C[4], Channel_1} },
-//     { muxI8.pin(2), {MIDI_Notes::C[4], Channel_1} },
-//     { muxI8.pin(1), {MIDI_Notes::C[4], Channel_1} },
-//     { muxI8.pin(0), {MIDI_Notes::C[4], Channel_1} },
-// };
+//on top of that, why the heck ever, the seqButton[] buttons ONLY work
+// if one pin on that multiplexer is also initialized as a midi button
+CCButton SEQ_NoteButtons[] {
+    //{ muxI8.pin(7), {MIDI_Notes::C[4], Channel_1} },
+    //{ muxI8.pin(6), {MIDI_Notes::C[4], Channel_1} },
+    //{ muxI8.pin(5), {MIDI_Notes::C[4], Channel_1} },
+    //{ muxI8.pin(4), {MIDI_Notes::C[4], Channel_1} },
+    //{ muxI8.pin(3), {MIDI_Notes::C[4], Channel_1} },
+    //{ muxI8.pin(2), {MIDI_Notes::C[4], Channel_1} },
+    //{ muxI8.pin(1), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(0), {127, Channel_14} },
+};
 
 
 CCPotentiometer I9_POTS[] {
@@ -605,13 +607,13 @@ void loop() {
   readInternalInputs();
   UpdateInternalVars();
 
-  for (int i = 0; i < 8; i++){
-    Serial.print(seqButtons[i].getState());
-    // Serial.print("->");
-    // Serial.print(mainClocks[0].bpm);
-     Serial.print(" | ");
+  // for (int i = 0; i < 8; i++){
+  //   Serial.print(seqButtons[i].getState());
+  //   // Serial.print("->");
+  //   // Serial.print(mainClocks[0].bpm);
+  //    Serial.print(" | ");
 
-  }
+  // }
   Serial.println();
   Serial.print(Metropolis[0].run);
   Serial.print(" | ");
