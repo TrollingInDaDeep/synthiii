@@ -116,36 +116,7 @@ void stopNote(int noteToStop){
 }
 
 // todo convert fusel0 and fusel1 to int number and store in seqButtonFunction
-void selectSeqNoteFunction(){
-  //make the faders an internal control (default, only overwritten if case 3)
-  if (!arr_analog_input_type[3][0]){
-    for (byte pin=0; pin<pinPerMux; pin++){
-      arr_analog_input_type[3][pin] = 1;
-    }
-  }
-  if (fuSel0 && fuSel1){
-    //Play Mode
-    seqButtonFunction = 0;
-  }
-  if (!fuSel0 && fuSel1){
-    //Skip mode
-    seqButtonFunction = 1;
-  }
-  if (fuSel0 && !fuSel1){
-    //Slide mode
-    seqButtonFunction = 2;
-  }
-  if (!fuSel0 && !fuSel1){
-    //Hold mode --> idea: play between pressed buttons mode
-    seqButtonFunction = 3;
-    if (!run) {
-    //make the faders a midi cc control
-    for (byte pin=0; pin<pinPerMux; pin++){
-      arr_analog_input_type[3][pin] = 0;
-    }
-}
-  }
-}
+
 
 // reset immediately and trigger the first pulse of the first step
 void resetSequencer() {

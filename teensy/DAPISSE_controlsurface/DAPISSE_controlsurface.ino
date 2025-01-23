@@ -12,7 +12,7 @@ USBMIDI_Interface midi;
 const int I1 = 38;    //Analog In 2 -> synth rechts
 const int I2 = 39;    //Analog In 2 -> synth links
 const int I3 = 41;    //Analog In 2 -> seq links pot
-const int I4 = 17;    //Analog In 3 -> seq links btn*
+const int I4 = 17;    //Analog In 3 -> seq links btn
 const int I5 = 15;    //Analog In 3 -> seq faders
 const int I6 = 16;    //Analog In 3 -> seq pulse
 const int I7 = 2;    //Digital Out -> seq LEDs //WARNING: ADD RESISTOR BEFORE LEDS
@@ -340,16 +340,16 @@ void setDefaultClockSettings(){
 }
 
 
-FilteredAnalog<12,3,uint32_t> testAnalogInput[] {
-  { muxI8.pin(0)},
-  { muxI8.pin(1)},
-  { muxI8.pin(2)},
-  { muxI8.pin(3)},
-  { muxI8.pin(4)},
-  { muxI8.pin(5)},
-  { muxI8.pin(6)},
-  { muxI8.pin(7)}
-};
+// FilteredAnalog<12,3,uint32_t> testAnalogInput[] {
+//   { muxI8.pin(0)},
+//   { muxI8.pin(1)},
+//   { muxI8.pin(2)},
+//   { muxI8.pin(3)},
+//   { muxI8.pin(4)},
+//   { muxI8.pin(5)},
+//   { muxI8.pin(6)},
+//   { muxI8.pin(7)}
+// };
 
 //all potentiometers that don't send midi directly
 //but are used for internal variables
@@ -407,14 +407,14 @@ Button internalDigital[] {
 
 // Button objects, digital inputs of the Sequencer buttons
 Button seqButtons[] {
-  muxI8.pin(7),
-  muxI8.pin(6),
-  muxI8.pin(5),
-  muxI8.pin(4),
-  muxI8.pin(3),
-  muxI8.pin(2),
-  muxI8.pin(1),
-  muxI8.pin(0)
+  { muxI8.pin(7)},
+  { muxI8.pin(6)},
+  { muxI8.pin(5)},
+  { muxI8.pin(4)},
+  { muxI8.pin(3)},
+  { muxI8.pin(2)},
+  { muxI8.pin(1)},
+  { muxI8.pin(0)}
 };
 
 ///
@@ -439,6 +439,9 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
 ///Functions
 ///
 
+//Function Prototypes
+void selectSeqNoteFunction(void);
+
 /// reads/updates all internal analog and digital inputs
 void readInternalInputs() {
 
@@ -447,9 +450,9 @@ void readInternalInputs() {
       internalAnalog[i].update();
     }
 
-  for (byte i = 0; i < (sizeof(testAnalogInput) / sizeof(testAnalogInput[0])); i++) {
-      testAnalogInput[i].update();
-  }
+  // for (byte i = 0; i < (sizeof(testAnalogInput) / sizeof(testAnalogInput[0])); i++) {
+  //     testAnalogInput[i].update();
+  // }
 
   for (byte i = 0; i < (sizeof(seqPulseCountPot) / sizeof(seqPulseCountPot[0])); i++) {
       seqPulseCountPot[i].update();
@@ -463,13 +466,13 @@ void readInternalInputs() {
       seqGateModePot[i].update();
   }
 
-// Ditital
+// Digital
   for (byte i = 0; i < (sizeof(internalDigital) / sizeof(internalDigital[0])); i++) {
       internalDigital[i].update();
     }
 
   for (byte i = 0; i < (sizeof(seqButtons) / sizeof(seqButtons[0])); i++) {
-      seqButtons[i].update();
+    seqButtons[i].update();
   }
     
 }
@@ -518,25 +521,26 @@ void UpdateInternalVars(){
     }
   }
 
-  Metropolis[0].fuSel0 = internalDigital[4].getState(); 
-  Metropolis[0].fuSel1 = internalDigital[5].getState();
+  //switches inverted
+  Metropolis[0].fuSel0 = !internalDigital[4].getState(); 
+  Metropolis[0].fuSel1 = !internalDigital[5].getState();
+
+  selectSeqNoteFunction();
 
   //seqSteps[0];
 
-  for (int i = 0; i > Metropolis[0].maxStepCount; i++){
-    seqSteps[i].pulseCount = seqPulseCountPot[i].getValue();
-    seqSteps[i].gateMode = seqGateModePot[i].getValue();
-    seqSteps[i].note = seqSliderPot[i].getValue();
-    
+  for (int i = 0; i < Metropolis[0].maxStepCount; i++){
+    seqSteps[i].pulseCount = map(seqPulseCountPot[i].getValue(),minAnalog,maxAnalog,Metropolis[0].minPulse,Metropolis[0].maxPulse);
+    seqSteps[i].gateMode = map(seqGateModePot[i].getValue(),minAnalog,maxAnalog,0,Metropolis[0].maxGateMode);
+    seqSteps[i].note = map(seqSliderPot[i].getValue(),minAnalog,maxAnalog,Metropolis[0].minSeqNote,Metropolis[0].maxSeqNote);
   }
 
   //mainClocks[0];
 
   //Sequencer Buttons
-  for (int i = 0; i > Metropolis[0].maxStepCount; i++){
+  for (int i = 0; i < Metropolis[0].maxStepCount; i++){
     switch (Metropolis[0].buttonFunction) {
       case 0: //Play
-
           //only play notes when sequencer is not running, and not synced to ext clock
           if (Metropolis[0].run) {//&& !syncClockToExt
             if (seqButtons[i].getState() == Button::State::Falling){
@@ -549,10 +553,10 @@ void UpdateInternalVars(){
       break;
 
       case 1: //Skip
-
+        
         //Clear values if "clear" pressed
         if (internalDigital[3].getState() == Button::State::Falling){
-          seqSteps[i].skip = false;
+         seqSteps[i].skip = false;
         }
 
         if (seqButtons[i].getState() == Button::State::Falling) {
@@ -565,6 +569,7 @@ void UpdateInternalVars(){
         if (internalDigital[3].getState() == Button::State::Falling){
           seqSteps[i].slide = false;
         }
+
         if (seqButtons[i].getState() == Button::State::Falling) {
           seqSteps[i].slide= !seqSteps[i].slide;
         }
@@ -590,20 +595,9 @@ void UpdateInternalVars(){
 
 
 void setup() {
-
-
-
   Control_Surface.begin();
   Serial.begin(9600);
-  // disable unconected for troubleshooting
-  // for (int i = 0; i<8; i++){
-  //   I9_POTS[i].disable();
-  //   I10_POTS[i].disable();
-  //   I11_POTS[i].disable();
-  //   I12_POTS[i].disable();
-  // }
   setDefaultClockSettings();
-
 }
 
 void loop() {
@@ -611,17 +605,47 @@ void loop() {
   readInternalInputs();
   UpdateInternalVars();
 
-  //for (int i = 0; i < 3; i ++){
-  //  Serial.print(internalAnalog[i].getValue());
+  for (int i = 0; i < 8; i++){
+    Serial.print(seqButtons[i].getState());
     // Serial.print("->");
     // Serial.print(mainClocks[0].bpm);
-    // Serial.print(" | ");
+     Serial.print(" | ");
 
-  //}
+  }
+  Serial.println();
+  Serial.print(Metropolis[0].run);
+  Serial.print(" | ");
   Serial.print(mainClocks[0].bpm);
+  Serial.print(" | ");
+  Serial.print(Metropolis[0].reset);
+  Serial.print(" | ");
+  Serial.print(Metropolis[0].playMode);
   Serial.print(" | ");
   Serial.print(Metropolis[0].numSteps);
   Serial.print(" | ");
   Serial.print(Metropolis[0].gateTime);
+  Serial.print(" | ");
+  Serial.print(Metropolis[0].fuSel1);
+  Serial.print(" | ");
+  Serial.print(Metropolis[0].fuSel0);
+  Serial.print(" | ");
+  Serial.print(seqSteps[0].pulseCount);
+  Serial.print(" | ");
+  Serial.print(seqSteps[0].note);
+  Serial.print(" | ");
+  Serial.print(seqSteps[0].gateMode);
+  Serial.print(" | ");
+  Serial.print(internalDigital[3].getState());
+  Serial.print(" | ");
+  Serial.print(seqButtons[0].getState());
+  Serial.print(" | ");
+  Serial.print(Metropolis[0].buttonFunction);
+  Serial.print(" | ");
+  Serial.print(seqSteps[0].skip);
+  Serial.print(" | ");
+  Serial.print(seqSteps[0].slide);
+  Serial.print(" | ");
+  Serial.print(seqSteps[0].hold);
+  Serial.print(" | ");
   Serial.println();
 }
