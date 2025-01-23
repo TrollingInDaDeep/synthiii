@@ -1,35 +1,3 @@
-#include <Keypad.h>
-#include <ArduinoTapTempo.h>
-#include <math.h>
-///
-/// How to
-///
-/// add multiplexer: add const int under pins, add input/output in setup, add to pin array, add line to all digi OR analog arrays in array section, 
-/// set if some inputs/outputs are disabled/not scanned in arr_disable
-/// set if MidiCC or internal control
-/// say what happens in UpdateSendValues()
-
-// change settings
-
-
-
-// PINS
-const int I1 = 38;    //Analog In -> synth rechts
-const int I2 = 41;    //Analog In -> synth links
-const int I3 = 40;    //Analog In -> seq links pot
-const int I4 = 39;    //Digital In -> seq links btn
-const int I5 = 25;    //Analog In -> seq faders
-const int I6 = 26;    //Analog In -> seq pulse
-const int I7 = 11;    //Digital Out -> seq LEDs
-const int I8 = 12;    //Digital In -> seq btn triggers
-const int A = 37;     //Digital Out
-const int B = 36;     //Digital Out
-const int C = 35;     //Digital Out
-const int Aout = 30;  //Digital Out
-const int Bout = 31;  //Digital Out
-const int Cout = 32;  //Digital Out
-
-
 //sequencer
 //const int note = 42;
 

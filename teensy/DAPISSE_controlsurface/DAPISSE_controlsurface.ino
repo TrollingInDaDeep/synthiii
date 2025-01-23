@@ -15,7 +15,7 @@ const int I3 = 41;    //Analog In 2 -> seq links pot
 const int I4 = 17;    //Analog In 3 -> seq links btn
 const int I5 = 15;    //Analog In 3 -> seq faders
 const int I6 = 16;    //Analog In 3 -> seq pulse
-const int I7 = 2;    //Digital Out -> seq LEDs //WARNING: ADD RESISTOR BEFORE LEDS
+const int I7 = 32;    //Digital Out -> seq LEDs //WARNING: ADD RESISTOR BEFORE LEDS
 const int I8 = 14;    //Analog In 3 -> seq btn triggers
 const int I9 = 24;    //Analog In 1 -> topPlate pots 1
 const int I10 = 25;    //Analog In 1 -> topPlate pots 2
@@ -25,9 +25,9 @@ const int I13 = 40;   //Analog In 2 -> seq Gatemode
 const int A = 33;     //Digital Out
 const int B = 34;     //Digital Out
 const int C = 35;     //Digital Out
-const int Aout = 30;  //Digital Out
-const int Bout = 31;  //Digital Out
-const int Cout = 32;  //Digital Out
+const int Aout = 36;  //Digital Out
+const int Bout = 37;  //Digital Out
+const int Cout = 23;  //Digital Out
 
 //Multiplexers
 CD74HC4051 muxI1 {I1, {A, B, C} };
@@ -37,7 +37,6 @@ CD74HC4051 muxI4 {I4, {A, B, C} };
 CD74HC4051 muxI5 {I5, {A, B, C} };
 CD74HC4051 muxI6 {I6, {A, B, C} };
 //CD74HC4051 muxI7 {I7, {Aout, Bout, Cout} };
-
 CD74HC4051 muxI8 {I8, {A, B, C} };
 CD74HC4051 muxI9 {I9, {A, B, C} };
 CD74HC4051 muxI10 {I10, {A, B, C} };
@@ -444,6 +443,21 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
 //Function Prototypes
 void selectSeqNoteFunction(void);
 
+
+// selects the pin on output multiplexer (LEDs)
+void selectMuxOutPin(byte pin){
+  pin = Metropolis[0].maxStepCount-pin; //LEDs are backwards, so adressing them backwards
+  bool valA = bitRead(pin, 0);
+  bool valB = bitRead(pin, 1);
+  bool valC = bitRead(pin, 2);
+  Serial.print(valA);
+  Serial.print(valB);
+  Serial.println(valC);
+  digitalWrite(Aout, valA);
+  digitalWrite(Bout, valB);
+  digitalWrite(Cout, valC);
+}
+
 /// reads/updates all internal analog and digital inputs
 void readInternalInputs() {
 
@@ -527,8 +541,6 @@ void UpdateInternalVars(){
   Metropolis[0].fuSel0 = !internalDigital[4].getState(); 
   Metropolis[0].fuSel1 = !internalDigital[5].getState();
 
-  selectSeqNoteFunction();
-
   //seqSteps[0];
 
   for (int i = 0; i < Metropolis[0].maxStepCount; i++){
@@ -600,12 +612,20 @@ void setup() {
   Control_Surface.begin();
   Serial.begin(9600);
   setDefaultClockSettings();
+
+  //setup the LED Pin and Multiplexer
+  pinMode(I7, OUTPUT);
+  digitalWrite(I7, HIGH);
+  pinMode(Aout, OUTPUT);
+  pinMode(Bout, OUTPUT);
+  pinMode(Cout, OUTPUT);
 }
 
 void loop() {
   Control_Surface.loop();
   readInternalInputs();
   UpdateInternalVars();
+  selectSeqNoteFunction();
 
   // for (int i = 0; i < 8; i++){
   //   Serial.print(seqButtons[i].getState());
@@ -614,7 +634,6 @@ void loop() {
   //    Serial.print(" | ");
 
   // }
-  Serial.println();
   Serial.print(Metropolis[0].run);
   Serial.print(" | ");
   Serial.print(mainClocks[0].bpm);
@@ -650,4 +669,6 @@ void loop() {
   Serial.print(seqSteps[0].hold);
   Serial.print(" | ");
   Serial.println();
+
+  selectMuxOutPin(seqSteps[0].pulseCount);
 }
