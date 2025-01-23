@@ -634,49 +634,15 @@ void UpdateSendValues() {
         if (!arr_digital_input_type[mux][pin]) {
           //usbMIDI.sendControlChange(arr_send_digital_inputs[mux][pin], arr_read_digital_inputs[mux][pin], synthMidiChannel);
         } else {
-          //Type = Internal Variable
-          //Mapping of Controller Number (from arr_send_digital_inputs) to internal variables
-          switch (arr_send_digital_inputs[mux][pin]){
-              case 41:
-                //Sequencer Play/pause
-                if (arr_read_digital_inputs[0][0] && arr_changed_digital_inputs[0][0]) {
-                  run = !run;
-                  if (run){
-                    // Serial.println("play");
-                    //prevClockStart = millis();
-                    //prevPulseStart = millis();
-                    resetClock();
-                  } else {
-                    // Serial.println("pause");
-                    stopLastNote();
-                    stopNote(stepPointer);
-                  }
-                }
-              break;
-              case 42:
-                //Sequencer Reset
-                if (arr_read_digital_inputs[0][1] && arr_changed_digital_inputs[0][1]) {
-                  reset = arr_read_digital_inputs[0][1];
-                }
-              break;
+
               case 43:
               if (blnTapTempo){
                   tapTempo.update(!arr_read_digital_inputs[0][2]);
                   bpm = long(tapTempo.getBPM());
                   Serial.println(bpm);
                 }
-              if (arr_read_digital_inputs[0][2] && arr_changed_digital_inputs[0][2]){
                 if (!blnTapTempo){
-                    //Sequencer Play Mode
-                    playMode++;
-                    if (playMode>=numPlayModes){
-                      playMode = 0;
-                  }
-                }
-              }
-                
-              break;
-              case 44:
+
                 //Clear selected SeqButton function
                 if (arr_read_digital_inputs[0][3] && arr_changed_digital_inputs[0][3]){
                   //except for 0=playMode

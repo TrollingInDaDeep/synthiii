@@ -12,7 +12,7 @@ USBMIDI_Interface midi;
 const int I1 = 38;    //Analog In 2 -> synth rechts
 const int I2 = 39;    //Analog In 2 -> synth links
 const int I3 = 41;    //Analog In 2 -> seq links pot
-const int I4 = 17;    //Analog In 3 -> seq links btn
+const int I4 = 17;    //Analog In 3 -> seq links btn*
 const int I5 = 15;    //Analog In 3 -> seq faders
 const int I6 = 16;    //Analog In 3 -> seq pulse
 const int I7 = 2;    //Digital Out -> seq LEDs //WARNING: ADD RESISTOR BEFORE LEDS
@@ -86,7 +86,7 @@ CCButton I4_BUTTONS[] {
     // { muxI4.pin(3), {0x1B, Channel_1} }, //all used internally
     // { muxI4.pin(4), {0x1C, Channel_1} },
     // { muxI4.pin(5), {0x1D, Channel_1} },
-    { muxI4.pin(6), {0x1E, Channel_1} } 
+    { muxI4.pin(6), {0x1E, Channel_1} } //sync switch for synth 
     //{ muxI4.pin(7), {0x1F, Channel_1} } //not connected
 };
 
@@ -248,6 +248,7 @@ struct seqStep {
 struct mainClock {
   int bpm = 60.0;
   int oldBPM = 0; //store last bpm to see if we actually had a bpm change
+  bool bpmChanged = false; //set true if bpm changed, hence update tempo
   float tempo = 1000.0/(bpm/60.0); //bpm in milliseconds
   const int subTicks = 24; //in how many ticks one beat shall be divided
   float tickMS = tempo/subTicks; //how long a tick is in ms
@@ -389,12 +390,12 @@ FilteredAnalog<12,3,uint32_t> seqGateModePot[] {
 //all buttons (digital inputs) that don't send midi directly
 //but are used for internal variables
 Button internalDigital[] {
-  { muxI4.pin(0)},
-  { muxI4.pin(1)},
-  { muxI4.pin(2)},
-  { muxI4.pin(3)},
-  { muxI4.pin(4)},
-  { muxI4.pin(5)}
+  { muxI4.pin(0)}, //Start/stop
+  { muxI4.pin(1)}, //reset
+  { muxI4.pin(2)}, //playmode
+  { muxI4.pin(3)}, //clear
+  { muxI4.pin(4)}, //fusel0
+  { muxI4.pin(5)}  //fusel1
 };
 
 // Button objects, digital inputs of the Sequencer buttons
@@ -472,14 +473,44 @@ void readInternalInputs() {
 void UpdateInternalVars(){
 
   //Metropolis[0];
-  Metropolis[0].gateTime = internalAnalog[0].getValue();
-  Metropolis[0].run = false;//
-  Metropolis[0].reset = false;//
-  Metropolis[0].numSteps = internalAnalog[0].getValue();
-  Metropolis[0].seqDirection = 1;// 
-  Metropolis[0].playMode = 0; //
-  Metropolis[0].fuSel0 = internalDigital[0].getState(); 
-  Metropolis[0].fuSel1 = internalDigital[0].getState();
+
+   //update bpm only if it changed
+  if (mainClocks[0].bpm != internalAnalog[2].getValue()){
+    mainClocks[0].bpm = internalAnalog[2].getValue();
+    mainClocks[0].bpmChanged = true;
+  }
+  else {
+    mainClocks[0].bpmChanged = false;
+  }
+
+  Metropolis[0].numSteps = internalAnalog[1].getValue();
+  Metropolis[0].gateTime = internalAnalog[2].getValue();
+
+  if (internalDigital[0].getState() == Button::State::Falling) {
+    Metropolis[0].run = !Metropolis[0].run; // Toggle Start/Stop
+
+    if (Metropolis[0].run){
+      // Serial.println("play");
+      //resetClock(); #
+    } else {
+      // Serial.println("pause"); #
+      //stopLastNote(); #
+      //stopNote(stepPointer); #
+    }
+  }
+  if (internalDigital[1].getState() == Button::State::Falling){
+    Metropolis[0].reset = true;
+  }
+
+  if (internalDigital[2].getState() == Button::State::Falling){
+    Metropolis[0].playMode++; //increment play mode
+    if (Metropolis[0].playMode >= Metropolis[0].numPlayModes){ //wrap play mode if max reached
+      Metropolis[0].playMode = 0;
+    }
+  }
+
+  Metropolis[0].fuSel0 = internalDigital[4].getState(); 
+  Metropolis[0].fuSel1 = internalDigital[5].getState();
 
   //seqSteps[0];
 
@@ -497,7 +528,6 @@ void UpdateInternalVars(){
   for (int i = 0; i > Metropolis[0].maxStepCount; i++){
     switch (Metropolis[0].buttonFunction) {
       case 0: //Play
-
 
           //only do when button not pressed, as this has unexpected consequences according to manual
           if (seqButtons[i].getState() != Button::State::Pressed){
@@ -518,21 +548,37 @@ void UpdateInternalVars(){
       break;
 
       case 1: //Skip
+
+        //Clear values if "clear" pressed
+        if (internalDigital[3].getState() == Button::State::Falling){
+          seqSteps[i].skip = false;
+        }
+
         if (seqButtons[i].getState() == Button::State::Falling) {
             seqSteps[i].skip = !seqSteps[i].skip;
           }
       break;
 
       case 2: //Slide
-      if (seqButtons[i].getState() == Button::State::Falling) {
-        seqSteps[i].slide= !seqSteps[i].slide;
-      }
+        //Clear values if "clear" pressed
+        if (internalDigital[3].getState() == Button::State::Falling){
+          seqSteps[i].slide = false;
+        }
+        if (seqButtons[i].getState() == Button::State::Falling) {
+          seqSteps[i].slide= !seqSteps[i].slide;
+        }
       break;
 
       case 3: //hold
-      if (seqButtons[i].getState() == Button::State::Falling) {
-        seqSteps[i].hold = !seqSteps[i].hold;
-      }
+
+        //Clear values if "clear" pressed
+        if (internalDigital[3].getState() == Button::State::Falling){
+          seqSteps[i].hold = false;
+        }
+
+        if (seqButtons[i].getState() == Button::State::Falling) {
+          seqSteps[i].hold = !seqSteps[i].hold;
+        }
       break;
     }
   }
@@ -594,34 +640,4 @@ void loop() {
   Control_Surface.loop();
   readInternalInputs();
   UpdateInternalVars();
-    
-      //testPot.update();
-  //Serial.println(testPot.getValue());
-
-
-  // for (int i = 0; i<6; i++){////DIRTY HACK!!!!!!!!!!!!
-  //   Serial.print(I1_POTS[i].getValue());
-  //   Serial.print("|");
-  // }
-  // Serial.print("**");
-  for (int i = 0; i<8; i++){ 
-    Serial.print(testAnalogInput[i].getValue());
-    Serial.print("|");
-  }
-  Serial.println();
-  // Serial.print("**");
-  // for (int i = 0; i<8; i++){
-  //   Serial.print(I6_POTS[i].getValue());
-  //   Serial.print("|");
-  // }
-  // Serial.print("**");
-  // for (int i = 0; i<8; i++){ 
-  //   I13_POTS[i].update();
-  //   Serial.print(I13_POTS[i].getValue());
-  //   Serial.print("|");
-  // }
-  // Serial.println();
-  //updateInternalVariables();
-
-
 }
