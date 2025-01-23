@@ -6,22 +6,22 @@
 // Instantiate a MIDI Interface to use
 USBMIDI_Interface midi;
 //din1
-//I4 I5 I7 I8 I13
+//I7
 
 // PINS
 const int I1 = 38;    //Analog In 2 -> synth rechts
 const int I2 = 39;    //Analog In 2 -> synth links
 const int I3 = 41;    //Analog In -> seq links pot
-const int I4 = 28;    //Digital In -> seq links btn
-const int I5 = 29;    //Analog In -> seq faders
-const int I6 = 40;    //Analog In 2 -> seq pulse
+const int I4 = 17;    //Digital In -> seq links btn
+const int I5 = 15;    //Analog In -> seq faders
+const int I6 = 16;    //Analog In 3 -> seq pulse
 const int I7 = 2;    //Digital Out -> seq LEDs //WARNING: ADD RESISTOR BEFORE LEDS
-const int I8 = 30;    //Digital In -> seq btn triggers
+const int I8 = 14;    //Digital In -> seq btn triggers
 const int I9 = 24;    //Analog In 1 -> topPlate pots 1
 const int I10 = 25;    //Analog In 1 -> topPlate pots 2
 const int I11 = 26;    //Analog In 1-> topPlate pots 3
 const int I12 = 27;    //Analog In 1-> topPlate pots 4
-const int I13 = 31;   //Analog In 2 -> seq Gatemode
+const int I13 = 40;   //Analog In 2 -> seq Gatemode
 const int A = 33;     //Digital Out
 const int B = 34;     //Digital Out
 const int C = 35;     //Digital Out
@@ -36,7 +36,7 @@ CD74HC4051 muxI3 {I3, {A, B, C} };
 CD74HC4051 muxI4 {I4, {A, B, C} };
 CD74HC4051 muxI5 {I5, {A, B, C} };
 CD74HC4051 muxI6 {I6, {A, B, C} };
-CD74HC4051 muxI7 {I7, {Aout, Bout, Cout} };
+//CD74HC4051 muxI7 {I7, {Aout, Bout, Cout} };
 
 CD74HC4051 muxI8 {I8, {A, B, C} };
 CD74HC4051 muxI9 {I9, {A, B, C} };
@@ -78,26 +78,26 @@ CCPotentiometer I3_POTS[] {
     { muxI3.pin(6), {0x16, Channel_1} }
     //{ muxI3.pin(7), {0x17, Channel_1} },
 };
-// CCPotentiometer I4_POTS[] {
-//     { muxI4.pin(0), {0x18, Channel_1} },
-//     { muxI4.pin(1), {0x19, Channel_1} },
-//     { muxI4.pin(2), {0x1A, Channel_1} },
-//     { muxI4.pin(3), {0x1B, Channel_1} },
-//     { muxI4.pin(4), {0x1C, Channel_1} },
-//     { muxI4.pin(5), {0x1D, Channel_1} },
-//     { muxI4.pin(6), {0x1E, Channel_1} },
-//     { muxI4.pin(7), {0x1F, Channel_1} },
-// };
-// CCPotentiometer I5_POTS[] {
-//     { muxI5.pin(0), {0x20, Channel_1} },
-//     { muxI5.pin(1), {0x21, Channel_1} },
-//     { muxI5.pin(2), {0x22, Channel_1} },
-//     { muxI5.pin(3), {0x23, Channel_1} },
-//     { muxI5.pin(4), {0x24, Channel_1} },
-//     { muxI5.pin(5), {0x25, Channel_1} },
-//     { muxI5.pin(6), {0x26, Channel_1} },
-//     { muxI5.pin(7), {0x27, Channel_1} },
-// };
+CCPotentiometer I4_POTS[] {
+    { muxI4.pin(0), {0x18, Channel_1} },
+    { muxI4.pin(1), {0x19, Channel_1} },
+    { muxI4.pin(2), {0x1A, Channel_1} },
+    { muxI4.pin(3), {0x1B, Channel_1} },
+    { muxI4.pin(4), {0x1C, Channel_1} },
+    { muxI4.pin(5), {0x1D, Channel_1} },
+    { muxI4.pin(6), {0x1E, Channel_1} },
+    { muxI4.pin(7), {0x1F, Channel_1} },
+};
+CCPotentiometer I5_POTS[] {
+    { muxI5.pin(7), {0x20, Channel_1} },
+    { muxI5.pin(6), {0x21, Channel_1} },
+    { muxI5.pin(5), {0x22, Channel_1} },
+    { muxI5.pin(4), {0x23, Channel_1} },
+    { muxI5.pin(3), {0x24, Channel_1} },
+    { muxI5.pin(2), {0x25, Channel_1} }, // not working, buggy
+    { muxI5.pin(1), {0x26, Channel_1} },
+    { muxI5.pin(0), {0x27, Channel_1} },
+};
 CCPotentiometer I6_POTS[] {
     { muxI6.pin(0), {0x28, Channel_1} },
     { muxI6.pin(1), {0x29, Channel_1} },
@@ -118,16 +118,16 @@ CCPotentiometer I6_POTS[] {
 //     { muxI7.pin(6), {0x36, Channel_1} },
 //     { muxI7.pin(7), {0x37, Channel_1} },
 // };
-// CCPotentiometer I8_POTS[] {
-//     { muxI8.pin(0), {0x38, Channel_1} },
-//     { muxI8.pin(1), {0x39, Channel_1} },
-//     { muxI8.pin(2), {0x3A, Channel_1} },
-//     { muxI8.pin(3), {0x3B, Channel_1} },
-//     { muxI8.pin(4), {0x3C, Channel_1} },
-//     { muxI8.pin(5), {0x3D, Channel_1} },
-//     { muxI8.pin(6), {0x3E, Channel_1} },
-//     { muxI8.pin(7), {0x3F, Channel_1} },
-// };
+CCPotentiometer I8_POTS[] {
+    { muxI8.pin(7), {0x38, Channel_1} },
+    { muxI8.pin(6), {0x39, Channel_1} },
+    { muxI8.pin(5), {0x3A, Channel_1} },
+    { muxI8.pin(4), {0x3B, Channel_1} },
+    { muxI8.pin(3), {0x3C, Channel_1} },
+    { muxI8.pin(2), {0x3D, Channel_1} },
+    { muxI8.pin(1), {0x3E, Channel_1} },
+    { muxI8.pin(0), {0x3F, Channel_1} },
+};
 
 CCPotentiometer I9_POTS[] {
     { muxI9.pin(0), {0x40, Channel_1} },
@@ -175,14 +175,14 @@ CCPotentiometer I12_POTS[] {
 };
 
 FilteredAnalog<12,3,uint32_t> testAnalogInput[] {
-  { muxI12.pin(0)},
-  { muxI12.pin(1)},
-  { muxI12.pin(2)},
-  { muxI12.pin(3)},
-  { muxI12.pin(4)},
-  { muxI12.pin(5)},
-  { muxI12.pin(6)},
-  { muxI12.pin(7)}
+  { muxI8.pin(0)},
+  { muxI8.pin(1)},
+  { muxI8.pin(2)},
+  { muxI8.pin(3)},
+  { muxI8.pin(4)},
+  { muxI8.pin(5)},
+  { muxI8.pin(6)},
+  { muxI8.pin(7)}
 };
 
 //all potentiometers that don't send midi directly
