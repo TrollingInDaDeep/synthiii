@@ -76,7 +76,7 @@ CCPotentiometer I3_POTS[] {
     // { muxI3.pin(3), {0x13, Channel_1} },
     // { muxI3.pin(4), {0x14, Channel_1} }, //used internally
     // { muxI3.pin(5), {0x15, Channel_1} },
-    { muxI3.pin(6), {0x16, Channel_1} }
+    { muxI3.pin(6), {0x16, Channel_1} } //slide amount
     //{ muxI3.pin(7), {0x17, Channel_1} }, //unused
 };
 CCButton I4_BUTTONS[] {
@@ -86,7 +86,7 @@ CCButton I4_BUTTONS[] {
     // { muxI4.pin(3), {0x1B, Channel_1} }, //all used internally
     // { muxI4.pin(4), {0x1C, Channel_1} },
     // { muxI4.pin(5), {0x1D, Channel_1} },
-    { muxI4.pin(6), {0x1E, Channel_1} }
+    { muxI4.pin(6), {0x1E, Channel_1} } 
     //{ muxI4.pin(7), {0x1F, Channel_1} } //not connected
 };
 
@@ -124,17 +124,19 @@ CCButton I4_BUTTONS[] {
 //     { muxI7.pin(7), {0x37, Channel_1} },
 // };
 
-//all used internally
-// CCPotentiometer I8_POTS[] {
-//     { muxI8.pin(7), {0x38, Channel_1} },
-//     { muxI8.pin(6), {0x39, Channel_1} },
-//     { muxI8.pin(5), {0x3A, Channel_1} },
-//     { muxI8.pin(4), {0x3B, Channel_1} },
-//     { muxI8.pin(3), {0x3C, Channel_1} },
-//     { muxI8.pin(2), {0x3D, Channel_1} },
-//     { muxI8.pin(1), {0x3E, Channel_1} },
-//     { muxI8.pin(0), {0x3F, Channel_1} },
-// };
+//NoteButton functionality if enabled for seq trigger buttons
+// initialize with default value
+NoteButton SEQ_NoteButtons[] {
+    { muxI8.pin(7), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(6), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(5), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(4), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(3), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(2), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(1), {MIDI_Notes::C[4], Channel_1} },
+    { muxI8.pin(0), {MIDI_Notes::C[4], Channel_1} },
+};
+
 
 CCPotentiometer I9_POTS[] {
     { muxI9.pin(0), {0x40, Channel_1} },
@@ -344,9 +346,9 @@ FilteredAnalog<12,3,uint32_t> testAnalogInput[] {
 //all potentiometers that don't send midi directly
 //but are used for internal variables
 FilteredAnalog<12,3,uint32_t> internalAnalog[] {
-    { muxI3.pin(3)},
-    { muxI3.pin(4)},
-    { muxI3.pin(5)},
+    { muxI3.pin(3)}, //BPM
+    { muxI3.pin(4)}, //numsteps
+    { muxI3.pin(5)}, //GateTime
 };
 
 // IMPORTANT: insert in the order they will be used in the sequencer
@@ -495,31 +497,40 @@ void UpdateInternalVars(){
   for (int i = 0; i > Metropolis[0].maxStepCount; i++){
     switch (Metropolis[0].buttonFunction) {
       case 0: //Play
+
+
+          //only do when button not pressed, as this has unexpected consequences according to manual
+          if (seqButtons[i].getState() != Button::State::Pressed){
+            // set the Note of the button to the currently dialed
+            // note from the fader
+            SEQ_NoteButtons[i].setAddressUnsafe({seqSteps[i].note, Channel_1});
+          }
+          
           //only play notes when sequencer is not running, and not synced to ext clock
           if (Metropolis[0].run) {//&& !syncClockToExt
-            if (seqButtons[0].getState() == Button::State::Falling){
+            if (seqButtons[i].getState() == Button::State::Falling){
               //startnote or notebuttonpressed (seqSteps[i].note);
             }
-            if (seqButtons[0].getState() == Button::State::Rising){
+            if (seqButtons[i].getState() == Button::State::Rising){
               //stopnote or notebuttonreleased (seqSteps[i].note);
             }
           }
       break;
 
       case 1: //Skip
-        if (seqButtons[0].getState() == Button::State::Falling) {
+        if (seqButtons[i].getState() == Button::State::Falling) {
             seqSteps[i].skip = !seqSteps[i].skip;
           }
       break;
 
       case 2: //Slide
-      if (seqButtons[0].getState() == Button::State::Falling) {
+      if (seqButtons[i].getState() == Button::State::Falling) {
         seqSteps[i].slide= !seqSteps[i].slide;
       }
       break;
 
       case 3: //hold
-      if (seqButtons[0].getState() == Button::State::Falling) {
+      if (seqButtons[i].getState() == Button::State::Falling) {
         seqSteps[i].hold = !seqSteps[i].hold;
       }
       break;
@@ -537,15 +548,26 @@ analog_t mapGateTime(analog_t val) {  return map(val, 0, 4096, Metropolis[0].gat
 analog_t mapBpm(analog_t val) {  return map(val, 0, 4096, Metropolis[0].bpmMin, Metropolis[0].bpmMax);}
 ///maps the value of input pot val pulse
 analog_t mapPulse(analog_t val) {  return map(val, 0, 4096, Metropolis[0].minPulse, Metropolis[0].maxPulse);}
+///maps the value of input pot val number of steps
+analog_t mapNumSteps(analog_t val) {  return map(val, 0, 4096, 1, Metropolis[0].maxStepCount);}
+///maps the value of input pot val sliders
+analog_t mapSliderNotes(analog_t val) {  return map(val, 0, 4096, Metropolis[0].minSeqNote, Metropolis[0].maxSeqNote);}
 
 ///assigns correct pot Mappings to
 ///Analog inputs
 /// <input>.map(mappingfunction)
 /// available mapping functions see above
 void potMappings() {
+  internalAnalog[0].map(mapBpm);
+  internalAnalog[1].map(mapNumSteps);
+  internalAnalog[2].map(mapGateTime);
 
-  internalAnalog[6].map(mapGateMode);
-  
+  //mapping of all sequencer pots
+  for (int i = 0; i < Metropolis[0].maxStepCount; i++){
+    seqSliderPot[i].map(mapSliderNotes);
+    seqPulseCountPot[i].map(mapPulse);
+    seqGateModePot[i].map(mapGateMode);
+  }
 }
 
 void setup() {
