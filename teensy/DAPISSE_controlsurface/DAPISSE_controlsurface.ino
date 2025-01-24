@@ -75,7 +75,7 @@ CCPotentiometer I3_POTS[] {
     // { muxI3.pin(3), {0x13, Channel_1} },
     // { muxI3.pin(4), {0x14, Channel_1} }, //used internally
     // { muxI3.pin(5), {0x15, Channel_1} },
-    { muxI3.pin(6), {0x16, Channel_1} } //slide amount
+    //{ muxI3.pin(6), {0x16, Channel_1} } //slide amount
     //{ muxI3.pin(7), {0x17, Channel_1} }, //unused
 };
 CCButton I4_BUTTONS[] {
@@ -212,7 +212,7 @@ struct sequencer {
   int gateTime = 50; //time in ms how long the note should be on
   const int gateMin = 5; //minimum gate time in ms for pot selection
   const int gateMax = 1000; //maximum gate time in ms for pot selection
-  const int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
+  int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
   const int minSeqNote = 20; //minimal Midi Note of sequencer fader
   const int maxSeqNote = 80; //minimal Midi Note of sequencer fader
   const int minPulse = 1; //how many pulses at least for sequencer
@@ -236,6 +236,7 @@ struct sequencer {
   // 1=enable/disable skip step
   // 2=enable/disable slide step
   // 3=?? open for ideas: hold button=skip all others,play only this note | play between the two held buttons | arp mode
+  int synthMidiChannel = 1;
 };
 //constant values below
 const int maxSteps = 8; // Maximum number of Steps of your sequencer
@@ -358,6 +359,7 @@ FilteredAnalog<12,3,uint32_t> internalAnalog[] {
     { muxI3.pin(3)}, //BPM
     { muxI3.pin(4)}, //numsteps
     { muxI3.pin(5)}, //GateTime
+    { muxI3.pin(6)}, // Slide Amount
 };
 
 // IMPORTANT: insert in the order they will be used in the sequencer
@@ -513,7 +515,7 @@ void UpdateInternalVars(){
 
   Metropolis[0].numSteps = map(internalAnalog[1].getValue(),minAnalog,maxAnalog,1,Metropolis[0].maxStepCount);
   Metropolis[0].gateTime = map(internalAnalog[2].getValue(),minAnalog,maxAnalog,Metropolis[0].gateMin,Metropolis[0].gateMax);
-
+  Metropolis[0].slideAmount = map(internalAnalog[3].getValue(),minAnalog,maxAnalog,0,127);
   if (internalDigital[0].getState() == Button::State::Falling) {
     Metropolis[0].run = !Metropolis[0].run; // Toggle Start/Stop
 
@@ -669,6 +671,4 @@ void loop() {
   Serial.print(seqSteps[0].hold);
   Serial.print(" | ");
   Serial.println();
-
-  selectMuxOutPin(seqSteps[0].pulseCount);
 }

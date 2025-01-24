@@ -5,7 +5,6 @@
 //bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = external clock received
 //bool drumDivMultMode = false; // true = trigger drum steps, when "fill each n step" is activated
 bool syncClockToExt = false; //trigger next clock cycle if midi Clock is received (untested)
-int synthMidiChannel = 2;
 bool blnTapTempo = true; //1 = playMode button becomes tapTempo button 
 ///
 /// Variable definitions
