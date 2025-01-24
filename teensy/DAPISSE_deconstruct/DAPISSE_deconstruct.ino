@@ -4,7 +4,6 @@
 //bool syncSequencerToClock = 0; // 1 = next sequencer note triggered on ext clock signal | 0 = internal bpm used as step tempo
 //bool syncDrumToSequencer = 1; //1 = drum step triggered when sequencer steps | 0 = external clock received
 //bool drumDivMultMode = false; // true = trigger drum steps, when "fill each n step" is activated
-bool syncClockToExt = false; //trigger next clock cycle if midi Clock is received (untested)
 bool blnTapTempo = true; //1 = playMode button becomes tapTempo button 
 ///
 /// Variable definitions
@@ -304,43 +303,16 @@ bool arr_digital_input_type [numDigitalInMux][pinPerMux] {
 void nextDrumStep(void);
 int youFuckenKiddingMe(char);
 int youFuckenKiddingMeToo(char);
-void startNote(int);
-void stopNote(int);
-void selectSeqNoteFunction(void);
-void noteButtonPressed(int);
-void noteButtonReleased(int);
+
 void updateDrumModifier(int);
 void changeDrumPattern(bool);
 void recordKey(int, int);
 int getDrumNote(int);
 int getDrumIndex(int);
-int getCurrentTick(void);
-void resetClock(void);
+
 int getSubClockIndexByInstrument(int);
 
-// what happens when an external clock signal is received
-void handleClock() {
 
-  if (syncClockToExt) {
-    if (run){
-      nextPulse();
-    }
-  }
-
-  ///OBSOLETE
-  // //Drumstep: only when drum running and NOT synced to sequencer
-  // if (runDrum) {
-  //   if (!syncDrumToSequencer) {
-  //     nextDrumStep();
-  //   }
-  // }
-
-  // //SEQ step: only when synced to external clock
-  // if (syncSequencerToClock) {
-    
-  // }
-
-}
 // selects the pin on input multiplexer
 void selectMuxInPin(byte pin) {
 
@@ -509,28 +481,6 @@ void UpdateSendValues() {
             // break;
             // case 16:
 
-            // break;
-            case 17:
-              //Clock / BPM
-              //if (!syncSequencerToClock){
-              bpm = map(arr_read_analog_inputs[2][0],0,127,bpmMin,bpmMax);
-              //}
-            break;
-            case 18:
-              // number of steps the sequencer should play
-              numSteps = map(arr_read_analog_inputs[2][1],0,127,1,maxSteps);
-            break;
-            case 19:
-              //Gate length
-              gateTime = map(arr_read_analog_inputs[2][2],0,127,gateMin,gateMax);
-            break;
-            case 20:
-              //Slide Amount
-              slideAmount = arr_read_analog_inputs[2][3];
-            break;
-            // case 21:
-            // break;
-            // case 22:
 
             // break;
             // case 23:
@@ -547,14 +497,7 @@ void UpdateSendValues() {
             case 28:
             case 29:
             case 30:
-            case 31:
-            case 32:
-              //-25 so that 25 is 0, 26 is 1 etc...
-              caseNumber = arr_send_analog_inputs[mux][pin];
-              noteNumberAnalog = caseNumber-25;
-              arr_seq_buttons[0][noteNumberAnalog] = map(arr_read_analog_inputs[3][noteNumberAnalog],0,127,minSeqNote,maxSeqNote);
-            break;
-
+      
             // seq Pulse count, how many pulses per step
             case 33:
             case 34:
@@ -562,14 +505,7 @@ void UpdateSendValues() {
             case 36:
             case 37:
             case 38:
-            case 39:
-            case 40:
-              //-33 so that 33 is 0, 34 is 1 etc...
-              caseNumber = arr_send_analog_inputs[mux][pin];
-              noteNumberAnalog = caseNumber-33;
-              pulseCount[noteNumberAnalog] = map(arr_read_analog_inputs[4][noteNumberAnalog],0,127,minPulse,maxPulse);
-            break;
-          }
+       
         }
       }
     }   
@@ -601,48 +537,7 @@ void UpdateSendValues() {
                   Serial.println(bpm);
                 }
                 if (!blnTapTempo){
-
-                //Clear selected SeqButton function
-                if (arr_read_digital_inputs[0][3] && arr_changed_digital_inputs[0][3]){
-                  //except for 0=playMode
-                  if (seqButtonFunction!=0){
-                    for (int i = 0; i<pinPerMux; i++)
-                    {
-                      arr_seq_buttons[seqButtonFunction][i]=0;
-                    }
-                  }
-                }
-                
-              break;
-              case 45:
-                //SeqButton Function Selector0 (fuSel0)
-                if (arr_changed_digital_inputs[0][4]){
-                  fuSel0 = arr_read_digital_inputs[0][4];
-                  selectSeqNoteFunction();
-                }
-              break;
-              case 46:
-                //SeqButton Function Selector1 (fuSel1)
-                if (arr_changed_digital_inputs[0][5]){
-                  fuSel1 = arr_read_digital_inputs[0][5];
-                  selectSeqNoteFunction();
-                }
-              break;
-              case 47:
-                //disabled
-              break;
-              case 48:
-                //disabled
-              break;
-
-              //notebuttons
-              case 49:
-              case 50:
-              case 51:
-              case 52:
-              case 53:
-              case 54:
-              case 55:
+se 55:
               case 56:
                 caseNumber = arr_send_digital_inputs[mux][pin];
                 //-49, so 49 will be 0, 50 will be 1 etc...
@@ -659,13 +554,6 @@ void UpdateSendValues() {
 
 }
 
-void setup() {
- 
-
-  usbMIDI.setHandleClock(handleClock);
-
-  
-}
 
 void loop() {
   
@@ -676,27 +564,24 @@ void loop() {
   }
   //reading drumpad and updating clock after every function for lower latency
   readDrumpad();
-  updateClock();
+  
   
   drumPadMillis = millis();
   readAnalogPins();
   
 
   readDrumpad();
-  updateClock();
+  
   readDigitalPins();
   digitalReadMillis = millis();
   
   readDrumpad();
-  updateClock();
-  usbMIDI.read();
-
-  updateClock();
   
-  if (initialClockReset && currentMillis > initialClockResetTime){
-    initialClockReset = false;
-    resetClock();
-  }
+  
+
+  
+  
+
 
   ///OBSOLETE due to new clock
   //sequencer step trigger

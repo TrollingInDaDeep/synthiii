@@ -288,6 +288,7 @@ struct mainClock {
   bool initialClockReset = true; //used to reset clock at first occurrence, to sync everything
   int initialClockResetTime = 1000; // reset clock after n ms of running to sync everything
   int selectedSubClock = 0; // which subclock is currently selected (which drum note has been triggered last)
+  bool syncClockToExt = false; //trigger next clock cycle if midi Clock is received (untested)
 };
 //const values below
   const int numSubClocks = 5; //how many subClocks with individual mult/division
@@ -326,7 +327,7 @@ void setDefaultClockSettings(){
   subClocks[3].index = 3;
   subClocks[4].index = 4;
 
-  subClocks[0].ratio = 4;
+  subClocks[0].ratio = 3;
   subClocks[1].ratio = 1;
   subClocks[2].ratio = 1;
   subClocks[3].ratio = 8;
@@ -451,7 +452,7 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
   {5,6,12,11}, //output LOW
   {7,8,9,10}, //input pullup
   keypadNotes,
-  Channel_1
+  Channel_3
 };
 
 ///
@@ -460,7 +461,14 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
 
 //Function Prototypes
 void selectSeqNoteFunction(void);
-
+void startNote(int);
+void stopNote(int);
+void noteButtonPressed(int);
+void noteButtonReleased(int);
+int getCurrentTick(void);
+void resetClock(void);
+void resetSequencer(void);
+void stopLastNote(void);
 
 // selects the pin on output multiplexer (LEDs)
 void selectMuxOutPin(byte pin){
@@ -628,7 +636,29 @@ void UpdateInternalVars(){
 
 }
 
+// what happens when an external clock signal is received
+void handleClock() {
 
+  if (mainClocks[0].syncClockToExt) {
+    if (Metropolis[0].run){
+      nextPulse();
+    }
+  }
+
+  ///OBSOLETE
+  // //Drumstep: only when drum running and NOT synced to sequencer
+  // if (runDrum) {
+  //   if (!syncDrumToSequencer) {
+  //     nextDrumStep();
+  //   }
+  // }
+
+  // //SEQ step: only when synced to external clock
+  // if (syncSequencerToClock) {
+    
+  // }
+
+}
 
 
 void setup() {
@@ -647,17 +677,22 @@ void setup() {
     subClocks[i].delayBuffer = subClocks[i].delay;  // Store set delay to delay buffer
   }
   selectMuxOutPin(Metropolis[0].stepPointer);
+  usbMIDI.setHandleClock(handleClock);
 }
 
 void loop() {
   startLoopMillis = millis();
   Control_Surface.loop();
+  updateClock();
   readInternalInputs();
+  updateClock();
   analogReadMillis = millis();
 
   UpdateInternalVars();
   updateValueMillis = millis();
+  updateClock();
   selectSeqNoteFunction();
+  usbMIDI.read();
 
 
   if (Metropolis[0].reset) {
@@ -680,7 +715,7 @@ void loop() {
       }
     }
   }
-
+  updateClock();
 
   // for (int i = 0; i < 8; i++){
   //   Serial.print(seqButtons[i].getState());
@@ -689,10 +724,12 @@ void loop() {
   //    Serial.print(" | ");
 
   // }
-  if (seqButtons[0].getState() == Button::State::Falling){
-    nextPulse();
-  }
-  
+
+  updateClock();
+  if (mainClocks[0].initialClockReset && currentMillis > mainClocks[0].initialClockResetTime){
+    mainClocks[0].initialClockReset = false;
+    resetClock();
+}
   //debugVars();
 }
 
