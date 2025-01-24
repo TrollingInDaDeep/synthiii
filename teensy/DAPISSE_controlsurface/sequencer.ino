@@ -100,7 +100,23 @@ void nextPulse() {
     nextStep();
   }
   if (Metropolis[0].run) {
-    startNote(Metropolis[0].stepPointer); // start the note of this pulse
+    switch (seqSteps[Metropolis[0].stepPointer].gateMode){
+      case 0: //no gate
+        //nothing
+      break;
+      case 1: //first gate
+        Serial.println(Metropolis[0].pulsePointer);
+        if(Metropolis[0].pulsePointer == 0) {
+          
+          startNote(Metropolis[0].stepPointer); // start the note on first pulse
+        }
+      break;
+      case 2: //every gate
+        startNote(Metropolis[0].stepPointer); // start the note of this pulse
+      break;
+
+    }
+    
   }
   Metropolis[0].pulsePointer++;
 }
