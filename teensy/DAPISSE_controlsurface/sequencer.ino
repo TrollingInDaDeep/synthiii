@@ -65,29 +65,56 @@ void nextStep() {
 //buggy, not sure if needed
 void stopLastNote(){
   usbMIDI.sendNoteOff(Metropolis[0].lastNoteSent, Metropolis[0].velocity, Metropolis[0].synthMidiChannel);
-  subClocks[0][10] = 1; //select sequencer, set "stopSent" to true
+  subClocks[0].stopSent = 1; //select sequencer, set "stopSent" to true
 }
 
 void startNote(int noteToPlay){
   stopLastNote();
 
   //set slide back to 0
-  usbMIDI.sendControlChange(22, 0, Metropolis[0].synthMidiChannel); //20 is the slide ctrlr number
+  usbMIDI.sendControlChange(22, 0, Metropolis[0].synthMidiChannel); //22 is the slide ctrlr number
 
   //if slide for note enabled -> enable slide control
-  if (seqSteps[Metropolis[0].stepPointer].slide[noteToPlay]){
-      usbMIDI.sendControlChange(22, Metropolis[0].slideAmount, Metropolis[0].synthMidiChannel); //20 is the slide ctrlr number
+  if (seqSteps[noteToPlay].slide){
+      usbMIDI.sendControlChange(22, Metropolis[0].slideAmount, Metropolis[0].synthMidiChannel); //22 is the slide ctrlr number
   }
   //noteStart = millis();
 
-//WEITER HIER
-
   usbMIDI.sendNoteOn(seqSteps[noteToPlay].note, Metropolis[0].velocity, Metropolis[0].synthMidiChannel);
-  subClocks[0][10] = 0; //select sequencer, set "stopSent" to false
+  subClocks[0].stopSent = false; //select sequencer, set "stopSent" to false
   Metropolis[0].lastNoteSent=seqSteps[noteToPlay].note;
   digitalWrite(I7, HIGH);
 }
 
+void nextPulse() {
+  //go to next pulse
+  //pulseStart = millis();
+
+  //go first pulse, first step if last pulse is reached or reset is triggered (pulsePointer = -1)
+  if (Metropolis[0].pulsePointer >= seqSteps[Metropolis[0].stepPointer].pulseCount || Metropolis[0].pulsePointer < 0) {
+    Metropolis[0].pulsePointer = 0;
+    nextStep();
+  }
+  if (Metropolis[0].run) {
+    startNote(Metropolis[0].stepPointer); // start the note of this pulse
+  }
+  Metropolis[0].pulsePointer++;
+}
+
+void stopNote(int noteToStop){
+  usbMIDI.sendNoteOff(seqSteps[noteToStop].note, Metropolis[0].velocity, Metropolis[0].synthMidiChannel);
+  subClocks[0].stopSent = true; //select sequencer, set "stopSent" to true
+  //digitalWrite(I7, LOW);
+}
+
+
+// reset immediately and trigger the first pulse of the first step
+void resetSequencer() {
+  Metropolis[0].stepPointer = -1;
+  Metropolis[0].pulsePointer = -1;
+  nextPulse(); //experimental, might need to uncomment again
+  Metropolis[0].reset = false;
+}
 
 //sets the function of the Sequencer trigger buttons
 void selectSeqNoteFunction(){

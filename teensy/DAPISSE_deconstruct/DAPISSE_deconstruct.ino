@@ -15,16 +15,8 @@ int analogReadDiff = 0;
 int caseNumber = 0;
 int noteNumberDigiRead = 0;
 int noteNumberAnalog = 0;
-float currentMillis = 0;
 
-//for benchmark purposes
-int startLoopMillis = 0;
-int drumPadMillis = 0;
-int analogReadMillis = 0;
-int digitalReadMillis = 0;
-int updateValueMillis = 0;
-int seqNotesMillis = 0;
-int endLoopMillis = 0;
+
 
 // ############
 // Clock
@@ -668,33 +660,15 @@ void UpdateSendValues() {
 }
 
 void setup() {
-  pinMode(I1, INPUT);
-  pinMode(I2, INPUT);
-  pinMode(I3, INPUT);
-  pinMode(I4, INPUT_PULLUP);
-  pinMode(I5, INPUT);
-  pinMode(I6, INPUT);
-  pinMode(I7, OUTPUT);
-  pinMode(I8, INPUT_PULLUP);
-  pinMode(A, OUTPUT);
-  pinMode(B, OUTPUT);
-  pinMode(C, OUTPUT);
-  pinMode(Aout, OUTPUT);
-  pinMode(Bout, OUTPUT);
-  pinMode(Cout, OUTPUT);
-
+ 
 
   usbMIDI.setHandleClock(handleClock);
-  selectMuxOutPin(stepPointer);
-  digitalWrite(I7, HIGH);
 
-  for (int i = 0; i < numSubClocks; i++) {
-    subClocks[i][13] = subClocks[i][4];  // Store set delay to delay buffer
-  }
+  
 }
 
 void loop() {
-  startLoopMillis = millis();
+  
   slowReadCycleCount++;
   if (slowReadCycleCount > digitalSmoother) {
     isSlowReadCycle = 1;
@@ -706,7 +680,7 @@ void loop() {
   
   drumPadMillis = millis();
   readAnalogPins();
-  analogReadMillis = millis();
+  
 
   readDrumpad();
   updateClock();
@@ -717,16 +691,7 @@ void loop() {
   updateClock();
   usbMIDI.read();
 
-  UpdateSendValues();
-  updateValueMillis = millis();
-
-  if (reset){
-    resetSequencer();
-    resetClock();
-  }
-
   updateClock();
-  isSlowReadCycle = 0; //
   
   if (initialClockReset && currentMillis > initialClockResetTime){
     initialClockReset = false;
@@ -766,21 +731,7 @@ void loop() {
   //   }
     
     
-  //stop notes if necessary (in case clock is not running)
-  for (int i = 0; i < numSubClocks; i++){
-    if (subClocks[i][11] > (currentMillis + subClocks[i][7])) { //if gate time is over
-      if (subClocks[i][10] == 0) { //stop not sent
-        if (subClocks[i][6] > 10){ //sequencer instrument
-          stopLastNote(); 
-        }
-        else // drum instrument
-        {
-          stopDrumNote(instrumentNotes[1][int(subClocks[i][6])],(i-1)); //hacky, i-1 only currently is correct
-        }
-        
-      }
-    }
-  }
+  
   // }
 
   //benchmarking

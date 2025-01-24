@@ -203,6 +203,22 @@ CCPotentiometer I12_POTS[] {
 /// Variables
 ///
 
+// general Variables
+
+float currentMillis = 0; //buffers the measured millisecond timestamp at the start of the loop
+
+//for benchmark purposes
+int startLoopMillis = 0;
+int drumPadMillis = 0;
+int analogReadMillis = 0;
+int digitalReadMillis = 0;
+int updateValueMillis = 0;
+int seqNotesMillis = 0;
+int endLoopMillis = 0;
+
+
+//Struct variables
+
 // all general variables of the sequencer that are not bound to an input
 //const = global settings
 struct sequencer {
@@ -285,7 +301,7 @@ struct subClock {
   int tick = 0; //after how many ticks it should be triggered
   int delay = 0; //how many ticks it should be delayed (off-beat)
   int ticksLeft = 0; //how many ticks left until trigger (tick + delay). not happening? ->$decrease every tick and set back to tick+delay after triggered
-  int instrument = 10; //which instrument the clock is connected to (eg. seqencer, bassdrum, etc.)
+  int instrument = 10; //which instrument the clock is connected to (eg. seqencer, bassdrum, etc.) Higher than 10 is  sequencer instrument
   float gateTime = 75; //after how many ms the stop signal should be triggered
   bool run = 1; //1 = running, 0 = stopped
   bool isStart = 1; //1 = Note should be started, 0 = note should be stopped
@@ -615,19 +631,53 @@ void setup() {
   Serial.begin(9600);
   setDefaultClockSettings();
 
+  selectMuxOutPin(Metropolis[0].stepPointer);
+
   //setup the LED Pin and Multiplexer
   pinMode(I7, OUTPUT);
   digitalWrite(I7, HIGH);
   pinMode(Aout, OUTPUT);
   pinMode(Bout, OUTPUT);
   pinMode(Cout, OUTPUT);
+
+  for (int i = 0; i < numSubClocks; i++) {
+    subClocks[i].delayBuffer = subClocks[i].delay;  // Store set delay to delay buffer
+  }
+
 }
 
 void loop() {
+  startLoopMillis = millis();
   Control_Surface.loop();
   readInternalInputs();
+  analogReadMillis = millis();
+
   UpdateInternalVars();
+  updateValueMillis = millis();
   selectSeqNoteFunction();
+
+
+  if (Metropolis[0].reset) {
+    resetSequencer();
+    //resetClock();
+  }
+
+//stop notes if necessary (in case clock is not running)
+  for (int i = 0; i < numSubClocks; i++){
+    if (subClocks[i].startMS > (currentMillis + subClocks[i].gateTime)) { //if gate time is over
+      if (subClocks[i].stopSent == 0) { //stop not sent
+        if (subClocks[i].instrument >= 10){ //sequencer instrument
+          stopLastNote(); 
+        }
+        else // drum instrument
+        {
+          //stopDrumNote(instrumentNotes[1][int(subClocks[i][6])],(i-1)); //hacky, i-1 only currently is correct
+        }
+        
+      }
+    }
+  }
+
 
   // for (int i = 0; i < 8; i++){
   //   Serial.print(seqButtons[i].getState());
@@ -636,6 +686,9 @@ void loop() {
   //    Serial.print(" | ");
 
   // }
+  if (seqButtons[0].getState() == Button::State::Falling){
+    nextPulse();
+  }
   Serial.print(Metropolis[0].run);
   Serial.print(" | ");
   Serial.print(mainClocks[0].bpm);
