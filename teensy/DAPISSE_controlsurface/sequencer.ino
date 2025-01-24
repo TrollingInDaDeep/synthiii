@@ -11,7 +11,6 @@ void noteButtonReleased(int note){
 
 
 void nextStep() {
-  
   //Sequencer play order
   switch (Metropolis[0].playMode) {
     //0=forwards
@@ -59,7 +58,13 @@ void nextStep() {
   if (seqSteps[Metropolis[0].stepPointer].skip) {
     nextStep();
   }
-  selectMuxOutPin(byte(Metropolis[0].stepPointer));
+    Serial.print("Step ");
+    Serial.print(Metropolis[0].stepPointer);
+    Serial.print("| direction ");
+    Serial.print(Metropolis[0].seqDirection);
+  Serial.print("| sent to selector:");
+  Serial.println(Metropolis[0].stepPointer);
+  selectMuxOutPin(Metropolis[0].stepPointer);
 }
 
 //buggy, not sure if needed
@@ -89,7 +94,6 @@ void startNote(int noteToPlay){
 void nextPulse() {
   //go to next pulse
   //pulseStart = millis();
-
   //go first pulse, first step if last pulse is reached or reset is triggered (pulsePointer = -1)
   if (Metropolis[0].pulsePointer >= seqSteps[Metropolis[0].stepPointer].pulseCount || Metropolis[0].pulsePointer < 0) {
     Metropolis[0].pulsePointer = 0;

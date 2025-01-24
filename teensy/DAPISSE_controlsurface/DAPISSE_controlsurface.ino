@@ -239,7 +239,7 @@ struct sequencer {
   const int maxStepCount = 8; //How many steps the sequencer has
   int numSteps = maxStepCount; // how many steps should be done. Jumps back to first step after numSteps
   int seqDirection = 1; // Sequencer step direction. 1=up, 0=down
-  int pulsePointer = 0; //points to the pulse within the step we're currently in
+  int pulsePointer = 1; //points to the pulse within the step we're currently in
   int lastStepPointer = 0; //previous step, to trigger note off
   int lastNoteSent = 0; //previous note sent, to trigger note off on time
   int playMode = 0; // Sequencer play order. 0=forwards, 1=backwards, 2=ping-pong,3=drunk
@@ -464,13 +464,18 @@ void selectSeqNoteFunction(void);
 
 // selects the pin on output multiplexer (LEDs)
 void selectMuxOutPin(byte pin){
-  pin = Metropolis[0].maxStepCount-pin; //LEDs are backwards, so adressing them backwards
+  //make sure the value is not negative and not over 8
+  //pin = constrain(pin, 0, 8);
+  pin = map(pin, 0, 7, 7, 0); //invert value as LEDs are backwards
+  //pin = Metropolis[0].maxStepCount-pin; //LEDs are backwards, so adressing them backwards
+  Serial.print("calculated ");
+  Serial.println(pin);
   bool valA = bitRead(pin, 0);
   bool valB = bitRead(pin, 1);
   bool valC = bitRead(pin, 2);
-  Serial.print(valA);
-  Serial.print(valB);
-  Serial.println(valC);
+  // Serial.print(valA);
+  // Serial.print(valB);
+  // Serial.println(valC);
   digitalWrite(Aout, valA);
   digitalWrite(Bout, valB);
   digitalWrite(Cout, valC);
@@ -631,8 +636,6 @@ void setup() {
   Serial.begin(9600);
   setDefaultClockSettings();
 
-  selectMuxOutPin(Metropolis[0].stepPointer);
-
   //setup the LED Pin and Multiplexer
   pinMode(I7, OUTPUT);
   digitalWrite(I7, HIGH);
@@ -643,7 +646,7 @@ void setup() {
   for (int i = 0; i < numSubClocks; i++) {
     subClocks[i].delayBuffer = subClocks[i].delay;  // Store set delay to delay buffer
   }
-
+  selectMuxOutPin(Metropolis[0].stepPointer);
 }
 
 void loop() {
@@ -689,6 +692,11 @@ void loop() {
   if (seqButtons[0].getState() == Button::State::Falling){
     nextPulse();
   }
+  
+  //debugVars();
+}
+
+void debugVars(){
   Serial.print(Metropolis[0].run);
   Serial.print(" | ");
   Serial.print(mainClocks[0].bpm);
