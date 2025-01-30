@@ -110,9 +110,9 @@ void nextClockCycle() {
     }
   }
   //Serial.print("clock @");
-  //Serial.println(currentTick);
+  Serial.println("clock");
   usbMIDI.sendClock();
-  // Serial.println(millis());
+
 }
 
 

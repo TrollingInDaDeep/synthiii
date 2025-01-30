@@ -70,13 +70,13 @@ CCPotentiometer I2_POTS[] {
 CCPotentiometer I3_POTS[] {
     //{ muxI3.pin(0), {0x10, Channel_1} },
     //{ muxI3.pin(1), {0x11, Channel_1} },//unused
-    //{ muxI3.pin(2), {0x12, Channel_1} },
 
-    // { muxI3.pin(3), {0x13, Channel_1} },
-    // { muxI3.pin(4), {0x14, Channel_1} }, //used internally
-    // { muxI3.pin(5), {0x15, Channel_1} },
-    //{ muxI3.pin(6), {0x16, Channel_1} } //slide amount
-    //{ muxI3.pin(7), {0x17, Channel_1} }, //unused
+    //{ muxI3.pin(2), {0x12, Channel_1} },
+    // { muxI3.pin(3), {0x13, Channel_1} }, //used internally
+    // { muxI3.pin(4), {0x14, Channel_1} }, 
+    // { muxI3.pin(5), {0x15, Channel_1} }, //slide amount
+    //{ muxI3.pin(6), {0x16, Channel_1} }, //minNote
+    //{ muxI3.pin(7), {0x17, Channel_1} },  //maxNote
 };
 CCButton I4_BUTTONS[] {
     // { muxI4.pin(0), {0x18, Channel_1} },
@@ -139,7 +139,6 @@ CCButton SEQ_NoteButtons[] {
     //{ muxI8.pin(1), {MIDI_Notes::C[4], Channel_1} },
     { muxI8.pin(0), {127, Channel_14} },
 };
-
 
 CCPotentiometer I9_POTS[] {
     { muxI9.pin(0), {0x40, Channel_1} },
@@ -229,8 +228,9 @@ struct sequencer {
   const int gateMin = 5; //minimum gate time in ms for pot selection
   const int gateMax = 1000; //maximum gate time in ms for pot selection
   int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
-  const int minSeqNote = 20; //minimal Midi Note of sequencer fader
-  const int maxSeqNote = 80; //minimal Midi Note of sequencer fader
+  int noteRange = 60; //range of notes the sequencer goes up from the min note. bound to pot
+  int minSeqNote = 20; //minimal Midi Note of sequencer fader, bound to pot
+  int maxSeqNote = minSeqNote + noteRange; //maximum sequencer note. minimum note + range
   const int minPulse = 1; //how many pulses at least for sequencer
   const int maxPulse = 8; //how many pulses at max for sequencer
   const int maxGateMode = 2; //How Many gate Modes there are (0-indexed)
@@ -373,10 +373,12 @@ void setDefaultClockSettings(){
 //all potentiometers that don't send midi directly
 //but are used for internal variables
 FilteredAnalog<12,3,uint32_t> internalAnalog[] {
-    { muxI3.pin(3)}, //BPM
-    { muxI3.pin(4)}, //numsteps
-    { muxI3.pin(5)}, //GateTime
-    { muxI3.pin(6)}, // Slide Amount
+    { muxI3.pin(2)}, //BPM
+    { muxI3.pin(3)}, //numsteps
+    { muxI3.pin(4)}, //GateTime
+    { muxI3.pin(5)}, // Slide Amount
+    { muxI3.pin(6)}, // Max Note
+    { muxI3.pin(7)} // Min Note
 };
 
 // IMPORTANT: insert in the order they will be used in the sequencer
@@ -545,6 +547,23 @@ void UpdateInternalVars(){
   Metropolis[0].numSteps = map(internalAnalog[1].getValue(),minAnalog,maxAnalog,1,Metropolis[0].maxStepCount);
   Metropolis[0].gateTime = map(internalAnalog[2].getValue(),minAnalog,maxAnalog,Metropolis[0].gateMin,Metropolis[0].gateMax);
   Metropolis[0].slideAmount = map(internalAnalog[3].getValue(),minAnalog,maxAnalog,0,127);
+
+  //set the note range of the sequencer
+  //define 
+  Metropolis[0].minSeqNote = map(internalAnalog[5].getValue(),minAnalog,maxAnalog,0,127); //minimum note highest -8
+  Metropolis[0].noteRange = map(internalAnalog[4].getValue(),minAnalog,maxAnalog,0,127); //maximum note lowest +8
+  
+  //calculate max Sequencer note
+  Metropolis[0].maxSeqNote = Metropolis[0].minSeqNote + Metropolis[0].noteRange;
+
+  //restrict the max. note to 127, maximum midi note
+  if (Metropolis[0].maxSeqNote > 127) {
+    Metropolis[0].maxSeqNote = 127;
+  }
+  // Serial.print(Metropolis[0].minSeqNote);
+  // Serial.print("->");
+  // Serial.println(Metropolis[0].maxSeqNote);
+  
   if (internalDigital[0].getState() == Button::State::Falling) {
     Metropolis[0].run = !Metropolis[0].run; // Toggle Start/Stop
 
