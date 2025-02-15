@@ -288,7 +288,10 @@ struct mainClock {
   bool initialClockReset = true; //used to reset clock at first occurrence, to sync everything
   int initialClockResetTime = 1000; // reset clock after n ms of running to sync everything
   int selectedSubClock = 0; // which subclock is currently selected (which drum note has been triggered last)
-  bool syncClockToExt = false; //trigger next clock cycle if midi Clock is received (untested)
+  bool reactToExtClock = false; //trigger next clock cycle if midi Clock is received (untested)
+  bool clockSource = false; //true = external clock is currently used, false = internal clock is currently used
+  float lastExtClockTick = 0; //timestamp when last external clock was received
+  float extClockTimeout = 4000; //how many ms to wait until we switch from external to internal clock
 };
 //const values below
   const int numSubClocks = 5; //how many subClocks with individual mult/division
@@ -304,7 +307,7 @@ struct subClock {
   int ticksLeft = 0; //how many ticks left until trigger (tick + delay). not happening? ->$decrease every tick and set back to tick+delay after triggered
   int instrument = 10; //which instrument the clock is connected to (eg. seqencer, bassdrum, etc.) Higher than 10 is  sequencer instrument
   float gateTime = 75; //after how many ms the stop signal should be triggered
-  bool run = 1; //1 = running, 0 = stopped
+  bool run = true; //1 = running, 0 = stopped
   bool isStart = 1; //1 = Note should be started, 0 = note should be stopped
   bool stopSent = 1; //1 = stop has been sent for a note already, 0 = stop not sent yet (otherwise it would spam stop always)
   float startMS = 0; //Millisecond timestamp when Note start was sent
@@ -327,7 +330,7 @@ void setDefaultClockSettings(){
   subClocks[3].index = 3;
   subClocks[4].index = 4;
 
-  subClocks[0].ratio = 3;
+  subClocks[0].ratio = 4;
   subClocks[1].ratio = 1;
   subClocks[2].ratio = 1;
   subClocks[3].ratio = 8;
@@ -478,8 +481,8 @@ void selectMuxOutPin(byte pin){
   //pin = constrain(pin, 0, 8);
   pin = map(pin, 0, 7, 7, 0); //invert value as LEDs are backwards
   //pin = Metropolis[0].maxStepCount-pin; //LEDs are backwards, so adressing them backwards
-  Serial.print("calculated ");
-  Serial.println(pin);
+  // Serial.print("calculated ");
+  // Serial.println(pin);
   bool valA = bitRead(pin, 0);
   bool valB = bitRead(pin, 1);
   bool valC = bitRead(pin, 2);
@@ -533,16 +536,21 @@ void UpdateInternalVars(){
 
   //Metropolis[0];
 
-   //update bpm only if it changed
-  if (mainClocks[0].bpm != map(internalAnalog[0].getValue(),minAnalog,maxAnalog,Metropolis[0].bpmMin,Metropolis[0].bpmMax)){
+  //update bpm only if no external clock is receiced
+  if (mainClocks[0].clockSource == false){
+
+    //update bpm only if it changed
+    if (mainClocks[0].bpm != map(internalAnalog[0].getValue(),minAnalog,maxAnalog,Metropolis[0].bpmMin,Metropolis[0].bpmMax)){
     mainClocks[0].bpm = map(internalAnalog[0].getValue(),minAnalog,maxAnalog,Metropolis[0].bpmMin,Metropolis[0].bpmMax);
     mainClocks[0].bpmChanged = true;
-    //Serial.print("BPM: ");
-    //Serial.println(mainClocks[0].bpm);
+    // Serial.print("BPM: ");
+    // Serial.println(mainClocks[0].bpm);
+    }
+    else {
+      mainClocks[0].bpmChanged = false;
+    }
   }
-  else {
-    mainClocks[0].bpmChanged = false;
-  }
+  
 
   Metropolis[0].numSteps = map(internalAnalog[1].getValue(),minAnalog,maxAnalog,1,Metropolis[0].maxStepCount);
   Metropolis[0].gateTime = map(internalAnalog[2].getValue(),minAnalog,maxAnalog,Metropolis[0].gateMin,Metropolis[0].gateMax);
@@ -658,13 +666,16 @@ void UpdateInternalVars(){
 // what happens when an external clock signal is received
 void handleClock() {
 
-  if (mainClocks[0].syncClockToExt) {
-    if (Metropolis[0].run){
-      nextPulse();
-    }
-  }
+  // if (mainClocks[0].reactToExtClock) {
+  //   mainClocks[0].lastExtClockTick = currentMillis;
+  //   Serial.println("external clock");
 
-  ///OBSOLETE
+  //   if (Metropolis[0].run){
+  //     nextPulse();
+  //   }
+  // }
+
+    ///OBSOLETE
   // //Drumstep: only when drum running and NOT synced to sequencer
   // if (runDrum) {
   //   if (!syncDrumToSequencer) {
@@ -676,12 +687,13 @@ void handleClock() {
   // if (syncSequencerToClock) {
     
   // }
-
+  usbMIDI.sendClock();
+  //Serial.println("p");
 }
-
 
 void setup() {
   Control_Surface.begin();
+  midi.begin();
   Serial.begin(9600);
   setDefaultClockSettings();
 
@@ -700,18 +712,21 @@ void setup() {
 }
 
 void loop() {
+  anythingAnytimeAllAtOnce();
   startLoopMillis = millis();
   Control_Surface.loop();
-  updateClock();
+  midi.update();
+  anythingAnytimeAllAtOnce();
   readInternalInputs();
-  updateClock();
+  anythingAnytimeAllAtOnce();
   analogReadMillis = millis();
 
   UpdateInternalVars();
+  anythingAnytimeAllAtOnce();
   updateValueMillis = millis();
-  updateClock();
+  
   selectSeqNoteFunction();
-  usbMIDI.read();
+  anythingAnytimeAllAtOnce();
 
 
   if (Metropolis[0].reset) {
@@ -734,8 +749,7 @@ void loop() {
       }
     }
   }
-  updateClock();
-
+  anythingAnytimeAllAtOnce();
   // for (int i = 0; i < 8; i++){
   //   Serial.print(seqButtons[i].getState());
   //   // Serial.print("->");
@@ -744,14 +758,29 @@ void loop() {
 
   // }
 
-  updateClock();
+  anythingAnytimeAllAtOnce();
+
   if (mainClocks[0].initialClockReset && currentMillis > mainClocks[0].initialClockResetTime){
     mainClocks[0].initialClockReset = false;
     resetClock();
-}
+  }
+
+  //set clock source to internal when timeout is reached
+  // if (currentMillis - mainClocks[0].lastExtClockTick > mainClocks[0].extClockTimeout)
+  // {
+  //   mainClocks[0].clockSource = false;
+  //   Serial.print(currentMillis - mainClocks[0].lastExtClockTick);
+  //   Serial.println(" switch to internal clock");
+
+  // }
   //debugVars();
 }
 
+//calls all actions that need to be called frequently
+void anythingAnytimeAllAtOnce(){
+  updateClock();
+  usbMIDI.read();
+}
 void debugVars(){
   Serial.print(Metropolis[0].run);
   Serial.print(" | ");

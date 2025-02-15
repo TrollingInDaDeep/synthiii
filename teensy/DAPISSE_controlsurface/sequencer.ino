@@ -58,12 +58,12 @@ void nextStep() {
   if (seqSteps[Metropolis[0].stepPointer].skip) {
     nextStep();
   }
-    Serial.print("Step ");
-    Serial.print(Metropolis[0].stepPointer);
-    Serial.print("| direction ");
-    Serial.print(Metropolis[0].seqDirection);
-  Serial.print("| sent to selector:");
-  Serial.println(Metropolis[0].stepPointer);
+  //   Serial.print("Step ");
+  //   Serial.print(Metropolis[0].stepPointer);
+  //   Serial.print("| direction ");
+  //   Serial.print(Metropolis[0].seqDirection);
+  // Serial.print("| sent to selector:");
+  // Serial.println(Metropolis[0].stepPointer);
   selectMuxOutPin(Metropolis[0].stepPointer);
 }
 

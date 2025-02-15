@@ -111,7 +111,11 @@ void nextClockCycle() {
   }
   //Serial.print("clock @");
   Serial.println("clock");
-  usbMIDI.sendClock();
+  //send midi clock via usb only if internal clock is used??
+  if (mainClocks[0].clockSource == false){
+    usbMIDI.sendClock();
+  }
+  
 
 }
 
