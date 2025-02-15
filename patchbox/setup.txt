@@ -33,3 +33,5 @@ dann jeweils für jedes drum instrument
 channel filter (1) -> transpose -> Drum synth
 channel filter (2) -> transpose -> highHat synth
 channel filter (3) -> transpose -> snare synth
+
+Pedalboards in /var/modep/pedalboards
