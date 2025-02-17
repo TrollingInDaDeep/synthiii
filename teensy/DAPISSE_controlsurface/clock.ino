@@ -16,9 +16,10 @@
 // check if any action to do (tick or subtick)
 // update subticks
 void updateClock() {
-  if (Metropolis[0].run){
-    currentMillis = millis();
-    mainClocks[0].timeSinceLastTick = currentMillis - mainClocks[0].lastTickTime;
+  //only if running and internal clock source selected
+  if (Metropolis[0].run && mainClocks[0].clockSource == false){
+    currentMicros = micros();
+    mainClocks[0].timeSinceLastTick = currentMicros - mainClocks[0].lastTickTime;
     mainClocks[0].missedTicks = mainClocks[0].timeSinceLastTick / mainClocks[0].tickMS; // how many ticks missed since last read
     
     if (mainClocks[0].missedTicks > 0) {
@@ -34,10 +35,10 @@ void updateClock() {
       }
       
       //update based on how many ticks have been processed
-      mainClocks[0].lastTickTime = currentMillis - fmod(mainClocks[0].timeSinceLastTick, mainClocks[0].tickMS);
+      mainClocks[0].lastTickTime = currentMicros - fmod(mainClocks[0].timeSinceLastTick, mainClocks[0].tickMS);
     }
  
-    mainClocks[0].elapsedTime = currentMillis - mainClocks[0].clockStart;
+    mainClocks[0].elapsedTime = currentMicros - mainClocks[0].clockStart;
 
     // suggested by ChatGPT to update this more frequently
     mainClocks[0].tickMS = mainClocks[0].tempo / mainClocks[0].subTicks;
@@ -47,7 +48,7 @@ void updateClock() {
     updateClockTempo();
 
     for (int i = 0; i < numSubClocks; i++){
-      if (currentMillis - subClocks[i].startMS >= subClocks[i].gateTime && subClocks[i].stopSent == 0) { //if gate time is over and stop not yet sent
+      if (currentMicros - subClocks[i].startMS >= subClocks[i].gateTime && subClocks[i].stopSent == 0) { //if gate time is over and stop not yet sent
           subClocks[i].isStart = 0; //set note to STOP mode
           clockHandler(i); // should stop the Note
           subClocks[i].stopSent = 1;
@@ -62,7 +63,7 @@ void updateClock() {
 int getCurrentTick() {
   int counter = 1;
   for (int leftTicks = 1; leftTicks <= mainClocks[0].subTicks; leftTicks++) {
-    if (((currentMillis - mainClocks[0].clockStart)-(leftTicks * mainClocks[0].tickMS)) > 0){
+    if (((currentMicros - mainClocks[0].clockStart)-(leftTicks * mainClocks[0].tickMS)) > 0){
       counter++;
     }
   }
@@ -95,7 +96,7 @@ void nextTick() {
 //run actions needed for next Clock Cycle (beat)
 void nextClockCycle() {
   mainClocks[0].prevClockStart = mainClocks[0].clockStart;
-  mainClocks[0].clockStart = currentMillis;
+  mainClocks[0].clockStart = currentMicros;
   mainClocks[0].currentTick = 0;
   mainClocks[0].lastTick = 0; //that's the solution++ otherwise it will drift!!!!!
 
@@ -176,7 +177,7 @@ void clockHandler (int subClockID) {
           //Serial.println(currentTick);
           
           subClocks[subClockID].stopSent = 0; //tell that stop hasn't been sent yet
-          subClocks[subClockID].startMS = currentMillis;
+          subClocks[subClockID].startMS = currentMicros;
         }
         else { // note Stop
           //Serial.println("noteStopMode");
@@ -198,11 +199,11 @@ void resetClock() {
   mainClocks[0].tickMS = mainClocks[0].tempo/mainClocks[0].subTicks;
   mainClocks[0].currentTick = 0;
   mainClocks[0].lastTick = 0;
-  mainClocks[0].lastTickTime = millis();
+  mainClocks[0].lastTickTime = micros();
   mainClocks[0].clockStart = 0;
   mainClocks[0].prevClockStart = 0;
   mainClocks[0].elapsedTime = 0;
-  currentMillis = millis();
+  currentMicros = micros();
   
   //reset drum steps
   //drumStepPointer = 0; #

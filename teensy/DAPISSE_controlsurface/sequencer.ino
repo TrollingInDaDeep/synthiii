@@ -83,7 +83,7 @@ void startNote(int noteToPlay){
   if (seqSteps[noteToPlay].slide){
       usbMIDI.sendControlChange(22, Metropolis[0].slideAmount, Metropolis[0].synthMidiChannel); //22 is the slide ctrlr number
   }
-  //noteStart = millis();
+  //noteStart = micros();
 
   usbMIDI.sendNoteOn(seqSteps[noteToPlay].note, Metropolis[0].velocity, Metropolis[0].synthMidiChannel);
   subClocks[0].stopSent = false; //select sequencer, set "stopSent" to false
@@ -93,7 +93,7 @@ void startNote(int noteToPlay){
 
 void nextPulse() {
   //go to next pulse
-  //pulseStart = millis();
+  //pulseStart = micros();
   //go first pulse, first step if last pulse is reached or reset is triggered (pulsePointer = -1)
   if (Metropolis[0].pulsePointer >= seqSteps[Metropolis[0].stepPointer].pulseCount || Metropolis[0].pulsePointer < 0) {
     Metropolis[0].pulsePointer = 0;
@@ -105,7 +105,7 @@ void nextPulse() {
         //nothing
       break;
       case 1: //first gate
-        Serial.println(Metropolis[0].pulsePointer);
+        //Serial.println(Metropolis[0].pulsePointer);
         if(Metropolis[0].pulsePointer == 0) {
           
           startNote(Metropolis[0].stepPointer); // start the note on first pulse
