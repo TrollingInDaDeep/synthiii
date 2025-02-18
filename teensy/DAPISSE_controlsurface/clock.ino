@@ -16,9 +16,9 @@
 // check if any action to do (tick or subtick)
 // update subticks
 void updateClock() {
+  currentMicros = micros();
   //only if running and internal clock source selected
-  if (Metropolis[0].run && mainClocks[0].clockSource == false){
-    currentMicros = micros();
+  if (mainClocks[0].run && mainClocks[0].clockSource == false){
     mainClocks[0].timeSinceLastTick = currentMicros - mainClocks[0].lastTickTime;
     mainClocks[0].missedTicks = mainClocks[0].timeSinceLastTick / mainClocks[0].tickMS; // how many ticks missed since last read
     
@@ -31,7 +31,7 @@ void updateClock() {
           nextClockCycle();
         }
         nextTick();
-     
+      
       }
       
       //update based on how many ticks have been processed
@@ -48,7 +48,7 @@ void updateClock() {
     updateClockTempo();
 
     for (int i = 0; i < numSubClocks; i++){
-      if (currentMicros - subClocks[i].startMS >= subClocks[i].gateTime && subClocks[i].stopSent == 0) { //if gate time is over and stop not yet sent
+      if ((currentMicros - subClocks[i].startMS) / 1000  >= subClocks[i].gateTime && subClocks[i].stopSent == 0) { //if gate time is over and stop not yet sent
           subClocks[i].isStart = 0; //set note to STOP mode
           clockHandler(i); // should stop the Note
           subClocks[i].stopSent = 1;
@@ -114,7 +114,8 @@ void nextClockCycle() {
   Serial.println("clock");
   //send midi clock via usb only if internal clock is used??
   if (mainClocks[0].clockSource == false){
-    usbMIDI.sendClock();
+    //dont send at every pulse, as korg needs only every 6th. handled via instrument
+    //usbMIDI.sendClock();
   }
   
 
@@ -144,7 +145,7 @@ void updateClockTempo() {
 
   if (mainClocks[0].oldBPM != mainClocks[0].bpm){ //only update if bpm changed
     mainClocks[0].oldBPM = mainClocks[0].bpm;
-    mainClocks[0].tempo = 1000.0/(mainClocks[0].bpm/60.0);
+    mainClocks[0].tempo = 1000000.0/(mainClocks[0].bpm/60.0);
     mainClocks[0].tickMS = mainClocks[0].tempo/mainClocks[0].subTicks;
 
     for (int i = 0; i < numSubClocks; i++)
@@ -187,6 +188,11 @@ void clockHandler (int subClockID) {
           subClocks[subClockID].isStart = 1; //set note to START mode
         }
       }
+    break;
+
+    case 5: //Korg volca Midi clock
+      usbMIDI.sendClock();
+      Serial.println("volca");
     break;
   
   }

@@ -1,7 +1,4 @@
 #include <Control_Surface.h>
-#include <Arduino_Helpers.h>
-#include <AH/Hardware/ExtendedInputOutput/AnalogMultiplex.hpp>
-#include <AH/Hardware/FilteredAnalog.hpp>
 
 // Instantiate a MIDI Interface to use
 USBMIDI_Interface midi;
@@ -228,9 +225,9 @@ struct sequencer {
   const uint8_t velocity = 127; // standard velocity for notes
   const long bpmMin=20.0; //minimum BPM value (for mapping)
   const long bpmMax=800.0; //maximum BPM value (for mapping)
-  int gateTime = 50; //time in ms how long the note should be on
-  const int gateMin = 5; //minimum gate time in ms for pot selection
-  const int gateMax = 1000; //maximum gate time in ms for pot selection
+  int gateTime = 50; //time in milliseconds how long the note should be on
+  const int gateMin = 5; //minimum gate time in milliseconds for pot selection
+  const int gateMax = 1000; //maximum gate time in milliseconds for pot selection
   int slideAmount = 0; //how much note slide if enabled MidiCC value from 0-127
   int noteRange = 60; //range of notes the sequencer goes up from the min note. bound to pot
   int minSeqNote = 20; //minimal Midi Note of sequencer fader, bound to pot
@@ -275,10 +272,11 @@ struct seqStep {
 
 //all variables for the main clock
 struct mainClock {
+  bool run = false;
   int bpm = 60.0;
   int oldBPM = 0; //store last bpm to see if we actually had a bpm change
   bool bpmChanged = false; //set true if bpm changed, hence update tempo
-  float tempo = 1000.0/(bpm/60.0); //bpm in microseconds
+  float tempo = 1000000.0/(bpm/60.0); //bpm in microseconds
   const int subTicks = 24; //in how many ticks one beat shall be divided
   float tickMS = tempo/subTicks; //how long a tick is in ms
   int currentTick = 0; // which tick we're currently at (pointer)
@@ -292,16 +290,17 @@ struct mainClock {
   bool initialClockReset = true; //used to reset clock at first occurrence, to sync everything
   int initialClockResetTime = 1000; // reset clock after n ms of running to sync everything
   int selectedSubClock = 0; // which subclock is currently selected (which drum note has been triggered last)
-  bool reactToExtClock = true; //trigger next clock cycle if midi Clock is received (untested)
-  bool clockSource = true; //true = external clock is currently used, false = internal clock is currently used
+  bool reactToExtClock = false; //trigger next clock cycle if midi Clock is received (untested)
+  bool clockSource = false; //true = external clock is currently used, false = internal clock is currently used
   float lastExtClockTick = 0; //timestamp when last external clock was received
   int avgExtClockInterval = 0; //average interval of ext. clocks received. to continue if some are missed
   int extTicksPerBeat = 6; //how many ticks per bpm.
   int extTicksCounter = 0; //number of ticks received externally within this beat
   float extClockTimeout = 4000; //how many ms to wait until we switch from external to internal clock
+  int extClockMissedCounter = 0; //counts missed clock cycles
 };
 //const values below
-  const int numSubClocks = 5; //how many subClocks with individual mult/division
+  const int numSubClocks = 6; //how many subClocks with individual mult/division
 
 //all variables that every subclock has
 struct subClock {
@@ -312,7 +311,7 @@ struct subClock {
   int delay = 0; //how many ticks it should be delayed (off-beat)
   int ticksLeft = 0; //how many ticks left until trigger (tick + delay). not happening? ->$decrease every tick and set back to tick+delay after triggered
   int instrument = 10; //which instrument the clock is connected to (eg. seqencer, bassdrum, etc.) Higher than 10 is  sequencer instrument
-  float gateTime = 75; //after how many ms the stop signal should be triggered
+  float gateTime = 75; //after how many milliseconds the stop signal should be triggered
   bool run = true; //1 = running, 0 = stopped
   bool isStart = 1; //1 = Note should be started, 0 = note should be stopped
   bool stopSent = 1; //1 = stop has been sent for a note already, 0 = stop not sent yet (otherwise it would spam stop always)
@@ -320,6 +319,7 @@ struct subClock {
   float tickCounter = 0; //how many ticks have passed for subclock: increase every tick
   int delayBuffer = 0; //store actual delay value to restore when delay has been set to 0
 };
+
 
 sequencer Metropolis[1]; //initializes a struct with the sequencer variables
 seqStep seqSteps[maxSteps]; //initializes a struct with the variables for each step. length defined by maxSteps of Sequencer
@@ -330,41 +330,47 @@ subClock subClocks[numSubClocks]; //initialize subClocks based on number in main
 void setDefaultClockSettings(){
 
   //Default subClock Settings
-  subClocks[0].index = 0;
+  subClocks[0].index = 0; //sequencer
   subClocks[1].index = 1;
   subClocks[2].index = 2;
   subClocks[3].index = 3;
   subClocks[4].index = 4;
+  subClocks[5].index = 5; //slow clock for korg volca
 
   subClocks[0].ratio = 4;
   subClocks[1].ratio = 1;
   subClocks[2].ratio = 1;
   subClocks[3].ratio = 8;
   subClocks[4].ratio = 2;
+  subClocks[5].ratio = 24;
 
   subClocks[0].divMult = 1;
   subClocks[1].divMult = 0;
   subClocks[2].divMult = 0;
   subClocks[3].divMult = 1;
   subClocks[4].divMult = 0;
+  subClocks[5].divMult = 1;
 
   subClocks[0].instrument = 10;
   subClocks[1].instrument = 0;
   subClocks[2].instrument = 1;
   subClocks[3].instrument = 2;
   subClocks[4].instrument = 3;
+  subClocks[5].instrument = 4;
 
   subClocks[0].gateTime = 75;
   subClocks[1].gateTime = 2;
   subClocks[2].gateTime = 2;
   subClocks[3].gateTime = 2;
   subClocks[4].gateTime = 2;
+  subClocks[5].gateTime = 2;
 
   subClocks[0].run = 1;
   subClocks[1].run = 0;
   subClocks[2].run = 0;
   subClocks[3].run = 0;
   subClocks[4].run = 0;
+  subClocks[5].run = 1;
 }
 
 
@@ -559,7 +565,11 @@ void UpdateInternalVars(){
   
 
   Metropolis[0].numSteps = map(internalAnalog[1].getValue(),minAnalog,maxAnalog,1,Metropolis[0].maxStepCount);
+  
+  //set gatetime for sequencer and for subclock
   Metropolis[0].gateTime = map(internalAnalog[2].getValue(),minAnalog,maxAnalog,Metropolis[0].gateMin,Metropolis[0].gateMax);
+  subClocks[0].gateTime = map(internalAnalog[2].getValue(),minAnalog,maxAnalog,Metropolis[0].gateMin,Metropolis[0].gateMax);
+  
   Metropolis[0].slideAmount = map(internalAnalog[3].getValue(),minAnalog,maxAnalog,0,127);
 
   //set the note range of the sequencer
@@ -580,14 +590,18 @@ void UpdateInternalVars(){
   
   if (internalDigital[0].getState() == Button::State::Falling) {
     Metropolis[0].run = !Metropolis[0].run; // Toggle Start/Stop
+    mainClocks[0].run = !mainClocks[0].run; //toggle clock run
 
     if (Metropolis[0].run){
-      // Serial.println("play");
+      // Serial.println("play")
       //resetClock(); #
+      usbMIDI.sendStart();
     } else {
       // Serial.println("pause"); #
-      //stopLastNote(); #
-      //stopNote(stepPointer); #
+      stopLastNote();
+      stopNote(Metropolis[0].stepPointer);
+      stopAllNotes();
+      usbMIDI.sendStop();
     }
   }
   if (internalDigital[1].getState() == Button::State::Falling){
@@ -671,76 +685,81 @@ void UpdateInternalVars(){
 
 //still buggy fires all the time
 void checkForMissedClocks() {
-  if (Metropolis[0].run) {
     int now = micros();
-    //if 1.5x of the expected clock interval passes
-    if ((now - mainClocks[0].lastExtClockTick) > (mainClocks[0].avgExtClockInterval * 1.5)) {
-      mainClocks[0].extTicksCounter++;
-      if (mainClocks[0].extTicksCounter >= mainClocks[0].extTicksPerBeat) {
-        mainClocks[0].extTicksCounter = 0;
-        
-        // do the actual missed clock
-        nextPulse();
-      }
+    if (mainClocks[0].run){
+      if (mainClocks[0].avgExtClockInterval > 0){
+        //if 1.5x of the expected clock interval passes
+        if ((now - mainClocks[0].lastExtClockTick) > (mainClocks[0].avgExtClockInterval * 1.5)) {
+        mainClocks[0].extClockMissedCounter++;
+        //set last tick to now minus a half interval. acts as if the last tick had occured at the
+        //expected average time
+        mainClocks[0].lastExtClockTick = now - (mainClocks[0].avgExtClockInterval / 2);
 
-      //set last tick to now minus a half interval. acts as if the last tick had occured at the
-      //expected average time
-      mainClocks[0].lastExtClockTick = now;// - (mainClocks[0].avgExtClockInterval / 2);
-      //clockMissed = true #
-      Serial.println("missed");
+        handleClock();
+        Serial.print("missed! last: ");
+        Serial.print(mainClocks[0].lastExtClockTick);
+        Serial.print(" avg: ");
+        Serial.print(mainClocks[0].avgExtClockInterval);
+        Serial.print(" now: ");
+        Serial.println(now);
+        }
+      }
     }
-  }
-  
+    
+}
+
+//executed when midi stop signal received
+void handleStop(){
+  Serial.println("stop");
+  mainClocks[0].run = false;
+  mainClocks[0].avgExtClockInterval = 0;
+}
+
+//executed when midi start signal received
+void handleStart(){
+  Serial.println("start");
+  mainClocks[0].run = true;
+}
+
+//executed when midi reset signal received
+void handleReset(){
+  Serial.println("reset");
+  mainClocks[0].avgExtClockInterval = 0;
+  mainClocks[0].lastExtClockTick = micros();
+  handleClock();
 }
 
 // what happens when an external clock signal is received
 void handleClock() {
   
   int now = micros();
-
-  if (mainClocks[0].lastExtClockTick > 0) {
-    int interval = now - mainClocks[0].lastExtClockTick; // calculate interval between pulses
-    if (mainClocks[0].avgExtClockInterval == 0) {
-      mainClocks[0].avgExtClockInterval = interval;
-    } else {
-      //set interval to average of last 8 ticks. should smooth out missed ticks
-      mainClocks[0].avgExtClockInterval = (mainClocks[0].avgExtClockInterval * 7 + interval) / 8;
+  if (mainClocks[0].run && mainClocks[0].reactToExtClock){
+    if (mainClocks[0].lastExtClockTick > 0) {
+      int interval = now - mainClocks[0].lastExtClockTick; // calculate interval between pulses
+      if (mainClocks[0].avgExtClockInterval == 0) {
+        mainClocks[0].avgExtClockInterval = interval;
+      } else {
+        //set interval to average of last 8 ticks. should smooth out missed ticks
+        mainClocks[0].avgExtClockInterval = (mainClocks[0].avgExtClockInterval * 7 + interval) / 8;
+      }
     }
-  }
 
-  mainClocks[0].lastExtClockTick = now;
-  //clockmissed = false #
+    mainClocks[0].lastExtClockTick = now;
+    mainClocks[0].extClockMissedCounter = false;
 
-  //only trigger every x tick
-  mainClocks[0].extTicksCounter++;
-  if (mainClocks[0].extTicksCounter >= mainClocks[0].extTicksPerBeat) {
-    mainClocks[0].extTicksCounter = 0;
-    
-    //do the actual clock cycle
-    if (mainClocks[0].reactToExtClock) {
-    mainClocks[0].lastExtClockTick = currentMicros;
-    //Serial.println("external clock");
 
-    if (Metropolis[0].run){
+    mainClocks[0].extTicksCounter++;
+    //only trigger every x tick
+    if (mainClocks[0].extTicksCounter >= mainClocks[0].extTicksPerBeat){
+      mainClocks[0].extTicksCounter = 0;
+
+      //do the actual clock cycle
+      usbMIDI.sendClock();
       nextPulse();
     }
   }
-  }
   
-
-    ///OBSOLETE
-  // //Drumstep: only when drum running and NOT synced to sequencer
-  // if (runDrum) {
-  //   if (!syncDrumToSequencer) {
-  //     nextDrumStep();
-  //   }
-  // }
-
-  // //SEQ step: only when synced to external clock
-  // if (syncSequencerToClock) {
-    
-  // }
-  usbMIDI.sendClock();
+  
   //Serial.println("p");
 }
 
@@ -762,39 +781,36 @@ void setup() {
   }
   selectMuxOutPin(Metropolis[0].stepPointer);
   usbMIDI.setHandleClock(handleClock);
-
+  usbMIDI.setHandleStart(handleStart);
+  usbMIDI.setHandleStop(handleStop);
+  usbMIDI.setHandleSystemReset(handleReset);
   //setup interrupt timer, calls function every 250 microseconds, even when other stuff is running
   //change this value if getting issues with controlsurface loop
   quickReadTimer.begin(anythingAnytimeAllAtOnce, 250);
 }
 
 void loop() {
-  anythingAnytimeAllAtOnce();
   startLoopMicros = micros();
   Control_Surface.loop();
   controlSurfaceMicros = micros();
-  midi.update();
-  anythingAnytimeAllAtOnce();
+  
   readInternalInputs();
-  anythingAnytimeAllAtOnce();
   analogReadMicros = micros();
 
   UpdateInternalVars();
-  anythingAnytimeAllAtOnce();
   updateValueMicros = micros();
   
   selectSeqNoteFunction();
-  anythingAnytimeAllAtOnce();
-
 
   if (Metropolis[0].reset) {
     resetSequencer();
-    //resetClock();
+    resetClock();
   }
 
 //stop notes if necessary (in case clock is not running)
   for (int i = 0; i < numSubClocks; i++){
-    if (subClocks[i].startMS > (currentMicros + subClocks[i].gateTime)) { //if gate time is over
+    // divide by 1000 as gatetime is in milliseconds and currentmicros and startms are in microseconds
+    if ( (currentMicros / 1000) > ((subClocks[i].startMS / 1000) + subClocks[i].gateTime)) { //if gate time is over
       if (subClocks[i].stopSent == 0) { //stop not sent
         if (subClocks[i].instrument >= 10){ //sequencer instrument
           stopLastNote(); 
@@ -807,7 +823,6 @@ void loop() {
       }
     }
   }
-  anythingAnytimeAllAtOnce();
   // for (int i = 0; i < 8; i++){
   //   Serial.print(seqButtons[i].getState());
   //   // Serial.print("->");
@@ -816,7 +831,6 @@ void loop() {
 
   // }
 
-  anythingAnytimeAllAtOnce();
 
   if (mainClocks[0].initialClockReset && currentMicros > mainClocks[0].initialClockResetTime){
     mainClocks[0].initialClockReset = false;
@@ -833,6 +847,7 @@ void loop() {
   // }
   //debugVars();
   endLoopMicros = micros();
+  //debugTimer();
   //benchmark();
 }
 
@@ -840,6 +855,8 @@ void loop() {
 void anythingAnytimeAllAtOnce(){
   updateClock();
   usbMIDI.read();
+  midi.read();
+  midi.update();
   //checkForMissedClocks(); //buggy asf
 }
 
@@ -851,6 +868,21 @@ void benchmark() {
   Serial.println(updateValueMicros-startLoopMicros);
   Serial.print("Full loop ");
   Serial.println(endLoopMicros-startLoopMicros);
+}
+
+void debugTimer(){
+  Serial.print("BPM");
+  Serial.print(mainClocks[0].bpm);
+  Serial.print(" run: ");
+  Serial.print(mainClocks[0].run);
+  Serial.print(" tempo: ");
+  Serial.print(mainClocks[0].tempo);
+  Serial.print(" currentTick: ");
+  Serial.print(mainClocks[0].currentTick);
+  Serial.print(" missed Ticks: ");
+  Serial.print(mainClocks[0].missedTicks);
+  Serial.print(" | ");
+  Serial.println();
 }
 void debugVars(){
   Serial.print(Metropolis[0].run);

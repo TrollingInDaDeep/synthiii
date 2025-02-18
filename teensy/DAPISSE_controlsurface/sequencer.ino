@@ -127,6 +127,12 @@ void stopNote(int noteToStop){
   //digitalWrite(I7, LOW);
 }
 
+//loops through all sequencer notes and sends a stop to them
+void stopAllNotes(){
+  for (int i = 0; i <= Metropolis[0].numSteps; i++){
+    stopNote(i);
+  }
+}
 
 // reset immediately and trigger the first pulse of the first step
 void resetSequencer() {
