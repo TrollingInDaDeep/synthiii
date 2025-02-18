@@ -321,25 +321,6 @@
                     },
                     "preset": ""
                 },
-                "mapkeychannel": {
-                    "bypassed": false,
-                    "parameters": {},
-                    "ports": {
-                        "k0": 1.0,
-                        "k1": 1.0,
-                        "k2": 1.0,
-                        "k3": 1.0,
-                        "k4": 1.0,
-                        "k5": 1.0,
-                        "k6": 1.0,
-                        "k7": 1.0,
-                        "k8": 1.0,
-                        "k9": 1.0,
-                        "k10": 1.0,
-                        "k11": 1.0
-                    },
-                    "preset": ""
-                },
                 "Delay": {
                     "bypassed": false,
                     "parameters": {},
@@ -639,6 +620,33 @@
                         "channelf": 1.0,
                         "ccin": 64.0,
                         "ccout": 119.0
+                    },
+                    "preset": ""
+                },
+                "eventblocker": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "blkcc": 1.0,
+                        "blknote": 1.0,
+                        "blkpc": 0.0,
+                        "blkpp": 0.0,
+                        "blkcp": 0.0,
+                        "blkpb": 0.0,
+                        "blksx": 0.0,
+                        "blkcm": 0.0,
+                        "cmt": 0.0,
+                        "cmf": 0.0,
+                        "cm1": -1.0,
+                        "cm2": -1.0
+                    },
+                    "preset": ""
+                },
+                "nodup": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "channelf": 0.0
                     },
                     "preset": ""
                 }
