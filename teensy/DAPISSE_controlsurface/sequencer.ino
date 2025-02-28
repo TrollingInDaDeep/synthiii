@@ -16,8 +16,8 @@ void nextStep() {
     //0=forwards
     case 0:
       Metropolis[0].stepPointer++;
-      if (Metropolis[0].stepPointer >= Metropolis[0].numSteps || Metropolis[0].stepPointer < 0) {
-        Metropolis[0].stepPointer = 0;
+      if (Metropolis[0].stepPointer >= Metropolis[0].lastStep || Metropolis[0].stepPointer < Metropolis[0].firstStep) {
+        Metropolis[0].stepPointer = Metropolis[0].firstStep;
       }
       Metropolis[0].seqDirection = 1; //upwards
     break;
@@ -25,8 +25,8 @@ void nextStep() {
     //1=backwards
     case 1:
       Metropolis[0].stepPointer--;
-      if (Metropolis[0].stepPointer < 0) {
-        Metropolis[0].stepPointer = Metropolis[0].numSteps-1;
+      if (Metropolis[0].stepPointer < Metropolis[0].firstStep) {
+        Metropolis[0].stepPointer = Metropolis[0].lastStep-1;
       }
       Metropolis[0].seqDirection = 0; //downwards
     break;
@@ -39,19 +39,19 @@ void nextStep() {
         Metropolis[0].stepPointer--;
       }
 
-      if (Metropolis[0].stepPointer < 0) {
-        Metropolis[0].stepPointer = 1;
+      if (Metropolis[0].stepPointer < Metropolis[0].firstStep) {
+        Metropolis[0].stepPointer = Metropolis[0].firstStep + 1;
         Metropolis[0].seqDirection = 1; //go upwards
       }
-      if (Metropolis[0].stepPointer >= Metropolis[0].numSteps){
-        Metropolis[0].stepPointer = Metropolis[0].numSteps-2;
+      if (Metropolis[0].stepPointer >= Metropolis[0].lastStep){
+        Metropolis[0].stepPointer = Metropolis[0].lastStep-2;
         Metropolis[0].seqDirection = 0; // go downwards
       }
     break;
 
     //3=drunk
     case 3:
-      Metropolis[0].stepPointer = random(0,Metropolis[0].numSteps);
+      Metropolis[0].stepPointer = random(0,Metropolis[0].lastStep);
     break;
   }
   // check if step should be skipped

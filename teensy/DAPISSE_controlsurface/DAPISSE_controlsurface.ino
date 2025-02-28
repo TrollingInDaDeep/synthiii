@@ -239,6 +239,8 @@ struct sequencer {
   bool reset = false; //if reset was pressed
   const int maxStepCount = 8; //How many steps the sequencer has
   int numSteps = maxStepCount; // how many steps should be done. Jumps back to first step after numSteps
+  int firstStep = 0; //first sequencer step to be played (for hold mode)
+  int lastStep = numSteps; //last sequencer step to be played (for hold mode). first and last can be identical
   int seqDirection = 1; // Sequencer step direction. 1=up, 0=down
   int pulsePointer = 1; //points to the pulse within the step we're currently in
   int lastStepPointer = 0; //previous step, to trigger note off
@@ -662,7 +664,7 @@ void UpdateInternalVars(){
         }
 
         if (seqButtons[i].getState() == Button::State::Falling) {
-          seqSteps[i].slide= !seqSteps[i].slide;
+          seqSteps[i].slide = !seqSteps[i].slide;
         }
       break;
 
@@ -673,11 +675,62 @@ void UpdateInternalVars(){
           seqSteps[i].hold = false;
         }
 
-        if (seqButtons[i].getState() == Button::State::Falling) {
-          seqSteps[i].hold = !seqSteps[i].hold;
+        if (seqButtons[i].getState() == 0) {
+          seqSteps[i].hold = true;
+        } else {
+          seqSteps[i].hold = false;
         }
       break;
     }
+  }
+
+  //set first and last step
+  if (Metropolis[0].buttonFunction == 3) { //hold mode
+    int holdButtonCount = 0;
+    //get the first held button
+    for (int i = 0; i < Metropolis[0].numSteps; i++){
+      if (seqSteps[i].hold) {
+        if (holdButtonCount == 0) { //only do on the first held button
+          Metropolis[0].firstStep = i;
+        }
+        holdButtonCount++;
+      }
+    }
+
+    //get the last held button
+    for (int i = 0; i < Metropolis[0].numSteps; i++){
+      if (seqSteps[i].hold) {
+        Metropolis[0].lastStep = i+1; //don't return, so last held button will be lastStep
+        //+1 as steps are 1 based, not 0 based
+      }
+    }
+
+    if (holdButtonCount == 1) { //if only 1 button held, first and last step are same, no +1
+      Metropolis[0].lastStep = Metropolis[0].firstStep;
+
+      //buggy corrective measures
+      switch (Metropolis[0].playMode){
+        case 1: //backwards
+          Metropolis[0].lastStep += 1;
+          Metropolis[0].firstStep += 1;
+        break;
+
+        case 2: //pingpong
+          Metropolis[0].lastStep += 2;
+          Metropolis[0].firstStep += 2;
+        break;
+      }
+      
+    }
+
+    if (holdButtonCount < 1) { //if no buttons held, set to default values
+      Metropolis[0].firstStep = 0;
+      Metropolis[0].lastStep = Metropolis[0].numSteps;
+    }
+  } else //set first and last step to defaults
+  {
+    Metropolis[0].firstStep = 0;
+    Metropolis[0].lastStep = Metropolis[0].numSteps;
   }
 
 }
