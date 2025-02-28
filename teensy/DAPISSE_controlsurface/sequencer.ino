@@ -73,8 +73,14 @@ void stopLastNote(){
   subClocks[0].stopSent = 1; //select sequencer, set "stopSent" to true
 }
 
+//starts sequencer note
+//int noteToPlay, note of which sequencer step to play
 void startNote(int noteToPlay){
-  stopLastNote();
+  //only stop note if not running, so that in play mode note is not stopped
+  if (Metropolis[0].run){
+    stopLastNote();
+  }
+  
 
   //set slide back to 0
   usbMIDI.sendControlChange(22, 0, Metropolis[0].synthMidiChannel); //22 is the slide ctrlr number
@@ -140,6 +146,11 @@ void resetSequencer() {
   Metropolis[0].pulsePointer = -1;
   nextPulse(); //experimental, might need to uncomment again
   Metropolis[0].reset = false;
+  stopAllNotes();
+  for (int i = 0; i <= 127; i++){
+    usbMIDI.sendNoteOff(i, 127, Metropolis[0].synthMidiChannel);
+  }
+  
 }
 
 //sets the function of the Sequencer trigger buttons

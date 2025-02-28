@@ -335,7 +335,7 @@ void setDefaultClockSettings(){
   subClocks[2].index = 2;
   subClocks[3].index = 3;
   subClocks[4].index = 4;
-  subClocks[5].index = 5; //slow clock for korg volca
+  subClocks[5].index = 5; //fast clock for korg volca
 
   subClocks[0].ratio = 4;
   subClocks[1].ratio = 1;
@@ -457,7 +457,6 @@ Button seqButtons[] {
 ///
 /// Keypad
 ///
-
 const AddressMatrix<4, 4> keypadNotes = {{
   {60, 61, 62, 63},
   {64, 65, 66, 67},
@@ -634,12 +633,12 @@ void UpdateInternalVars(){
     switch (Metropolis[0].buttonFunction) {
       case 0: //Play
           //only play notes when sequencer is not running, and not synced to ext clock
-          if (Metropolis[0].run) {//&& !syncClockToExt
+          if (!Metropolis[0].run) {//&& !syncClockToExt
             if (seqButtons[i].getState() == Button::State::Falling){
-              //startnote or notebuttonpressed (seqSteps[i].note);
+              startNote(i);
             }
             if (seqButtons[i].getState() == Button::State::Rising){
-              //stopnote or notebuttonreleased (seqSteps[i].note);
+              stopNote(i);
             }
           }
       break;
@@ -812,7 +811,7 @@ void loop() {
     // divide by 1000 as gatetime is in milliseconds and currentmicros and startms are in microseconds
     if ( (currentMicros / 1000) > ((subClocks[i].startMS / 1000) + subClocks[i].gateTime)) { //if gate time is over
       if (subClocks[i].stopSent == 0) { //stop not sent
-        if (subClocks[i].instrument >= 10){ //sequencer instrument
+        if (subClocks[i].instrument >= 10 && Metropolis[0].run){ //sequencer instrument and sequencer running
           stopLastNote(); 
         }
         else // drum instrument

@@ -192,7 +192,7 @@ void clockHandler (int subClockID) {
 
     case 5: //Korg volca Midi clock
       usbMIDI.sendClock();
-      Serial.println("volca");
+      //Serial.println("volca");
     break;
   
   }
