@@ -595,7 +595,7 @@ void UpdateInternalVars(){
 
     if (Metropolis[0].run){
       // Serial.println("play")
-      //resetClock(); #
+      resetClock();
       usbMIDI.sendStart();
     } else {
       // Serial.println("pause"); #
