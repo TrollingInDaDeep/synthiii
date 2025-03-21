@@ -121,9 +121,6 @@ void nextClockCycle() {
 
 }
 
-
-
-
 //update tempo
 /// sets the tempo modifier of the subclock
 /// expects number to multiply or divide clock
@@ -190,9 +187,31 @@ void clockHandler (int subClockID) {
       }
     break;
 
+    case 1 ... 4: //all drum notes
+      if (subClocks[subClockID].run){ // if subclock is running
+        if (subClocks[subClockID].isStart){ //note Start
+          
+          startDrumNote(subClockID);
+          
+          subClocks[subClockID].stopSent = 0; //tell that stop hasn't been sent yet
+          subClocks[subClockID].startMS = currentMicros;
+        }
+        else { // note Stop
+          //Serial.println("noteStopMode");
+          if (subClocks[subClockID].stopSent == 0) {
+            stopDrumNote(subClockID);
+          }
+          subClocks[subClockID].isStart = 1; //set note to START mode
+        }
+      }
+    break;
+
     case 5: //Korg volca Midi clock
-      usbMIDI.sendClock();
-      //Serial.println("volca");
+      if (subClocks[subClockID].run){ // if subclock is running
+        //Serial.println("volca");
+        usbMIDI.sendClock();
+        subClocks[subClockID].startMS = currentMicros;
+      }   
     break;
   
   }
