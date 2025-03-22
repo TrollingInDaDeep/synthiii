@@ -176,8 +176,8 @@ CCPotentiometer I11_POTS[] {
 CCPotentiometer I12_POTS[] {
     { muxI12.pin(0), {0x58, Channel::createChannel(synthMidiChannel)} },
     { muxI12.pin(1), {0x59, Channel::createChannel(synthMidiChannel)} },
-    { muxI12.pin(2), {0x5A, Channel::createChannel(synthMidiChannel)} },
-    { muxI12.pin(3), {0x5B, Channel::createChannel(synthMidiChannel)} },
+    //{ muxI12.pin(2), {0x5A, Channel::createChannel(synthMidiChannel)} }, //used internally
+    //{ muxI12.pin(3), {0x5B, Channel::createChannel(synthMidiChannel)} }, //used internally
     { muxI12.pin(4), {0x5C, Channel::createChannel(synthMidiChannel)} },
     { muxI12.pin(5), {0x5D, Channel::createChannel(synthMidiChannel)} }//,
     //{ muxI12.pin(6), {0x5E, Channel::createChannel(synthMidiChannel)} }, //PINS NOT CONNECTED
@@ -225,8 +225,8 @@ int endLoopMicros = 0;
 //const = global settings
 struct sequencer {
   const uint8_t velocity = 127; // standard velocity for notes
-  const long bpmMin=20.0; //minimum BPM value (for mapping)
-  const long bpmMax=800.0; //maximum BPM value (for mapping)
+  const long bpmMin=5.0; //minimum BPM value (for mapping)
+  const long bpmMax=400.0; //maximum BPM value (for mapping)
   int gateTime = 50; //time in milliseconds how long the note should be on
   const int gateMin = 5; //minimum gate time in milliseconds for pot selection
   const int gateMax = 1000; //maximum gate time in milliseconds for pot selection
@@ -324,10 +324,42 @@ struct subClock {
   int delayBuffer = 0; //store actual delay value to restore when delay has been set to 0
 };
 
+///
+/// DRUM Variables
+///
+
+const int numDrumInstruments = 4; //(0=kick, 1=snare, 2=highhat, 3=cymbal)
+
+//stores midi note to be sent for every drum instrument
+int drumInstrumentNotes[numDrumInstruments] = {
+  63, //Kick
+  67, //snare
+  71, //highhat
+  75  //cymbals
+};
+
+//all variables that every drumpad has
+struct drumPad {
+  int drumMidiChannel = 13; //Midi channel to which the keypad notes are sent
+  int keypadMode = 0; //0 = play, 1 = Perform, 2 = setRate, 3 = enable/disable mode
+  const int numKeypadModes = 4;
+};
+
+
+
 sequencer Metropolis[1]; //initializes a struct with the sequencer variables
 seqStep seqSteps[maxSteps]; //initializes a struct with the variables for each step. length defined by maxSteps of Sequencer
 mainClock mainClocks[1]; //the main clock is initialized
 subClock subClocks[numSubClocks]; //initialize subClocks based on number in mainClock
+drumPad telephone[1]; //initialize drumpad, called telephone because i^m using an old telephone keypad
+
+///
+///
+///
+/// NEXT
+/// make drum hits configurable via keypad
+/// and also playable (ratchets)
+///
 
 //sets the default settings of all subclock/instruments
 void setDefaultClockSettings(){
@@ -389,20 +421,7 @@ void setDefaultClockSettings(){
 
 
 
-///
-/// DRUM Variables
-///
 
-const int numDrumInstruments = 4; //(0=kick, 1=snare, 2=highhat, 3=cymbal)
-int drumMidiChannel = 13; //Midi channel to which the keypad notes are sent
-
-//stores midi note to be sent for every drum instrument
-int drumInstrumentNotes[numDrumInstruments] = {
-  63, //Kick
-  67, //snare
-  71, //highhat
-  75  //cymbals
-};
 
 // FilteredAnalog<12,3,uint32_t> testAnalogInput[] {
 //   { muxI8.pin(0)},
@@ -423,7 +442,9 @@ FilteredAnalog<12,3,uint32_t> internalAnalog[] {
     { muxI3.pin(4)}, //GateTime
     { muxI3.pin(5)}, // Slide Amount
     { muxI3.pin(6)}, // Max Note
-    { muxI3.pin(7)} // Min Note
+    { muxI3.pin(7)}, // Min Note
+    { muxI12.pin(2)}, //Keypad Mode
+    { muxI12.pin(3)} //Sequencer Rate
 };
 
 // IMPORTANT: insert in the order they will be used in the sequencer
@@ -498,7 +519,7 @@ const NoteButtonMatrix<4, 4> keypadMatrix {
   {5,6,12,11}, //output LOW
   {7,8,9,10}, //input pullup
   keypadNotes,
-  Channel::createChannel(drumMidiChannel)
+  Channel::createChannel(telephone[0].drumMidiChannel)
 };
 
 
@@ -609,6 +630,11 @@ void UpdateInternalVars(){
   Metropolis[0].minSeqNote = map(internalAnalog[5].getValue(),minAnalog,maxAnalog,0,127); //minimum note highest -8
   Metropolis[0].noteRange = map(internalAnalog[4].getValue(),minAnalog,maxAnalog,0,127); //maximum note lowest +8
   
+  // Keypad Mode of the telephone pad
+  telephone[0].keypadMode = map(internalAnalog[6].getValue(),minAnalog,maxAnalog,1,telephone[0].numKeypadModes);
+  // ratio of the sequencer
+  subClocks[0].ratio = map(internalAnalog[7].getValue(),minAnalog,maxAnalog,1,16);
+
   //calculate max Sequencer note
   Metropolis[0].maxSeqNote = Metropolis[0].minSeqNote + Metropolis[0].noteRange;
 
