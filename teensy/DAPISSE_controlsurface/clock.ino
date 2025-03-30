@@ -30,8 +30,8 @@ void updateClock() {
         if (mainClocks[0].currentTick == 0){
           nextClockCycle();
         }
-        nextTick();
-      
+        //nextTick();
+        nextTick2();
       }
       
       //update based on how many ticks have been processed
@@ -71,9 +71,11 @@ int getCurrentTick() {
 }
 
 
-//Run actions needed for next Tick
+///Run actions needed for next Tick
+/// variant 1 based on subtracting ticks until 0 are left
 void nextTick() {
   mainClocks[0].lastTick = mainClocks[0].currentTick;
+  Serial.println(mainClocks[0].currentTick);
   for (int i = 0; i < numSubClocks; i++){
     subClocks[i].tickCounter++; //increase the tick counter
     if (subClocks[i].tickCounter >= subClocks[i].ticksLeft) { // No ticks left -> trigger!
@@ -86,10 +88,36 @@ void nextTick() {
       subClocks[i].tickCounter = 0;
     }
   }
-  // if (runDrum){
+    // if (runDrum){
   //   nextDrumStep(); #
   // }
+
 }
+
+/// Run actions needed for next Tick
+/// variant 2 based on which tick we're currently in
+void nextTick2() {
+  //loop through subclocks
+  for (int i = 0; i < numSubClocks; i++){
+    //if current tick number is set to trigger in the triggerTable
+    if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
+      // todo: implement probability here #
+      clockHandler(i);
+    }
+  } 
+}
+
+/// checks if number (num) is contained in trigger table at index (idx)
+/// returns bool if true
+bool containsNum(int idx, int num) {
+    for (int i = 0; i < rowSizes[idx]; i++) {
+        if (triggerTable[idx][i] == num) {
+            return true; // Found the number
+        }
+    }
+    return false; // Not found
+}
+
 
 
 

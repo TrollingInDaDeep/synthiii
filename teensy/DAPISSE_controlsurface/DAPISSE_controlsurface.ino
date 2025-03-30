@@ -205,6 +205,30 @@ CCPotentiometer I12_POTS[] {
 
 IntervalTimer quickReadTimer;
 
+const int numTriggerFrequencies = 14; //number of trigger frequencies
+const int clockSubTicks = 24; //how many subticks in a clock
+
+// !!! sets the size of each row. used when looping through the array
+// !!! change this if you change triggerTable
+const int rowSizes[] = {1, 1, 2, 3, 2, 3, 4, 3, 4, 5, 6, 8, 12, 24};
+//at which subtick of the clock the subclock shall be triggered
+int triggerTable[numTriggerFrequencies][clockSubTicks] = {
+  {0}, //1
+  {12}, //1 off
+  {0, 12}, //2
+  {0, 8, 16}, //3
+  {8, 16}, //3 Jump
+  {0, 8, 20}, //3 Swing
+  {0, 6, 12, 18}, //4
+  {6, 12, 18}, //4 Jump
+  {0, 8, 12, 20}, // 4 Swing
+  {0, 8, 12, 16, 20}, //6 Jump
+  {0, 4, 8, 12, 16, 20}, // 6
+  {0, 3, 6, 9, 12, 15, 18, 21}, //8
+  {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22}, // 12
+  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23} // 24
+};
+
 
 float currentMicros = 0; //buffers the measured Microsecond timestamp at the start of the loop
 
@@ -280,7 +304,7 @@ struct mainClock {
   int oldBPM = 0; //store last bpm to see if we actually had a bpm change
   bool bpmChanged = false; //set true if bpm changed, hence update tempo
   float tempo = 1000000.0/(bpm/60.0); //bpm in microseconds
-  const int subTicks = 24; //in how many ticks one beat shall be divided
+  const int subTicks = clockSubTicks; //in how many ticks one beat shall be divided
   float tickMS = tempo/subTicks; //how long a tick is in ms
   int currentTick = 0; // which tick we're currently at (pointer)
   int lastTick = 0; //which tick we were at before (pointer)
@@ -322,6 +346,8 @@ struct subClock {
   float startMS = 0; //microsecond timestamp when Note start was sent
   float tickCounter = 0; //how many ticks have passed for subclock: increase every tick
   int delayBuffer = 0; //store actual delay value to restore when delay has been set to 0
+  int triggerFrequency = 0; //Which trigger frequency from the triggerTable[] is selected
+  float triggerProb = 1; // probability of the trigger actually occuring
 };
 
 ///
@@ -385,6 +411,14 @@ void setDefaultClockSettings(){
   subClocks[3].divMult = 1;
   subClocks[4].divMult = 0;
   subClocks[5].divMult = 1;
+
+  // when the subclock shall be triggered
+  subClocks[0].triggerFrequency = 0;
+  subClocks[1].triggerFrequency = 0;
+  subClocks[2].triggerFrequency = 1;
+  subClocks[3].triggerFrequency = 0;
+  subClocks[4].triggerFrequency = 0;
+  subClocks[5].triggerFrequency = 0;
 
 //not intuitive
 // 0-9 are drum instruments, so are not stopped automatically, see loop
@@ -615,7 +649,7 @@ void UpdateInternalVars(){
       mainClocks[0].bpmChanged = false;
     }
   }
-  
+
 
   Metropolis[0].numSteps = map(internalAnalog[1].getValue(),minAnalog,maxAnalog,1,Metropolis[0].maxStepCount);
   
@@ -632,8 +666,14 @@ void UpdateInternalVars(){
   
   // Keypad Mode of the telephone pad
   telephone[0].keypadMode = map(internalAnalog[6].getValue(),minAnalog,maxAnalog,1,telephone[0].numKeypadModes);
+  
+  /// *** now using trigger frequency
   // ratio of the sequencer
-  subClocks[0].ratio = map(internalAnalog[7].getValue(),minAnalog,maxAnalog,1,16);
+  //subClocks[0].ratio = map(internalAnalog[7].getValue(),minAnalog,maxAnalog,1,16);
+  /// *** now
+
+  // set triggerFrequency of sequencer
+  subClocks[0].triggerFrequency = map(internalAnalog[7].getValue(),minAnalog,maxAnalog,0,numTriggerFrequencies-1);
 
   //calculate max Sequencer note
   Metropolis[0].maxSeqNote = Metropolis[0].minSeqNote + Metropolis[0].noteRange;
