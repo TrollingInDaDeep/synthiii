@@ -367,8 +367,10 @@ int drumInstrumentNotes[numDrumInstruments] = {
 //all variables that every drumpad has
 struct drumPad {
   int drumMidiChannel = 13; //Midi channel to which the keypad notes are sent
-  int keypadMode = 0; //0 = play, 1 = Perform, 2 = setRate, 3 = enable/disable mode
+  int keypadMode = 2; //1 = play, 2 = Perform, 3 = setRate, 4 = enable/disable mode
   const int numKeypadModes = 4;
+  bool ButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores current state of all buttons
+  bool lastButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores last state of all buttons
 };
 
 
@@ -549,7 +551,7 @@ const AddressMatrix<4, 4> keypadNotes = {{
   {72, 73, 74, 75}
 }};
 
-const NoteButtonMatrix<4, 4> keypadMatrix {
+NoteButtonMatrix<4, 4> keypadMatrix {
   {5,6,12,11}, //output LOW
   {7,8,9,10}, //input pullup
   keypadNotes,
@@ -573,6 +575,7 @@ void resetSequencer(void);
 void stopLastNote(void);
 void startDrumNote(int);
 void stopDrumNote(int);
+void readDrumPad();
 
 // selects the pin on output multiplexer (LEDs)
 void selectMuxOutPin(byte pin){
@@ -666,7 +669,6 @@ void UpdateInternalVars(){
   
   // Keypad Mode of the telephone pad
   telephone[0].keypadMode = map(internalAnalog[6].getValue(),minAnalog,maxAnalog,1,telephone[0].numKeypadModes);
-  
   /// *** now using trigger frequency
   // ratio of the sequencer
   //subClocks[0].ratio = map(internalAnalog[7].getValue(),minAnalog,maxAnalog,1,16);
@@ -943,6 +945,11 @@ void loop() {
   Control_Surface.loop();
   controlSurfaceMicros = micros();
   
+  if (telephone[0].keypadMode != 1) { //read drumpad when not in play mode.
+    readDrumPad();
+  }
+  ;
+
   readInternalInputs();
   analogReadMicros = micros();
 
