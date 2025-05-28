@@ -100,23 +100,27 @@ void nextTick2() {
   //loop through subclocks
   for (int i = 0; i < numSubClocks; i++){
       
-      //if current tick number is set to trigger in the triggerTable
-      if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
-        // todo: implement probability here #
-        
-        if (telephone[0].keypadMode != 4) {
+    //if current tick number is set to trigger in the triggerTable
+    if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
+      // todo: implement probability here #
+      
+      if (telephone[0].keypadMode != 4) {
+        clockHandler(i);
+      } else { // "i need a drummer" mode
+        if (i < 1) { //sequencer
           clockHandler(i);
-        } else { // "i need a drummer" mode
-          if (i < 1) {
-            clockHandler(i);
-
-            //weiter:
-            //check and loop through drummer brain
-
-          }
         }
-        
       }
+      
+    }
+    if (telephone[0].keypadMode == 4) {
+      if (i >= 1 && i <= numDrumInstruments) { //drum instruments
+        //check and loop through drummer brain
+        if (drummerBrain[telephone[0].drummerGenre][telephone[0].drummerIntensity][telephone[0].drummerSeqBeat][i-1][mainClocks[0].currentTick]) { //if current beat, current subclock (drum instruments start at 0 again) and current tick are enabled ->trigger
+          clockHandler(i);
+        }
+      }
+    }
   }
 }
 
