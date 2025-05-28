@@ -1,0 +1,59 @@
+$ Metropolix
+- [c]I dont have a drummer
+Pre programmed drum sequences on dapisse for volca etc. Keyboard: increase/decrease intensity
+Halftime
+Breakdown extra
+Genres
+Postrock (russian circles, magma)
+Metal (theocracy nailed, crimson architect)
+...
+...
+
+Break and accent (separate) is layered patrern, adds fill, crash etc. Can be set probability, frequency (every 4 bars), triggered manually, default intensity to be set after break(verse intensity after triggering break)
+
+Pre programmed chains (1-2-3-2-3-4))
+Intro, verse, chorus, verse, breakdown)
+
+
+- [c] drumnotes channel
+- gate modes
+
+
+- [c]notestart/stop
+- [b]stabilize
+- [b]attach knobs
+
+- [dont continue if you like being healthy]
+	read external midi: reading midi is pain, as we are missing clocks
+	if extmidiclock received -> extmode, if not, intmode
+	handleclock -> serialprint -> misses Clock Signals while control surface loop runs
+	ppqn, how?
+	calculate bpm
+	buffer [num ppqn]
+	store [num ppqn] intervals
+	remove highest 2 intervals
+	calculate bpm / interval
+	if missedclock -> increase counter
+	next handleclock() does multiple Clocks (counter)
+	Maybe: only react to Clock every so often (when swithc activated), then run on your own with same bpm
+
+
+$ Drums:
+
+1-9: bpm / n -> fill x step
+* \ # -> 1/n or n/1
+
+beat division = 24
+4 beats = 96 ticks
+
+
+initial value read (bool isinitial) in read function
+
+$ Clocks
+timerthree by Paul stoffregen https://github.com/PaulStoffregen/TimerThree
+1. basic Clock + trigger (1 subclock) -> done
+2. multiple subclocks -> prepared
+3. division / mult -> ongoing
+4. LP -> ???
+
+

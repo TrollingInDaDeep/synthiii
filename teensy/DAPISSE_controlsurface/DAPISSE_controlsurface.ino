@@ -355,6 +355,7 @@ struct subClock {
 ///
 
 const int numDrumInstruments = 4; //(0=kick, 1=snare, 2=highhat, 3=cymbal)
+const int numDrummerIntensity = 4; //how many intensities per genre
 
 //stores midi note to be sent for every drum instrument
 int drumInstrumentNotes[numDrumInstruments] = {
@@ -367,10 +368,13 @@ int drumInstrumentNotes[numDrumInstruments] = {
 //all variables that every drumpad has
 struct drumPad {
   int drumMidiChannel = 13; //Midi channel to which the keypad notes are sent
-  int keypadMode = 2; //1 = play, 2 = Perform, 3 = setRate, 4 = enable/disable mode
+  int keypadMode = 2; //1 = play, 2 = Perform, 3 = setRate, 4 = I need a Drummer
   const int numKeypadModes = 4;
   bool ButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores current state of all buttons
   bool lastButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores last state of all buttons
+  int drummerGenre = 0; //which genre is selected
+  int numDrummerGenres = 10; //number of genre store slots, corresponds number of num keys on telephone keypad)
+  int drummerIntensity = 0; //intensity of drummer pattern.
 };
 
 
@@ -452,7 +456,7 @@ void setDefaultClockSettings(){
   subClocks[2].run = 1;
   subClocks[3].run = 0;
   subClocks[4].run = 0;
-  subClocks[5].run = 0;
+  subClocks[5].run = 1; //send volca clock signal
 }
 
 

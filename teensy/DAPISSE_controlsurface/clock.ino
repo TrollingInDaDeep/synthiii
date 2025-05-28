@@ -71,7 +71,7 @@ int getCurrentTick() {
 }
 
 
-///Run actions needed for next Tick
+///Run actions needed for next Tick -> currently unused
 /// variant 1 based on subtracting ticks until 0 are left
 void nextTick() {
   mainClocks[0].lastTick = mainClocks[0].currentTick;
@@ -97,14 +97,21 @@ void nextTick() {
 /// Run actions needed for next Tick
 /// variant 2 based on which tick we're currently in
 void nextTick2() {
-  //loop through subclocks
-  for (int i = 0; i < numSubClocks; i++){
-    //if current tick number is set to trigger in the triggerTable
-    if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
-      // todo: implement probability here #
-      clockHandler(i);
+  
+  
+    //loop through subclocks
+    for (int i = 0; i < numSubClocks; i++){
+
+      if (telephone[0].keypadMode != 4) { //not in "i need a drummer" mode
+      
+        //if current tick number is set to trigger in the triggerTable
+        if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
+          // todo: implement probability here #
+          clockHandler(i);
+        }
+      }
+
     }
-  } 
 }
 
 /// checks if number (num) is contained in trigger table at index (idx)
