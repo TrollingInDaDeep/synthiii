@@ -356,6 +356,8 @@ struct subClock {
 
 const int numDrumInstruments = 4; //(0=kick, 1=snare, 2=highhat, 3=cymbal)
 const int numDrummerIntensity = 4; //how many intensities per genre
+const int numDrummerSeqBeats = 4; //length of drummer sequence in beats
+const int numDrummerGenres = 10; //number of genre store slots, corresponds number of num keys on telephone keypad)
 
 //stores midi note to be sent for every drum instrument
 int drumInstrumentNotes[numDrumInstruments] = {
@@ -373,8 +375,8 @@ struct drumPad {
   bool ButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores current state of all buttons
   bool lastButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores last state of all buttons
   int drummerGenre = 0; //which genre is selected
-  int numDrummerGenres = 10; //number of genre store slots, corresponds number of num keys on telephone keypad)
   int drummerIntensity = 0; //intensity of drummer pattern.
+  int drummerSeqBeat = 0; //which beat in the sequence we're in
 };
 
 
@@ -384,6 +386,44 @@ seqStep seqSteps[maxSteps]; //initializes a struct with the variables for each s
 mainClock mainClocks[1]; //the main clock is initialized
 subClock subClocks[numSubClocks]; //initialize subClocks based on number in mainClock
 drumPad telephone[1]; //initialize drumpad, called telephone because i^m using an old telephone keypad
+
+
+//this will fuck your brain: 5 dimensional array
+//[numDrummerGenres][numDrummerIntensity]
+int drummerBrain[numDrummerSeqBeats][numDrumInstruments][clockSubTicks]
+{
+  //Beat 1
+  {
+    {1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}
+  },
+
+  //Beat 2
+  {
+    {1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}
+  },
+
+  //Beat 3
+  {
+    {1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}
+  },
+
+  //Beat 4
+  {
+    {1, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0,    0, 0, 0, 0, 0, 0}
+  }
+};
 
 ///
 ///
@@ -579,7 +619,9 @@ void resetSequencer(void);
 void stopLastNote(void);
 void startDrumNote(int);
 void stopDrumNote(int);
-void readDrumPad();
+void readDrumPad(void);
+void resetDrums(void);
+void increaseDrummerBeat(void);
 
 // selects the pin on output multiplexer (LEDs)
 void selectMuxOutPin(byte pin){
@@ -965,6 +1007,7 @@ void loop() {
   if (Metropolis[0].reset) {
     resetSequencer();
     resetClock();
+    resetDrums();
   }
 
 //stop notes if necessary (in case clock is not running)

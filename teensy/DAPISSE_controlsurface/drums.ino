@@ -101,46 +101,6 @@ void readDrumPad() {
             btnCounter++;
           }
         }
-        
-        ///lookup shite below
-        // int col;
-        // col = 0;
-
-        // //Loop through col 1 -> decrease intensity
-        // for (int i = 0; i < 4; i++){
-        //   if (!telephone[0].ButtonStates[col][i]) {
-        //     Serial.print("decrease ");
-        //     Serial.println(i);
-        //     changeDrumTriggerFreq(i+1,false); //drum instruments are id 1-4 currently
-        //   }
-        // }
-
-        // col = 1; //mute
-        // for (int i = 0; i < 4; i++){
-        //   if (!telephone[0].ButtonStates[col][i]) {
-        //     subClocks[i+1].run = !subClocks[i+1].run;
-            
-        //   }
-        // }
-
-        // col = 2; //increase
-        // //Loop through col 3 -> increase rate
-        // for (int i = 0; i < 4; i++){
-        //   if (!telephone[0].ButtonStates[col][i]) {
-        //     Serial.print("increase ");
-        //     Serial.println(i);
-        //     changeDrumTriggerFreq(i+1,true); //drum instruments are id 1-4 currently
-        //   }
-        // }
-
-        // col = 3; //play note
-        // //Loop through col 4 -> play note
-        // for (int i = 0; i < 4; i++){
-        //   if (!telephone[0].ButtonStates[col][i]) {
-        //     stopDrumNote(i+1); //weak de-doubling algorithm
-        //     startDrumNote(i+1); //subclockID starts at 1 for drum instruments
-        //   }
-        //}
       }
 
     }
@@ -188,6 +148,17 @@ void changeDrummerIntensity(bool direction){
   }
 }
 
+/// counts / increases the beat number that the drummer is currently in
+void increaseDrummerBeat(){
+  telephone[0].drummerSeqBeat++; //increase beat count
+
+  //if max. or higher, go back to 0
+  if (telephone[0].drummerSeqBeat >= numDrummerSeqBeats) {
+    telephone[0].drummerSeqBeat = 0;
+  }
+
+}
+
 ///starts a drumnote reading note from drumInstrument array
 void startDrumNote(int subClockID) {
 
@@ -197,4 +168,8 @@ void startDrumNote(int subClockID) {
 ///stops a drumnote reading note from drumInstrument array
 void stopDrumNote(int subClockID) {
   usbMIDI.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
+}
+
+void resetDrums(){
+  telephone[0].drummerSeqBeat = 0;
 }

@@ -28,7 +28,7 @@ void updateClock() {
         mainClocks[0].currentTick = (mainClocks[0].currentTick + 1) % mainClocks[0].subTicks; //move to next tick, reset to 0 when subTicks reached
       
         if (mainClocks[0].currentTick == 0){
-          nextClockCycle();
+          nextClockCycle(false);
         }
         //nextTick();
         nextTick2();
@@ -97,21 +97,27 @@ void nextTick() {
 /// Run actions needed for next Tick
 /// variant 2 based on which tick we're currently in
 void nextTick2() {
-  
-  
-    //loop through subclocks
-    for (int i = 0; i < numSubClocks; i++){
-
-      if (telephone[0].keypadMode != 4) { //not in "i need a drummer" mode
+  //loop through subclocks
+  for (int i = 0; i < numSubClocks; i++){
       
-        //if current tick number is set to trigger in the triggerTable
-        if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
-          // todo: implement probability here #
+      //if current tick number is set to trigger in the triggerTable
+      if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
+        // todo: implement probability here #
+        
+        if (telephone[0].keypadMode != 4) {
           clockHandler(i);
-        }
-      }
+        } else { // "i need a drummer" mode
+          if (i < 1) {
+            clockHandler(i);
 
-    }
+            //weiter:
+            //check and loop through drummer brain
+
+          }
+        }
+        
+      }
+  }
 }
 
 /// checks if number (num) is contained in trigger table at index (idx)
@@ -128,12 +134,22 @@ bool containsNum(int idx, int num) {
 
 
 
-//run actions needed for next Clock Cycle (beat)
-void nextClockCycle() {
+///run actions needed for next Clock Cycle (beat)
+/// reset = true -> when called from reset
+void nextClockCycle(bool reset) {
   mainClocks[0].prevClockStart = mainClocks[0].clockStart;
   mainClocks[0].clockStart = currentMicros;
   mainClocks[0].currentTick = 0;
   mainClocks[0].lastTick = 0; //that's the solution++ otherwise it will drift!!!!!
+
+  if (!reset){
+    increaseDrummerBeat();
+  }
+  else {
+    telephone[0].drummerSeqBeat = 0;
+  }
+  Serial.print("drm Beat ");
+  Serial.println(telephone[0].drummerSeqBeat);
 
   for (int i = 0; i < numSubClocks; i++)
   {
@@ -198,7 +214,7 @@ void updateClockTempo() {
  //either seq step
  //or drum instrument trigger
  //or note stop -> maybe should be handled via gate time of each instrument by itself
-void clockHandler (int subClockID) {
+void clockHandler(int subClockID) {
   switch (subClockID)
   {
     case 0: // sequencer
@@ -278,6 +294,6 @@ void resetClock() {
     subClocks[i].delay = 0; //clear the delay again as it shall only be used once
   }
 
-  nextClockCycle();
+  nextClockCycle(true); //true = from reset
 }
   
