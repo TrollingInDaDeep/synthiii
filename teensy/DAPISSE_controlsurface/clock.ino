@@ -152,8 +152,8 @@ void nextClockCycle(bool reset) {
   else {
     telephone[0].drummerSeqBeat = 0;
   }
-  Serial.print("drm Beat ");
-  Serial.println(telephone[0].drummerSeqBeat);
+  // Serial.print("drm Beat ");
+  // Serial.println(telephone[0].drummerSeqBeat);
 
   for (int i = 0; i < numSubClocks; i++)
   {
@@ -246,7 +246,14 @@ void clockHandler(int subClockID) {
       if (subClocks[subClockID].run){ // if subclock is running
         if (subClocks[subClockID].isStart){ //note Start
           
-          startDrumNote(subClockID);
+          float roll = random(0,101);
+          if (roll <= subClocks[subClockID].triggerProb){
+            // Serial.print(subClocks[subClockID].triggerProb);
+            // Serial.print("bigger than roll: ");
+            // Serial.println(roll);
+            startDrumNote(subClockID);
+          }
+         
           
           subClocks[subClockID].stopSent = 0; //tell that stop hasn't been sent yet
           subClocks[subClockID].startMS = currentMicros;

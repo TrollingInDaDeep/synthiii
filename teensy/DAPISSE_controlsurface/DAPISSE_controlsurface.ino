@@ -165,16 +165,16 @@ CCPotentiometer I10_POTS[] {
 CCPotentiometer I11_POTS[] {
     { muxI11.pin(0), {0x50, Channel::createChannel(synthMidiChannel)} },
     { muxI11.pin(1), {0x51, Channel::createChannel(synthMidiChannel)} },
-    { muxI11.pin(2), {0x52, Channel::createChannel(synthMidiChannel)} },
+    //{ muxI11.pin(2), {0x52, Channel::createChannel(synthMidiChannel)} }, //probability 1
     { muxI11.pin(3), {0x53, Channel::createChannel(synthMidiChannel)} },
-    { muxI11.pin(4), {0x54, Channel::createChannel(synthMidiChannel)} },
+    //{ muxI11.pin(4), {0x54, Channel::createChannel(synthMidiChannel)} }, //probability 2
     { muxI11.pin(5), {0x55, Channel::createChannel(synthMidiChannel)} },
-    { muxI11.pin(6), {0x56, Channel::createChannel(synthMidiChannel)} },
+    //{ muxI11.pin(6), {0x56, Channel::createChannel(synthMidiChannel)} }, //probability 3
     { muxI11.pin(7), {0x57, Channel::createChannel(synthMidiChannel)} },
 };
 
 CCPotentiometer I12_POTS[] {
-    { muxI12.pin(0), {0x58, Channel::createChannel(synthMidiChannel)} },
+    //{ muxI12.pin(0), {0x58, Channel::createChannel(synthMidiChannel)} }, //probability 4
     { muxI12.pin(1), {0x59, Channel::createChannel(synthMidiChannel)} },
     //{ muxI12.pin(2), {0x5A, Channel::createChannel(synthMidiChannel)} }, //used internally
     //{ muxI12.pin(3), {0x5B, Channel::createChannel(synthMidiChannel)} }, //used internally
@@ -347,7 +347,7 @@ struct subClock {
   float tickCounter = 0; //how many ticks have passed for subclock: increase every tick
   int delayBuffer = 0; //store actual delay value to restore when delay has been set to 0
   int triggerFrequency = 0; //Which trigger frequency from the triggerTable[] is selected
-  float triggerProb = 1; // probability of the trigger actually occuring
+  float triggerProb = 100; // probability of the trigger actually occuring. value from 0 to 100
 };
 
 ///
@@ -1944,7 +1944,11 @@ FilteredAnalog<12,3,uint32_t> internalAnalog[] {
     { muxI3.pin(6)}, // Max Note
     { muxI3.pin(7)}, // Min Note
     { muxI12.pin(2)}, //Keypad Mode
-    { muxI12.pin(3)} //Sequencer Rate
+    { muxI12.pin(3)}, //Sequencer Rate
+    { muxI11.pin(2)}, //probability 1
+    { muxI11.pin(4)}, //probability 2
+    { muxI11.pin(6)}, //probability 3
+    { muxI12.pin(0)} //probability 4
 };
 
 // IMPORTANT: insert in the order they will be used in the sequencer
@@ -2142,6 +2146,12 @@ void UpdateInternalVars(){
 
   // set triggerFrequency of sequencer
   subClocks[0].triggerFrequency = map(internalAnalog[7].getValue(),minAnalog,maxAnalog,0,numTriggerFrequencies-1);
+
+  // set the probability of drum instruments 1-4
+  subClocks[1].triggerProb = map(internalAnalog[8].getValue(),minAnalog,maxAnalog,0,100);
+  subClocks[2].triggerProb = map(internalAnalog[9].getValue(),minAnalog,maxAnalog,0,100);
+  subClocks[3].triggerProb = map(internalAnalog[10].getValue(),minAnalog,maxAnalog,0,100);
+  subClocks[4].triggerProb = map(internalAnalog[11].getValue(),minAnalog,maxAnalog,0,100);
 
   //calculate max Sequencer note
   Metropolis[0].maxSeqNote = Metropolis[0].minSeqNote + Metropolis[0].noteRange;

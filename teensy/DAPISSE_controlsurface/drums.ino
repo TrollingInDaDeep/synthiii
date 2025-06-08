@@ -162,6 +162,8 @@ void increaseDrummerBeat(){
 ///starts a drumnote reading note from drumInstrument array
 void startDrumNote(int subClockID) {
 
+  //probability
+  
   usbMIDI.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
 }
 
