@@ -1,5 +1,9 @@
 # synthiii
 
+For technical overview and documentation, head here.
+
+If you want to build your own project, take my advice below.
+
 ## Storytime
 I wanted a synthesizer. A modular Synthesizer. Analog. But they expensive, me no money. But I like electronics and figured I could build one myself.
 Seen some videos from LookMumNoComputer and it didn´t look that hard. Believe me, it is. Not the "soldering some pots and caps and jack sockets together" part, but the "decide on a way to go in this endless jungle of possibilities".
