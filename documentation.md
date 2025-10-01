@@ -1,7 +1,0 @@
-#Documentation
-
-## Function diagram
-
-## Images
-
-## 
