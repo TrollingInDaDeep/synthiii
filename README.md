@@ -1,6 +1,6 @@
 # synthiii
 
-For technical overview and documentation, head here.
+For technical overview and documentation, head [to the Documentation](./Documentation/Documentation.md).
 
 If you want to build your own project, take my advice below.
 
