@@ -36,24 +36,24 @@ LITTLE PROJECTS. WORK YOUR WAY UP.
 ### My journey (don't follow)
 Here's what i tried and where it lead me. Funny to look back to this thinking I actually thought the start of this was any good. Silly me...
 
-PureData Synthesizer using Automationism3.1 -ish
-started out by using Raspberry Pi 3b but it's a piece of junk.
-using and old AMD platform PC instead now.
-On Raspberry I used the Orac Patchbox distro, it features a low latency kernel and built-in PureData installation.
-Was much better and faster but still giving only performance problems.
-Also Raspberry can't read analog signals like potentiometer values, so I need an ADC.
-Currently using arduino Uno for that (attiny85 would also work but sending the value to PC is pain in the butthole)
-With the Arduino I can just send it to serial via USB.
-The base of the synth will still be Pure data and Automationism, this is fully platform independent!
-So on this AMD platform currently running it on (hopefully headless) windows, but might switch to Patchbox or another low-latency linux kernel later.
-Raspberry PI with pisound is great platform. includes patchbox low latency linux os.
-This creates great sound and has good software on it. (Modep)
-This SW I can control via midi.
-I build a midi controller with many inputs to control the Modep synth plugins (AMSYNTH)
-Arduino does not have enough analog inputs
-Teensy is the way to go. Low latency, fast, midi and great libraries already included, saves a ton of work
-Teensy still does not have enough analog I/O, i need to use multiplexers
-Soldering multiplexers together in a stable way with protoboard PCBs works but is pain
-Designing own PCB to have an easier system to plug many potentiometers via multiplexers into the teensy
-All working great, i write a shit ton of code to run on the teensy, my possibilities are (too) endless
+* PureData Synthesizer using Automationism3.1 -ish
+* started out by using Raspberry Pi 3b but it's a piece of junk.
+* using and old AMD platform PC instead now.
+* On Raspberry I used the Orac Patchbox distro, it features a low latency kernel and built-in PureData installation.
+* Was much better and faster but still giving only performance problems.
+* Also Raspberry can't read analog signals like potentiometer values, so I need an ADC.
+* Currently using arduino Uno for that (attiny85 would also work but sending the value to PC is pain in the butthole)
+* With the Arduino I can just send it to serial via USB.
+* The base of the synth will still be Pure data and Automationism, this is fully platform independent!
+* So on this AMD platform currently running it on (hopefully headless) windows, but might switch to Patchbox or another low-latency linux kernel later.
+* Raspberry PI with pisound is great platform. includes patchbox low latency linux os.
+* This creates great sound and has good software on it. (Modep)
+* This SW I can control via midi.
+* I build a midi controller with many inputs to control the Modep synth plugins (AMSYNTH)
+* Arduino does not have enough analog inputs
+* Teensy is the way to go. Low latency, fast, midi and great libraries already included, saves a ton of work
+* Teensy still does not have enough analog I/O, i need to use multiplexers
+* Soldering multiplexers together in a stable way with protoboard PCBs works but is pain
+* Designing own PCB to have an easier system to plug many potentiometers via multiplexers into the teensy
+* All working great, i write a shit ton of code to run on the teensy, my possibilities are (too) endless
 
