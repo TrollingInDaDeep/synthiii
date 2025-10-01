@@ -1,0 +1,147 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36 Edg/140.0.0.0" version="28.2.5">
+  <diagram name="Seite-1" id="o6ZbqSITmVtlOigWVmzj">
+    <mxGraphModel dx="2058" dy="1116" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-4" value="Korg volca Sample" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="960" y="1215" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-10" value="Custom PCB&#39;s with multiplexers" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="390" y="132.66" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-29" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Vghg2UhNcvSdB3-npH1y-11" target="mDIGNpfSQLl3gT0NQgVL-6" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-11" value="Custom PCB&#39;s with multiplexers" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="390" y="297.5" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-12" value="Custom PCB&#39;s with multiplexers" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="390" y="220" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-16" value="" style="group" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="650" y="115" width="710" height="425" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-4" value="" style="group" parent="Vghg2UhNcvSdB3-npH1y-16" vertex="1" connectable="0">
+          <mxGeometry width="617" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-9" value="Teensy" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;fontSize=21;fontStyle=1" parent="mDIGNpfSQLl3gT0NQgVL-4" vertex="1">
+          <mxGeometry width="580" height="240" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-4" source="Vghg2UhNcvSdB3-npH1y-13" target="mDIGNpfSQLl3gT0NQgVL-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-13" value="Read, output MIDI" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-4" vertex="1">
+          <mxGeometry x="20" y="30" width="140" height="35.33" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.25;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-4" source="Vghg2UhNcvSdB3-npH1y-14" target="Vghg2UhNcvSdB3-npH1y-18" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-14" value="Read, control Sequencer" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-4" vertex="1">
+          <mxGeometry x="20" y="100" width="160" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-15" value="Receive from Sequencer, output to I/O Pins" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-4" vertex="1">
+          <mxGeometry x="20" y="160" width="250" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-4" source="Vghg2UhNcvSdB3-npH1y-18" target="mDIGNpfSQLl3gT0NQgVL-1" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="480" y="152" />
+              <mxPoint x="480" y="96" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-4" source="Vghg2UhNcvSdB3-npH1y-18" target="Vghg2UhNcvSdB3-npH1y-15" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Vghg2UhNcvSdB3-npH1y-18" value="MIDI Sequencer" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-4" vertex="1">
+          <mxGeometry x="320" y="130" width="130" height="43" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-1" value="USB MIDI" style="whiteSpace=wrap;html=1;aspect=fixed;" parent="mDIGNpfSQLl3gT0NQgVL-4" vertex="1">
+          <mxGeometry x="537" y="56" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-4" source="mDIGNpfSQLl3gT0NQgVL-3" target="mDIGNpfSQLl3gT0NQgVL-1" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-3" value="MIDI Drum Machine" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-4" vertex="1">
+          <mxGeometry x="320" y="180" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="mDIGNpfSQLl3gT0NQgVL-5" target="Vghg2UhNcvSdB3-npH1y-10" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-5" value="MIDI Controls&lt;br&gt;(Potentiometers and buttons)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="132.66" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-6" value="LEDs (Outputs)" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="307.5" width="200" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="mDIGNpfSQLl3gT0NQgVL-7" target="Vghg2UhNcvSdB3-npH1y-12" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-7" value="Internal Controls&lt;div&gt;(Potentiometers and buttons)&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="100" y="220" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="Vghg2UhNcvSdB3-npH1y-10" target="Vghg2UhNcvSdB3-npH1y-13" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="Vghg2UhNcvSdB3-npH1y-12" target="Vghg2UhNcvSdB3-npH1y-14" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Vghg2UhNcvSdB3-npH1y-15" target="Vghg2UhNcvSdB3-npH1y-11" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" parent="1" source="mDIGNpfSQLl3gT0NQgVL-1" target="mDIGNpfSQLl3gT0NQgVL-35" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-50" value="" style="group" parent="1" vertex="1" connectable="0">
+          <mxGeometry x="670" y="500" width="640" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-30" value="Raspberry Pi 3b+&lt;br&gt;&lt;span style=&quot;font-size: 17px;&quot;&gt;Pisound Soundcard&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;align=center;fontSize=21;fontStyle=1" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry x="240" width="360" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-46" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-50" source="mDIGNpfSQLl3gT0NQgVL-36" target="mDIGNpfSQLl3gT0NQgVL-45" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-36" value="MIDI Out" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry x="210" y="40" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-42" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-50" source="mDIGNpfSQLl3gT0NQgVL-35" target="mDIGNpfSQLl3gT0NQgVL-41" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-35" value="USB In" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry x="580" y="15" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-43" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.25;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-50" source="mDIGNpfSQLl3gT0NQgVL-41" target="mDIGNpfSQLl3gT0NQgVL-36" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-44" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.75;exitDx=0;exitDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-50" source="mDIGNpfSQLl3gT0NQgVL-41" target="mDIGNpfSQLl3gT0NQgVL-37" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-41" value="Modep Software" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry x="360" y="100" width="140" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-48" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="mDIGNpfSQLl3gT0NQgVL-50" source="mDIGNpfSQLl3gT0NQgVL-37" target="mDIGNpfSQLl3gT0NQgVL-47" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-37" value="Audio Out" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry x="210" y="160" width="60" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-45" value="Drum Machine or Sampler" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry y="40" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-47" value="Speakers or&lt;div&gt;Headphones&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry y="160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-49" value="AMSynth plugin" style="rounded=0;whiteSpace=wrap;html=1;" parent="mDIGNpfSQLl3gT0NQgVL-50" vertex="1">
+          <mxGeometry x="380" y="140" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-52" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.75;entryDx=0;entryDy=0;" parent="1" source="mDIGNpfSQLl3gT0NQgVL-51" target="mDIGNpfSQLl3gT0NQgVL-35" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="mDIGNpfSQLl3gT0NQgVL-51" value="Other USB Midi Devices" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="1370" y="600" width="120" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
