@@ -4,9 +4,6 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="Vghg2UhNcvSdB3-npH1y-4" value="Korg volca Sample" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
-          <mxGeometry x="960" y="1215" width="120" height="60" as="geometry" />
-        </mxCell>
         <mxCell id="Vghg2UhNcvSdB3-npH1y-10" value="Custom PCB&#39;s with multiplexers" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="390" y="132.66" width="120" height="60" as="geometry" />
         </mxCell>
