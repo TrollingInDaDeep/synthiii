@@ -170,7 +170,8 @@ void nextClockCycle(bool reset) {
   //send midi clock via usb only if internal clock is used??
   if (mainClocks[0].clockSource == false){
     //dont send at every pulse, as korg needs only every 6th. handled via instrument
-    //usbMIDI.sendClock();
+    //midi.sendClock();
+    //midi.sendRealTime(RealTimeMessage::TimingClock);
   }
   
 
@@ -271,7 +272,8 @@ void clockHandler(int subClockID) {
     case 5: //Korg volca Midi clock
       if (subClocks[subClockID].run){ // if subclock is running
         //Serial.println("volca");
-        usbMIDI.sendClock();
+        //midi.sendClock();
+        midi.sendRealTime(RealTimeMessage::TimingClock);
         subClocks[subClockID].startMS = currentMicros;
       }   
     break;

@@ -1,8 +1,28 @@
 #include <Control_Surface.h>
 
 // Instantiate a MIDI Interface to use
+//USB Midi output
 USBMIDI_Interface midi;
 const  int synthMidiChannel = 12;
+
+//TRS Midi Output
+HardwareSerialMIDI_Interface trsMIDI {Serial7, 115200}; //Serial7 is RX Pin 28 and TX Pin 29, see https://www.pjrc.com/teensy/td_libs_MIDI.html
+
+
+//MIDI callbacks
+
+// RealTimeMIDI_Callbacks rtCallbacks {
+//   .clock = handleClock,
+//   .start = handleStart,
+//   .stop  = handleStop,
+//   .reset = handleReset
+// }
+
+//old version via teensy core as follows: (obsolete)
+  //midi.setHandleClock(handleClock);
+  //midi.setHandleStart(handleStart);
+  //midi.setHandleStop(handleStop);
+  //midi.setHandleSystemReset(handleReset);
 
 //din1
 //I7
@@ -2171,13 +2191,15 @@ void UpdateInternalVars(){
     if (Metropolis[0].run){
       // Serial.println("play")
       resetClock();
-      usbMIDI.sendStart();
+      //midi.sendStart();
+      midi.sendRealTime(RealTimeMessage::Start);
     } else {
       // Serial.println("pause"); #
       stopLastNote();
       stopNote(Metropolis[0].stepPointer);
       stopAllNotes();
-      usbMIDI.sendStop();
+      //midi.sendStop();
+      midi.sendRealTime(RealTimeMessage::Stop);
     }
   }
   if (internalDigital[1].getState() == Button::State::Falling){
@@ -2335,6 +2357,7 @@ void checkForMissedClocks() {
     
 }
 
+
 //executed when midi stop signal received
 void handleStop(){
   Serial.println("stop");
@@ -2381,7 +2404,7 @@ void handleClock() {
       mainClocks[0].extTicksCounter = 0;
 
       //do the actual clock cycle
-      usbMIDI.sendClock();
+      midi.sendRealTime(RealTimeMessage::TimingClock);
       nextPulse();
     }
   }
@@ -2393,7 +2416,8 @@ void handleClock() {
 void setup() {
   Control_Surface.begin();
   midi.begin();
-  Serial.begin(9600);
+  trsMIDI.begin();
+  Serial.begin(115200);
   setDefaultClockSettings();
 
   //setup the LED Pin and Multiplexer
@@ -2407,10 +2431,13 @@ void setup() {
     subClocks[i].delayBuffer = subClocks[i].delay;  // Store set delay to delay buffer
   }
   selectMuxOutPin(Metropolis[0].stepPointer);
+
+  //should use midi.$$$ but i cant attach the interrupts //TODO
   usbMIDI.setHandleClock(handleClock);
   usbMIDI.setHandleStart(handleStart);
   usbMIDI.setHandleStop(handleStop);
   usbMIDI.setHandleSystemReset(handleReset);
+
   //setup interrupt timer, calls function every 250 microseconds, even when other stuff is running
   //change this value if getting issues with controlsurface loop
   quickReadTimer.begin(anythingAnytimeAllAtOnce, 250);
@@ -2487,7 +2514,6 @@ void loop() {
 //calls all actions that need to be called frequently
 void anythingAnytimeAllAtOnce(){
   updateClock();
-  usbMIDI.read();
   midi.read();
   midi.update();
   //checkForMissedClocks(); //buggy asf

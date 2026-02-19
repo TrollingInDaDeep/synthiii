@@ -164,12 +164,14 @@ void startDrumNote(int subClockID) {
 
   //probability
   
-  usbMIDI.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
+  //midi.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
+  midi.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127);
 }
 
 ///stops a drumnote reading note from drumInstrument array
 void stopDrumNote(int subClockID) {
-  usbMIDI.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
+  //midi.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
+  midi.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127);
 }
 
 void resetDrums(){
