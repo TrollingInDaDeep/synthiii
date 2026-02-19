@@ -8,21 +8,10 @@ const  int synthMidiChannel = 12;
 //TRS Midi Output
 HardwareSerialMIDI_Interface trsMIDI {Serial7, 115200}; //Serial7 is RX Pin 28 and TX Pin 29, see https://www.pjrc.com/teensy/td_libs_MIDI.html
 
-
-//MIDI callbacks
-
-// RealTimeMIDI_Callbacks rtCallbacks {
-//   .clock = handleClock,
-//   .start = handleStart,
-//   .stop  = handleStop,
-//   .reset = handleReset
-// }
-
-//old version via teensy core as follows: (obsolete)
-  //midi.setHandleClock(handleClock);
-  //midi.setHandleStart(handleStart);
-  //midi.setHandleStop(handleStop);
-  //midi.setHandleSystemReset(handleReset);
+// midi pipes for routing
+// Instantiate the three pipes to connect the interfaces to Control_Surface
+//https://tttapa.github.io/Control-Surface/Doxygen/d3/df7/midi-tutorial.html
+MIDI_Pipe pipe_tx_u, pipe_rx_u, pipe_tx_s;
 
 //din1
 //I7
@@ -2414,7 +2403,12 @@ void handleClock() {
 }
 
 void setup() {
-  Control_Surface.begin();
+    // Manually route MIDI output from Control_Surface to the USB MIDI interface
+    Control_Surface >> pipe_tx_u >> midi;
+    // Manually route MIDI output from the USB MIDI interface to Control_Surface
+    Control_Surface << pipe_rx_u << midi;
+    // Manually route MIDI output from Control_Surface to the Serial MIDI interface
+    Control_Surface >> pipe_tx_s >> trsMIDI;  Control_Surface.begin();
   midi.begin();
   trsMIDI.begin();
   Serial.begin(115200);
