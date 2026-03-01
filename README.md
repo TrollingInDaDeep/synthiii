@@ -18,15 +18,15 @@ Sort of a fixed Modular system. As you can imagine, its impossible to settle on 
 
 
 ### A satisfying "work in progress" state
-Following I will stress to you the most: *Don´t expect to be finished ever*.
-In the beginning I loved the electronics, soldering, programming, I even learned how to design PCBs. When I check back where I started, it's incredible to me how much i've learned. After some years it started to frustrate me. I spent so much time troubleshooting, programming and soldering but not making music, which was my ultimate goal in the first place. Sure I had prototypes, but it was not possible to just power them on and enjoy making sounds. I figured it was time to spend a little bit of money to have at least a small sound making device and discovered the Korg Volca Sample (V1 with pajen firmware). Out of nowhere I was making music and could just sit at the window and tweak knobs to get *sound*.
+Here's what I will stress to you the most: *Don´t expect to be finished ever*.
+In the beginning I loved the electronics, soldering, programming, I even learned how to design PCBs. When I check back where I started, it's incredible to me how much i've learned. After some years however it started to frustrate me. I spent so much time troubleshooting, programming and soldering but not making music, which was my ultimate goal in the first place. Sure I had prototypes, but it was not possible to just power them on and enjoy making sounds. I figured it was time to spend a little bit of money to have at least a small sound making device and discovered the Korg Volca Sample (V1 with pajen firmware). Out of nowhere I was making music and could just sit at the window and tweak knobs to get *sound*.
 And with that joy, also my passion got re-ignited to customize and augment the sampler I had bought. Suddenly it was much clearer for me what I wanted to build because I knew how I wanted it to sound! And while these builds were not finished (which they never are), I could still jam happily.
 You need to be in a state that you feel like you're doing exactly what you wanted. Don't postpone that happiness until your device is finished, because it never really will be.
 
 ### Time is valuable
 Out of all the limited resources you'll have: Money, Frustration tolerance, space on your Desk etc... time is the most valuable one. If you spend several months reading about synths, ordering parts, writing code, being frustrated and heading to the bar in the evening, etc...
 before you know, you will have spent a considerable amount of money in wrong Parts, beer and therapy. If you had just bought a small, finished device to build your ecosystem *around* you'd be actually off way cheaper.
-If you do it good, you will eventually even replace the first instrument you bought with your DIY projects and you can sell it again. Don't get me wrong, you can spend all your life in tinkering, as long as you enjoy it.And if you don´t? Then your lifetime is not worth building everything on your own just to save a little bit of money.
+If you do it well, you will eventually even replace the first instrument you bought with your DIY projects and you can sell it again. Don't get me wrong, you can spend all your life in tinkering, as long as you enjoy it. And if you don´t? Then your lifetime is not worth building everything on your own just to save a little bit of money.
 
 
 ### Simplicity
@@ -48,7 +48,7 @@ Here's what i tried and where it lead me. Funny to look back to this thinking I 
 * Also Raspberry can't read analog signals like potentiometer values, so I need an ADC.
 * Currently using arduino Uno for that (attiny85 would also work but sending the value to PC is pain in the butthole)
 * With the Arduino I can just send it to serial via USB.
-* The base of the synth will still be Pure data and Automationism, this is fully platform independent!
+* The base of the synth will still be Pure data and Automatonism, this is fully platform independent!
 * So on this AMD platform currently running it on (hopefully headless) windows, but might switch to Patchbox or another low-latency linux kernel later.
 * Raspberry PI with pisound is great platform. includes patchbox low latency linux os.
 * This creates great sound and has good software on it. (Modep)
