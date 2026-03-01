@@ -4,14 +4,14 @@
 //USB Midi output
 USBMIDI_Interface midi;
 const  int synthMidiChannel = 12;
+Channel CSsynthMidiChannel = Channel_3;
+//drum channel definition below at drum struct
 
 //TRS Midi Output
-HardwareSerialMIDI_Interface trsMIDI {Serial7, 115200}; //Serial7 is RX Pin 28 and TX Pin 29, see https://www.pjrc.com/teensy/td_libs_MIDI.html
+//HardwareSerialMIDI_Interface trsMIDI {Serial7, 115200}; //Serial7 is RX Pin 28 and TX Pin 29, see https://www.pjrc.com/teensy/td_libs_MIDI.html
+//USBDebugMIDI_Interface debugMIDI; //test output
 
-// midi pipes for routing
-// Instantiate the three pipes to connect the interfaces to Control_Surface
-//https://tttapa.github.io/Control-Surface/Doxygen/d3/df7/midi-tutorial.html
-MIDI_Pipe pipe_tx_u, pipe_rx_u, pipe_tx_s;
+
 
 //din1
 //I7
@@ -55,80 +55,80 @@ CD74HC4051 muxI13 {I13, {A, B, C} };
 // Controls
 //CCPotentiometer
 CCPotentiometer I1_POTS[] {
-    { muxI1.pin(0), {0x00, Channel::createChannel(synthMidiChannel)} },
-    { muxI1.pin(1), {0x01, Channel::createChannel(synthMidiChannel)} },
-    { muxI1.pin(2), {0x02, Channel::createChannel(synthMidiChannel)} },
-    { muxI1.pin(3), {0x03, Channel::createChannel(synthMidiChannel)} },
-    { muxI1.pin(4), {0x04, Channel::createChannel(synthMidiChannel)} },
-    { muxI1.pin(5), {0x05, Channel::createChannel(synthMidiChannel)} },
-    //{ muxI1.pin(6), {0x06, Channel::createChannel(synthMidiChannel)} }, //not Connected
-    //{ muxI1.pin(7), {0x07, Channel::createChannel(synthMidiChannel)} }
+    { muxI1.pin(0), {0x00, CSsynthMidiChannel} },
+    { muxI1.pin(1), {0x01, CSsynthMidiChannel} },
+    { muxI1.pin(2), {0x02, CSsynthMidiChannel} },
+    { muxI1.pin(3), {0x03, CSsynthMidiChannel} },
+    { muxI1.pin(4), {0x04, CSsynthMidiChannel} },
+    { muxI1.pin(5), {0x05, CSsynthMidiChannel} },
+    //{ muxI1.pin(6), {0x06, CSsynthMidiChannel} }, //not Connected
+    //{ muxI1.pin(7), {0x07, CSsynthMidiChannel} }
 };
 CCPotentiometer I2_POTS[] {
-    { muxI2.pin(7), {0x08, Channel::createChannel(synthMidiChannel)} },
-    { muxI2.pin(6), {0x09, Channel::createChannel(synthMidiChannel)} },
-    { muxI2.pin(5), {0x0A, Channel::createChannel(synthMidiChannel)} },
-    { muxI2.pin(4), {0x0B, Channel::createChannel(synthMidiChannel)} },
-    { muxI2.pin(3), {0x0C, Channel::createChannel(synthMidiChannel)} },
-    { muxI2.pin(2), {0x0D, Channel::createChannel(synthMidiChannel)} },
-    { muxI2.pin(1), {0x0E, Channel::createChannel(synthMidiChannel)} },
-    { muxI2.pin(0), {0x0F, Channel::createChannel(synthMidiChannel)} }
+    { muxI2.pin(7), {0x08, CSsynthMidiChannel} },
+    { muxI2.pin(6), {0x09, CSsynthMidiChannel} },
+    { muxI2.pin(5), {0x0A, CSsynthMidiChannel} },
+    { muxI2.pin(4), {0x0B, CSsynthMidiChannel} },
+    { muxI2.pin(3), {0x0C, CSsynthMidiChannel} },
+    { muxI2.pin(2), {0x0D, CSsynthMidiChannel} },
+    { muxI2.pin(1), {0x0E, CSsynthMidiChannel} },
+    { muxI2.pin(0), {0x0F, CSsynthMidiChannel} }
 };
 
 CCPotentiometer I3_POTS[] {
-    //{ muxI3.pin(0), {0x10, Channel::createChannel(synthMidiChannel)} },
-    //{ muxI3.pin(1), {0x11, Channel::createChannel(synthMidiChannel)} },//unused
+    //{ muxI3.pin(0), {0x10, CSsynthMidiChannel} },
+    //{ muxI3.pin(1), {0x11, CSsynthMidiChannel} },//unused
 
-    //{ muxI3.pin(2), {0x12, Channel::createChannel(synthMidiChannel)} },
-    // { muxI3.pin(3), {0x13, Channel::createChannel(synthMidiChannel)} }, //used internally
-    // { muxI3.pin(4), {0x14, Channel::createChannel(synthMidiChannel)} }, 
-    // { muxI3.pin(5), {0x15, Channel::createChannel(synthMidiChannel)} }, //slide amount
-    //{ muxI3.pin(6), {0x16, Channel::createChannel(synthMidiChannel)} }, //minNote
-    //{ muxI3.pin(7), {0x17, Channel::createChannel(synthMidiChannel)} },  //maxNote
+    //{ muxI3.pin(2), {0x12, CSsynthMidiChannel} },
+    // { muxI3.pin(3), {0x13, CSsynthMidiChannel} }, //used internally
+    // { muxI3.pin(4), {0x14, CSsynthMidiChannel} }, 
+    // { muxI3.pin(5), {0x15, CSsynthMidiChannel} }, //slide amount
+    //{ muxI3.pin(6), {0x16, CSsynthMidiChannel} }, //minNote
+    //{ muxI3.pin(7), {0x17, CSsynthMidiChannel} },  //maxNote
 };
 CCButton I4_BUTTONS[] {
-    // { muxI4.pin(0), {0x18, Channel::createChannel(synthMidiChannel)} },
-    // { muxI4.pin(1), {0x19, Channel::createChannel(synthMidiChannel)} },
-    // { muxI4.pin(2), {0x1A, Channel::createChannel(synthMidiChannel)} },
-    // { muxI4.pin(3), {0x1B, Channel::createChannel(synthMidiChannel)} }, //all used internally
-    // { muxI4.pin(4), {0x1C, Channel::createChannel(synthMidiChannel)} },
-    // { muxI4.pin(5), {0x1D, Channel::createChannel(synthMidiChannel)} },
-    { muxI4.pin(6), {0x1E, Channel::createChannel(synthMidiChannel)} } //sync switch for synth 
-    //{ muxI4.pin(7), {0x1F, Channel::createChannel(synthMidiChannel)} } //not connected
+    // { muxI4.pin(0), {0x18, CSsynthMidiChannel} },
+    // { muxI4.pin(1), {0x19, CSsynthMidiChannel} },
+    // { muxI4.pin(2), {0x1A, CSsynthMidiChannel} },
+    // { muxI4.pin(3), {0x1B, CSsynthMidiChannel} }, //all used internally
+    // { muxI4.pin(4), {0x1C, CSsynthMidiChannel} },
+    // { muxI4.pin(5), {0x1D, CSsynthMidiChannel} },
+    { muxI4.pin(6), {0x1E, CSsynthMidiChannel} } //sync switch for synth 
+    //{ muxI4.pin(7), {0x1F, CSsynthMidiChannel} } //not connected
 };
 
 //used internally
 // CCPotentiometer I5_POTS[] {
-//     { muxI5.pin(7), {0x20, Channel::createChannel(synthMidiChannel)} },
-//     { muxI5.pin(6), {0x21, Channel::createChannel(synthMidiChannel)} },
-//     { muxI5.pin(5), {0x22, Channel::createChannel(synthMidiChannel)} },
-//     { muxI5.pin(4), {0x23, Channel::createChannel(synthMidiChannel)} },
-//     { muxI5.pin(3), {0x24, Channel::createChannel(synthMidiChannel)} },
-//     { muxI5.pin(2), {0x25, Channel::createChannel(synthMidiChannel)} }, // not working, buggy
-//     { muxI5.pin(1), {0x26, Channel::createChannel(synthMidiChannel)} },
-//     { muxI5.pin(0), {0x27, Channel::createChannel(synthMidiChannel)} },
+//     { muxI5.pin(7), {0x20, CSsynthMidiChannel} },
+//     { muxI5.pin(6), {0x21, CSsynthMidiChannel} },
+//     { muxI5.pin(5), {0x22, CSsynthMidiChannel} },
+//     { muxI5.pin(4), {0x23, CSsynthMidiChannel} },
+//     { muxI5.pin(3), {0x24, CSsynthMidiChannel} },
+//     { muxI5.pin(2), {0x25, CSsynthMidiChannel} }, // not working, buggy
+//     { muxI5.pin(1), {0x26, CSsynthMidiChannel} },
+//     { muxI5.pin(0), {0x27, CSsynthMidiChannel} },
 // };
 
 //used internally
 // CCPotentiometer I6_POTS[] {
-//     { muxI6.pin(0), {0x28, Channel::createChannel(synthMidiChannel)} },
-//     { muxI6.pin(1), {0x29, Channel::createChannel(synthMidiChannel)} },
-//     { muxI6.pin(2), {0x2A, Channel::createChannel(synthMidiChannel)} },
-//     { muxI6.pin(3), {0x2B, Channel::createChannel(synthMidiChannel)} },
-//     { muxI6.pin(4), {0x2C, Channel::createChannel(synthMidiChannel)} },
-//     { muxI6.pin(5), {0x2D, Channel::createChannel(synthMidiChannel)} },
-//     { muxI6.pin(6), {0x2E, Channel::createChannel(synthMidiChannel)} },
-//     { muxI6.pin(7), {0x2F, Channel::createChannel(synthMidiChannel)} }
+//     { muxI6.pin(0), {0x28, CSsynthMidiChannel} },
+//     { muxI6.pin(1), {0x29, CSsynthMidiChannel} },
+//     { muxI6.pin(2), {0x2A, CSsynthMidiChannel} },
+//     { muxI6.pin(3), {0x2B, CSsynthMidiChannel} },
+//     { muxI6.pin(4), {0x2C, CSsynthMidiChannel} },
+//     { muxI6.pin(5), {0x2D, CSsynthMidiChannel} },
+//     { muxI6.pin(6), {0x2E, CSsynthMidiChannel} },
+//     { muxI6.pin(7), {0x2F, CSsynthMidiChannel} }
 // };
 // CCPotentiometer I7_POTS[] {
-//     { muxI7.pin(0), {0x30, Channel::createChannel(synthMidiChannel)} },
-//     { muxI7.pin(1), {0x31, Channel::createChannel(synthMidiChannel)} },
-//     { muxI7.pin(2), {0x32, Channel::createChannel(synthMidiChannel)} },
-//     { muxI7.pin(3), {0x33, Channel::createChannel(synthMidiChannel)} },
-//     { muxI7.pin(4), {0x34, Channel::createChannel(synthMidiChannel)} },
-//     { muxI7.pin(5), {0x35, Channel::createChannel(synthMidiChannel)} },
-//     { muxI7.pin(6), {0x36, Channel::createChannel(synthMidiChannel)} },
-//     { muxI7.pin(7), {0x37, Channel::createChannel(synthMidiChannel)} },
+//     { muxI7.pin(0), {0x30, CSsynthMidiChannel} },
+//     { muxI7.pin(1), {0x31, CSsynthMidiChannel} },
+//     { muxI7.pin(2), {0x32, CSsynthMidiChannel} },
+//     { muxI7.pin(3), {0x33, CSsynthMidiChannel} },
+//     { muxI7.pin(4), {0x34, CSsynthMidiChannel} },
+//     { muxI7.pin(5), {0x35, CSsynthMidiChannel} },
+//     { muxI7.pin(6), {0x36, CSsynthMidiChannel} },
+//     { muxI7.pin(7), {0x37, CSsynthMidiChannel} },
 // };
 
 //NoteButton functionality if enabled for seq trigger buttons
@@ -138,71 +138,71 @@ CCButton I4_BUTTONS[] {
 //on top of that, why the heck ever, the seqButton[] buttons ONLY work
 // if one pin on that multiplexer is also initialized as a midi button
 CCButton SEQ_NoteButtons[] {
-    //{ muxI8.pin(7), {MIDI_Notes::C[4], Channel::createChannel(synthMidiChannel)} },
-    //{ muxI8.pin(6), {MIDI_Notes::C[4], Channel::createChannel(synthMidiChannel)} },
-    //{ muxI8.pin(5), {MIDI_Notes::C[4], Channel::createChannel(synthMidiChannel)} },
-    //{ muxI8.pin(4), {MIDI_Notes::C[4], Channel::createChannel(synthMidiChannel)} },
-    //{ muxI8.pin(3), {MIDI_Notes::C[4], Channel::createChannel(synthMidiChannel)} },
-    //{ muxI8.pin(2), {MIDI_Notes::C[4], Channel::createChannel(synthMidiChannel)} },
-    //{ muxI8.pin(1), {MIDI_Notes::C[4], Channel::createChannel(synthMidiChannel)} },
-    { muxI8.pin(0), {127, Channel::createChannel(synthMidiChannel)} },
+    //{ muxI8.pin(7), {MIDI_Notes::C[4], CSsynthMidiChannel} },
+    //{ muxI8.pin(6), {MIDI_Notes::C[4], CSsynthMidiChannel} },
+    //{ muxI8.pin(5), {MIDI_Notes::C[4], CSsynthMidiChannel} },
+    //{ muxI8.pin(4), {MIDI_Notes::C[4], CSsynthMidiChannel} },
+    //{ muxI8.pin(3), {MIDI_Notes::C[4], CSsynthMidiChannel} },
+    //{ muxI8.pin(2), {MIDI_Notes::C[4], CSsynthMidiChannel} },
+    //{ muxI8.pin(1), {MIDI_Notes::C[4], CSsynthMidiChannel} },
+    { muxI8.pin(0), {127, CSsynthMidiChannel} },
 };
 
 CCPotentiometer I9_POTS[] {
-    { muxI9.pin(0), {0x40, Channel::createChannel(synthMidiChannel)} },
-    { muxI9.pin(1), {0x41, Channel::createChannel(synthMidiChannel)} },
-    { muxI9.pin(2), {0x42, Channel::createChannel(synthMidiChannel)} },
-    { muxI9.pin(3), {0x43, Channel::createChannel(synthMidiChannel)} },
-    { muxI9.pin(4), {0x44, Channel::createChannel(synthMidiChannel)} },
-    { muxI9.pin(5), {0x45, Channel::createChannel(synthMidiChannel)} },
-    { muxI9.pin(6), {0x46, Channel::createChannel(synthMidiChannel)} },
-    { muxI9.pin(7), {0x47, Channel::createChannel(synthMidiChannel)} },
+    { muxI9.pin(0), {0x40, CSsynthMidiChannel} },
+    { muxI9.pin(1), {0x41, CSsynthMidiChannel} },
+    { muxI9.pin(2), {0x42, CSsynthMidiChannel} },
+    { muxI9.pin(3), {0x43, CSsynthMidiChannel} },
+    { muxI9.pin(4), {0x44, CSsynthMidiChannel} },
+    { muxI9.pin(5), {0x45, CSsynthMidiChannel} },
+    { muxI9.pin(6), {0x46, CSsynthMidiChannel} },
+    { muxI9.pin(7), {0x47, CSsynthMidiChannel} },
 };
 
 
 CCPotentiometer I10_POTS[] {
-    { muxI10.pin(0), {0x48, Channel::createChannel(synthMidiChannel)} },
-    { muxI10.pin(1), {0x49, Channel::createChannel(synthMidiChannel)} },
-    { muxI10.pin(2), {0x4A, Channel::createChannel(synthMidiChannel)} },
-    { muxI10.pin(3), {0x4B, Channel::createChannel(synthMidiChannel)} },
-    { muxI10.pin(4), {0x4C, Channel::createChannel(synthMidiChannel)} },
-    { muxI10.pin(5), {0x4D, Channel::createChannel(synthMidiChannel)} },
-    { muxI10.pin(6), {0x4E, Channel::createChannel(synthMidiChannel)} },
-    { muxI10.pin(7), {0x4F, Channel::createChannel(synthMidiChannel)} },
+    { muxI10.pin(0), {0x48, CSsynthMidiChannel} },
+    { muxI10.pin(1), {0x49, CSsynthMidiChannel} },
+    { muxI10.pin(2), {0x4A, CSsynthMidiChannel} },
+    { muxI10.pin(3), {0x4B, CSsynthMidiChannel} },
+    { muxI10.pin(4), {0x4C, CSsynthMidiChannel} },
+    { muxI10.pin(5), {0x4D, CSsynthMidiChannel} },
+    { muxI10.pin(6), {0x4E, CSsynthMidiChannel} },
+    { muxI10.pin(7), {0x4F, CSsynthMidiChannel} },
 };
 
 CCPotentiometer I11_POTS[] {
-    { muxI11.pin(0), {0x50, Channel::createChannel(synthMidiChannel)} },
-    { muxI11.pin(1), {0x51, Channel::createChannel(synthMidiChannel)} },
-    //{ muxI11.pin(2), {0x52, Channel::createChannel(synthMidiChannel)} }, //probability 1
-    { muxI11.pin(3), {0x53, Channel::createChannel(synthMidiChannel)} },
-    //{ muxI11.pin(4), {0x54, Channel::createChannel(synthMidiChannel)} }, //probability 2
-    { muxI11.pin(5), {0x55, Channel::createChannel(synthMidiChannel)} },
-    //{ muxI11.pin(6), {0x56, Channel::createChannel(synthMidiChannel)} }, //probability 3
-    { muxI11.pin(7), {0x57, Channel::createChannel(synthMidiChannel)} },
+    { muxI11.pin(0), {0x50, CSsynthMidiChannel} },
+    { muxI11.pin(1), {0x51, CSsynthMidiChannel} },
+    //{ muxI11.pin(2), {0x52, CSsynthMidiChannel} }, //probability 1
+    { muxI11.pin(3), {0x53, CSsynthMidiChannel} },
+    //{ muxI11.pin(4), {0x54, CSsynthMidiChannel} }, //probability 2
+    { muxI11.pin(5), {0x55, CSsynthMidiChannel} },
+    //{ muxI11.pin(6), {0x56, CSsynthMidiChannel} }, //probability 3
+    { muxI11.pin(7), {0x57, CSsynthMidiChannel} },
 };
 
 CCPotentiometer I12_POTS[] {
-    //{ muxI12.pin(0), {0x58, Channel::createChannel(synthMidiChannel)} }, //probability 4
-    { muxI12.pin(1), {0x59, Channel::createChannel(synthMidiChannel)} },
-    //{ muxI12.pin(2), {0x5A, Channel::createChannel(synthMidiChannel)} }, //used internally
-    //{ muxI12.pin(3), {0x5B, Channel::createChannel(synthMidiChannel)} }, //used internally
-    { muxI12.pin(4), {0x5C, Channel::createChannel(synthMidiChannel)} },
-    { muxI12.pin(5), {0x5D, Channel::createChannel(synthMidiChannel)} }//,
-    //{ muxI12.pin(6), {0x5E, Channel::createChannel(synthMidiChannel)} }, //PINS NOT CONNECTED
-    //{ muxI12.pin(7), {0x5F, Channel::createChannel(synthMidiChannel)} },
+    //{ muxI12.pin(0), {0x58, CSsynthMidiChannel} }, //probability 4
+    { muxI12.pin(1), {0x59, CSsynthMidiChannel} },
+    //{ muxI12.pin(2), {0x5A, CSsynthMidiChannel} }, //used internally
+    //{ muxI12.pin(3), {0x5B, CSsynthMidiChannel} }, //used internally
+    { muxI12.pin(4), {0x5C, CSsynthMidiChannel} },
+    { muxI12.pin(5), {0x5D, CSsynthMidiChannel} }//,
+    //{ muxI12.pin(6), {0x5E, CSsynthMidiChannel} }, //PINS NOT CONNECTED
+    //{ muxI12.pin(7), {0x5F, CSsynthMidiChannel} },
 };
 
 // all used internally
 // CCPotentiometer I13_POTS[] {
-//     { muxI13.pin(0), {0x60, Channel::createChannel(synthMidiChannel)} },
-//     { muxI13.pin(1), {0x61, Channel::createChannel(synthMidiChannel)} },
-//     { muxI13.pin(2), {0x62, Channel::createChannel(synthMidiChannel)} },
-//     { muxI13.pin(3), {0x63, Channel::createChannel(synthMidiChannel)} },
-//     { muxI13.pin(4), {0x64, Channel::createChannel(synthMidiChannel)} },
-//     { muxI13.pin(5), {0x65, Channel::createChannel(synthMidiChannel)} },
-//     { muxI13.pin(6), {0x66, Channel::createChannel(synthMidiChannel)} },
-//     { muxI13.pin(7), {0x67, Channel::createChannel(synthMidiChannel)} },
+//     { muxI13.pin(0), {0x60, CSsynthMidiChannel} },
+//     { muxI13.pin(1), {0x61, CSsynthMidiChannel} },
+//     { muxI13.pin(2), {0x62, CSsynthMidiChannel} },
+//     { muxI13.pin(3), {0x63, CSsynthMidiChannel} },
+//     { muxI13.pin(4), {0x64, CSsynthMidiChannel} },
+//     { muxI13.pin(5), {0x65, CSsynthMidiChannel} },
+//     { muxI13.pin(6), {0x66, CSsynthMidiChannel} },
+//     { muxI13.pin(7), {0x67, CSsynthMidiChannel} },
 // };
 
 
@@ -388,13 +388,15 @@ struct drumPad {
   int drummerSeqBeat = 0; //which beat in the sequence we're in
 };
 
-
-
 sequencer Metropolis[1]; //initializes a struct with the sequencer variables
 seqStep seqSteps[maxSteps]; //initializes a struct with the variables for each step. length defined by maxSteps of Sequencer
 mainClock mainClocks[1]; //the main clock is initialized
 subClock subClocks[numSubClocks]; //initialize subClocks based on number in mainClock
 drumPad telephone[1]; //initialize drumpad, called telephone because i^m using an old telephone keypad
+
+
+//create drum Midi Channel also as Channel element
+Channel CSdrumMidiChannel = Channel::createChannel(telephone[0].drumMidiChannel);
 
 
 //this will fuck your brain: 5 dimensional array
@@ -2403,14 +2405,12 @@ void handleClock() {
 }
 
 void setup() {
-    // Manually route MIDI output from Control_Surface to the USB MIDI interface
-    Control_Surface >> pipe_tx_u >> midi;
-    // Manually route MIDI output from the USB MIDI interface to Control_Surface
-    Control_Surface << pipe_rx_u << midi;
-    // Manually route MIDI output from Control_Surface to the Serial MIDI interface
-    Control_Surface >> pipe_tx_s >> trsMIDI;  Control_Surface.begin();
+  
+  
+  Control_Surface.begin();
   midi.begin();
-  trsMIDI.begin();
+  //trsMIDI.begin();
+  //debugMIDI.begin();
   Serial.begin(115200);
   setDefaultClockSettings();
 
@@ -2444,8 +2444,7 @@ void loop() {
   
   if (telephone[0].keypadMode != 1) { //read drumpad when not in play mode.
     readDrumPad();
-  }
-  ;
+  };
 
   readInternalInputs();
   analogReadMicros = micros();

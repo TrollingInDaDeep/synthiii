@@ -70,7 +70,7 @@ void nextStep() {
 //buggy, not sure if needed
 void stopLastNote(){
   //midi.sendNoteOff(Metropolis[0].lastNoteSent, Metropolis[0].velocity, synthMidiChannel);
-  midi.sendNoteOff(Metropolis[0].lastNoteSent, Metropolis[0].velocity);
+  midi.sendNoteOff({Metropolis[0].lastNoteSent, CSsynthMidiChannel}, Metropolis[0].velocity);
   subClocks[0].stopSent = 1; //select sequencer, set "stopSent" to true
 }
 
@@ -85,17 +85,23 @@ void startNote(int noteToPlay){
 
   //set slide back to 0
   //midi.sendControlChange(22, 0, synthMidiChannel); 
-  midi.sendControlChange(22, 0); //22 is the slide ctrlr number
+  midi.sendControlChange({22, CSsynthMidiChannel}, 0); //22 is the slide ctrlr number
 
   //if slide for note enabled -> enable slide control
   if (seqSteps[noteToPlay].slide){
       //midi.sendControlChange(22, Metropolis[0].slideAmount, synthMidiChannel);
-      midi.sendControlChange(22, Metropolis[0].slideAmount); //22 is the slide ctrlr number
+      midi.sendControlChange({22, CSsynthMidiChannel}, Metropolis[0].slideAmount); //22 is the slide ctrlr number
   }
   //noteStart = micros();
 
   //midi.sendNoteOn(seqSteps[noteToPlay].note, Metropolis[0].velocity, synthMidiChannel);
-  midi.sendNoteOn(seqSteps[noteToPlay].note, Metropolis[0].velocity);
+  midi.sendNoteOn({seqSteps[noteToPlay].note, CSsynthMidiChannel}, Metropolis[0].velocity);
+  
+  //for testing purpose
+  //trsMIDI.sendNoteOn(seqSteps[noteToPlay].note, Metropolis[0].velocity);
+  //debugMIDI.sendNoteOn(seqSteps[noteToPlay].note, Metropolis[0].velocity);
+
+
   subClocks[0].stopSent = false; //select sequencer, set "stopSent" to false
   Metropolis[0].lastNoteSent=seqSteps[noteToPlay].note;
   digitalWrite(I7, HIGH);
@@ -133,7 +139,12 @@ void nextPulse() {
 
 void stopNote(int noteToStop){
   //midi.sendNoteOff(seqSteps[noteToStop].note, Metropolis[0].velocity, synthMidiChannel);
-    midi.sendNoteOff(seqSteps[noteToStop].note, Metropolis[0].velocity);
+    midi.sendNoteOff({seqSteps[noteToStop].note, CSsynthMidiChannel}, Metropolis[0].velocity);
+
+   //for testing purpose
+   //trsMIDI.sendNoteOff(seqSteps[noteToStop].note, Metropolis[0].velocity);
+   //debugMIDI.sendNoteOff(seqSteps[noteToStop].note, Metropolis[0].velocity);
+
   subClocks[0].stopSent = true; //select sequencer, set "stopSent" to true
   //digitalWrite(I7, LOW);
 }
@@ -154,7 +165,7 @@ void resetSequencer() {
   stopAllNotes();
   for (int i = 0; i <= 127; i++){
     //midi.sendNoteOff(i, 127, synthMidiChannel);
-    midi.sendNoteOff(i, 127);
+    midi.sendNoteOff({i, CSsynthMidiChannel}, 127);
   }
   
 }

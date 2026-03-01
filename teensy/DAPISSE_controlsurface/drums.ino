@@ -14,7 +14,7 @@ void readDrumPad() {
 
   }
 
-  //only run operands once at change, not multiple times
+  //only run operands once per change, not multiple times
   
     
     if (telephone[0].keypadMode == 3) { //setRate mode
@@ -165,13 +165,13 @@ void startDrumNote(int subClockID) {
   //probability
   
   //midi.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
-  midi.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127);
+  midi.sendNoteOn({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
 }
 
 ///stops a drumnote reading note from drumInstrument array
 void stopDrumNote(int subClockID) {
   //midi.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
-  midi.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127);
+  midi.sendNoteOff({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
 }
 
 void resetDrums(){
