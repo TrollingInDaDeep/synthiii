@@ -79,6 +79,61 @@ You can increase (green) or decrease (red) the intensity with the * and # Key. S
 
 At the same time you can also play the instruments manually to add more notes into (blue).
 
+Editing the Drum patterns:
+To edit the drum patterns, see the files under /teensy/drumpatterns.txt. You have genre, 5 intensities per genre, 4 beats per intensity, 24 ticks per beat.
+"x" means hit, "-" means pause.
+To upload, you just paste them into the serial monitor. it doesn't work in the serial monitor of the arduino ide, but you can send the file via putty.
+Uploading also works live while drum sequence is running.
+```
+BEGIN_DRUM_PATTERNS
+LOAD
+GENRE 0
+INTENSITY 0
+
+BEAT 0
+x-----------------------
+------------------------
+------------------------
+------------------------
+
+BEAT 1
+x-----------------------
+------------------------
+------------------------
+------------------------
+
+BEAT 2
+x-----------------------
+------------------------
+------------------------
+------------------------
+
+BEAT 3
+x-----------------------
+------------------------
+------------------------
+------------------------
+
+
+INTENSITY 1
+
+BEAT 0
+------------------------
+------------------------
+------------------------
+------------------------
+```
+etc...
+end file with
+```
+END_DRUM_PATTERNS
+```
+to paste whole file i did following in powershell:
+```
+Get-Content <your file name> | plink -serial <teensy com port> -sercfg 115200,8,n,1,N
+Get-Content testfile.txt | plink -serial COM3 -sercfg 115200,8,n,1,N
+```
+
 ## Code
 
 ## Sound examples
