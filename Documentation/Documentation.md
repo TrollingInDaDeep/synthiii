@@ -29,7 +29,8 @@ Each instrument is triggered from a different SubClock. Instruments 0-9 are Drum
 #### Keypad Modes
 Via a Pot you can select between 4 Keypad Modes
 1: Play
-In this mode, the Keypad is just a midi notePad or Keyboard. It will play notes from 60 to 75 on the drum Channel. The rightmost column corresponds the midi notes of the 4 Instruments (kick, snare, hat, cymbal). You can simply play notes, also the drum notes. In the loop, the drumpad will not be read, hence no else drumpad function is executed.
+![functional diagram](./Keypadmode_play.png)
+In this mode, the Keypad is just a midi notePad or Keyboard. It will play notes from 60 to 75 on the drum Channel. The rightmost column (Blue) corresponds the midi notes of the 4 Instruments (kick, snare, hat, cymbal). You can simply play notes, also the drum notes. In the loop, the drumpad will not be read, hence no else drumpad function is executed.
 Keys are initialized as "NoteButtonMatrix<4, 4> keypadMatrix". It will send the midi notes always, i didn't get to fix this yet. midi notes should only be sent in play mode. in other modes, the midi notes should be sent via the sequencer. i tried running keypadmatrix.enable() and .disable(), but that results in no control updating whatsoever.
 Workaround would be to use a different midi channel for the keypadMatrix and the sequenced drum midi notes. maybe also use a filter within this code to filter out the keypad notes conditionally.
 
@@ -37,8 +38,40 @@ Workaround would be to use a different midi channel for the keypadMatrix and the
 not implemented yet. idea is to do like a po-33 with ratchets, live effects on an existing drum beat.
 
 3: setRate
+![functional diagram](./Keypadmode_setrate.png)
+SetRate lets you set the trigger Frequency of each instrument separately. Every Row is an instrument (Kick, Snare, Hat, Cymbal).
+Every column features a different "effect" for each instrument individualy:
+First Row (red): Decrease the frequency
+Second Row (grey): Mute/unmute instrument
+Third Row (green): Increase the frequency
+Fourth Row (yellow): Play the instruments manually
+
+There are 14 Trigger Frequencies (stored in const int numTriggerFrequencies) which you can navigate in (go up or down with first/third button):
+  {0}, //1
+  {12}, //1 off
+  {0, 12}, //2
+  {0, 8, 16}, //3
+  {8, 16}, //3 Jump
+  {0, 8, 20}, //3 Swing
+  {0, 6, 12, 18}, //4
+  {6, 12, 18}, //4 Jump
+  {0, 8, 12, 20}, // 4 Swing
+  {0, 8, 12, 16, 20}, //6 Jump
+  {0, 4, 8, 12, 16, 20}, // 6
+  {0, 3, 6, 9, 12, 15, 18, 21}, //8
+  {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22}, // 12
+  {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23} // 24
+  
+The instrument is triggered at a defined subTick in the clock cycle. every clock cycle has 24 subticks where something can be triggered.
+
 
 4: I need a Drummer
+![functional diagram](./Keypadmode_ineedadrummer.png)
+
+Most Live-y Mode. Select between 10 different "Genres" or pre defined Drum Patterns (yellow). Each of the 10 Genres (buttons 0-9) have 5 different "intensities".
+You can increase (green) or decrease (red) the intensity with the * and # Key. So a Punk beat will start basic, then with increasing intensity will get more snares, some cymbals and eventually a doubletime speed.
+
+At the same time you can also play the instruments manually to add more notes into (blue).
 
 ## Code
 
