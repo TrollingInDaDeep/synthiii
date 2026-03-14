@@ -166,7 +166,7 @@ void nextClockCycle(bool reset) {
     }
   }
   //Serial.print("clock @");
-  Serial.println("clock");
+  //Serial.println("clock");
   //send midi clock via usb only if internal clock is used??
   if (mainClocks[0].clockSource == false){
     //dont send at every pulse, as korg needs only every 6th. handled via instrument

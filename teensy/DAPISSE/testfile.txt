@@ -1,0 +1,10 @@
+BEGIN_DRUM_PATTERNS
+LOAD
+GENRE 0
+INTENSITY 0
+BEAT 0
+x--------x-----x-----x-x
+------------------------
+------------------------
+------------------------
+END_DRUM_PATTERNS

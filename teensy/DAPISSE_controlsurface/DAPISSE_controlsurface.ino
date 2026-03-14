@@ -217,6 +217,14 @@ IntervalTimer quickReadTimer;
 const int numTriggerFrequencies = 14; //number of trigger frequencies
 const int clockSubTicks = 24; //how many subticks in a clock
 
+// Serial stuff
+String serialLine = ""; //current line to read
+bool loadingPatterns = false; //if serial input is being interpreted
+int serGenre = 0; //currently read genre
+int serIntensity = 0; //currently read intensity
+int serBeat = 0; //currently read beat
+int serInstrument = 0; //currently read instrument
+
 // !!! sets the size of each row. used when looping through the array
 // !!! change this if you change triggerTable
 const int rowSizes[] = {1, 1, 2, 3, 2, 3, 4, 3, 4, 5, 6, 8, 12, 24};
@@ -2408,6 +2416,83 @@ void handleClock() {
   //Serial.println("p");
 }
 
+///
+/// Parses lines consisting of keyword or 24 character beat pattern
+/// stores patterns into array drummerBrain into the correct genre, beat and intensity
+///
+void parsePatternLine(String line) {
+  Serial.print("LINE: ");
+  Serial.println(line);
+  if (line == "BEGIN_DRUM_PATTERNS") return;
+
+  if (line == "LOAD")
+  {
+    loadingPatterns = true;
+    Serial.println("Loading patterns...");
+    return;
+  }
+
+  if (line == "END_DRUM_PATTERNS")
+  {
+    loadingPatterns = false;
+    Serial.println("Patterns loaded.");
+    return;
+  }
+
+  if (!loadingPatterns) return;
+
+
+  if (line.startsWith("GENRE"))
+  {
+    serGenre = line.substring(6).toInt();
+    return;
+  }
+
+  if (line.startsWith("INTENSITY"))
+  {
+    serIntensity = line.substring(10).toInt();
+    return;
+  }
+
+  if (line.startsWith("BEAT"))
+  {
+    serBeat = line.substring(5).toInt();
+    serInstrument = 0;
+    return;
+  }
+
+   if (line.length() == clockSubTicks)
+  {
+    if (serInstrument >= numDrumInstruments) return;
+    for (int i = 0; i < clockSubTicks; i++)
+    {
+      drummerBrain[serGenre][serIntensity][serBeat][serInstrument][i] =
+        (line[i] == 'x' || line[i] == '1'); //true if i= x or 1, else false
+    }
+
+    serInstrument++;
+  }
+}
+
+///
+/// checks if serial data is sent
+/// reads line by line and sends it to parsing function
+///
+void readSerialPatterns(){
+  while (Serial.available()) {
+    char c = Serial.read();
+
+    if (c == '\n' || c == '\r'){ //if end of line reached, trim line and parse it
+      serialLine.trim();
+      parsePatternLine(serialLine);
+      serialLine = ""; //reset buffer
+    }
+    else {
+      serialLine += c; //add character to buffer
+    }
+  }
+}
+
 void setup() {
   
   
@@ -2442,6 +2527,7 @@ void setup() {
 }
 
 void loop() {
+  readSerialPatterns();
   startLoopMicros = micros();
   Control_Surface.loop();
   controlSurfaceMicros = micros();
