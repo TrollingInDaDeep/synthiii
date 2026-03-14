@@ -380,6 +380,10 @@ int drumInstrumentNotes[numDrumInstruments] = {
 struct drumPad {
   int drumMidiChannel = 13; //Midi channel to which the keypad notes are sent
   int keypadMode = 2; //1 = play, 2 = Perform, 3 = setRate, 4 = I need a Drummer
+  //play: just play midi notes
+  //perform: not implemented, live effects like po33, ratchets
+  //setRate: set the trigger frequency of each drum instrument individually
+  //i need a drummer: switch between genres and increase/decrease intensity
   const int numKeypadModes = 4;
   bool ButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores current state of all buttons
   bool lastButtonStates[4][4] = { {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0} }; //stores last state of all buttons
