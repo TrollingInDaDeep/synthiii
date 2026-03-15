@@ -74,7 +74,7 @@ The instrument is triggered at a defined subTick in the clock cycle. every clock
 ![functional diagram](./Keypadmode_ineedadrummer.png)
 
 
-Most Live-y Mode. Select between 10 different "Genres" or pre defined Drum Patterns (yellow). Each of the 10 Genres (buttons 0-9) have 5 different "intensities".
+Most Live-y Mode. Select between 10 different "Genres" or pre defined Drum Patterns (yellow). Each of the 10 Genres (buttons 0-9) have 4 different "intensities".
 You can increase (green) or decrease (red) the intensity with the * and # Key. So a Punk beat will start basic, then with increasing intensity will get more snares, some cymbals and eventually a doubletime speed.
 
 At the same time you can also play the instruments manually to add more notes into (blue).
