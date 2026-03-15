@@ -134,6 +134,76 @@ Get-Content <your file name> | plink -serial <teensy com port> -sercfg 115200,8,
 Get-Content testfile.txt | plink -serial COM3 -sercfg 115200,8,n,1,N
 ```
 
+# uploading file automatically
+you can also upload the file automatically via python:
+first install pyserial:
+```
+pip install Serial //don't know if needed
+pip install pyserial
+```
+then make a script that uploads the file:
+```
+import serial
+comport = "COM3" #edit your com port here
+baudrate = 115200 #edit your baud rate here
+filepath = "C:/path/to/your/file/drumPatterns.txt" #edit your file path here
+
+ser = serial.Serial(comport, baudrate, timeout=1)
+ser.write(open(filepath, "rb").read())
+ser.close()
+```
+save that as `sendDrumPatternSerial.py` and whenever you run it, it will upload the drumpattern file to teensy. Yayy!
+
+But we want MORE! whenever I save the file and it changes, i want the script to automatically upload (only while the script is running of course.
+For that we use a watchdog:
+
+```
+pip install watchdog
+```
+change the code from above to this:
+```
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+import time
+import serial
+
+comport = "COM3" #edit your com port here
+baudrate = 115200 #edit your baud rate here
+filepath = "D:/repo/teensy/DAPISSE/drumPatterns.txt" #edit your file path here
+filedir = "D:/repo/teensy/DAPISSE/" #just the file directory location to watch
+ser = serial.Serial(comport, baudrate, timeout=1)
+print(f"Serial Port opened")
+
+# called when the watchdog triggers an event
+class MyEventHandler(FileSystemEventHandler):
+	# called when file is modified
+	def on_modified(self, event): 
+		print(f"File modified: {event.src_path}")
+		ser.write(open(filepath, "rb").read()) #actually write the file to serial
+	
+
+if __name__ == "__main__":
+	event_handler = MyEventHandler()
+	observer = Observer()
+	observer.schedule(event_handler, filedir, recursive=True)
+
+    # Start the observer
+	observer.start()
+	print(f"Monitoring dir: {filedir}")
+
+	try:
+		while True:
+			time.sleep(1)
+	except KeyboardInterrupt:
+		observer.stop()
+		ser.close()
+	observer.join()
+
+```
+
+now just run `python sendDrumPatternSerial.py` in the console and edit your textfile. every edit will immediately be uploaded. HOOORAY.
+Now don't forget to actually program some sick beats, that's why we're actually here :)
+
 ## Code
 
 ## Sound examples
