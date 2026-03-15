@@ -267,7 +267,7 @@ int endLoopMicros = 0;
 struct sequencer {
   const uint8_t velocity = 127; // standard velocity for notes
   const long bpmMin=5.0; //minimum BPM value (for mapping)
-  const long bpmMax=400.0; //maximum BPM value (for mapping)
+  const long bpmMax=120.0; //maximum BPM value (for mapping)
   int gateTime = 50; //time in milliseconds how long the note should be on
   const int gateMin = 5; //minimum gate time in milliseconds for pot selection
   const int gateMax = 1000; //maximum gate time in milliseconds for pot selection
