@@ -2487,7 +2487,7 @@ void readSerialPatterns(){
       parsePatternLine(serialLine);
       serialLine = ""; //reset buffer
     }
-    else {
+    else if (c != '.'){
       serialLine += c; //add character to buffer
     }
   }
