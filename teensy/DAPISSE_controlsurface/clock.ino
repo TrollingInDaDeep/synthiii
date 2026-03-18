@@ -102,8 +102,8 @@ void nextTick2() {
       
     //if current tick number is set to trigger in the triggerTable
     if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
-      // todo: implement probability here #
       
+
       if (telephone[0].keypadMode != 4) {
         clockHandler(i);
       } else { // "i need a drummer" mode
