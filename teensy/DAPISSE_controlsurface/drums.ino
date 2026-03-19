@@ -15,11 +15,69 @@ void readDrumPad() {
   }
 
   //only run operands once per change, not multiple times
-  
-    
+  int col;
+    if (telephone[0].keypadMode == 2) {//euclid mode
+      if (buttonChanged){
+        col = 0;
+
+        //loop through col 1 -> decrease number of hits
+        for (int i = 0; i < 4; i++){
+          if (!telephone[0].ButtonStates[col][i]) {
+            if (numPrimaryHits[i] <= 0){
+              //nüscht
+            } else {
+              numPrimaryHits[i]--;
+            }
+            Serial.println(numPrimaryHits[i]);
+          }
+        }
+
+        col = 1;
+        //loop through col 2 -> increase number of hits
+        for (int i = 0; i < 4; i++){
+          if (!telephone[0].ButtonStates[col][i]) {
+
+            if (numPrimaryHits[i] >= clockSubTicks){
+              //nüscht
+            } else {
+              numPrimaryHits[i]++;
+            }
+            Serial.println(numPrimaryHits[i]);
+          }
+        }
+
+        col = 2;
+        //loop through col 3 -> decrease secondary probability
+        for (int i = 0; i < 4; i++){
+          if (!telephone[0].ButtonStates[col][i]) {
+            //prob--
+            if (probSecondary[i] <= 0){
+              //nüscht
+            } else {
+              probSecondary[i]-= 5;
+            }
+            Serial.println(probSecondary[i]);
+          }
+        }
+
+        col = 3;
+        //loop through col 4 -> increase secondary probability
+        for (int i = 0; i < 4; i++){
+          if (!telephone[0].ButtonStates[col][i]) {
+            //prob++
+            if (probSecondary[i] >= 100){
+              //nüscht
+            } else {
+              probSecondary[i]+= 5;
+            }
+            Serial.println(probSecondary[i]);
+          }
+        }
+      }
+    }
+
     if (telephone[0].keypadMode == 3) { //setRate mode
       if (buttonChanged){
-        int col;
         col = 0;
 
         //Loop through col 1 -> decrease rate

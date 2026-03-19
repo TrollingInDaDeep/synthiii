@@ -246,7 +246,6 @@ int triggerTable[numTriggerFrequencies][clockSubTicks] = {
   {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23} // 24
 };
 
-
 float currentMicros = 0; //buffers the measured Microsecond timestamp at the start of the loop
 
 //for benchmark purposes
@@ -383,6 +382,14 @@ int drumInstrumentNotes[numDrumInstruments] = {
   71, //highhat
   75  //cymbals
 };
+
+//for euclid drum mode
+int primaryHits[numDrumInstruments][clockSubTicks]; //list of subtick number where primary hits happen (like in triggerTable)
+int numPrimaryHits[numDrumInstruments]; //how many hits get distributed over the 24 subticks
+
+int probSecondary[numDrumInstruments]; //probability of secondary hit occurring for each instrument
+
+
 
 //all variables that every drumpad has
 struct drumPad {
