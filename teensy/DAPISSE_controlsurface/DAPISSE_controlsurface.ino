@@ -2502,6 +2502,41 @@ void readSerialPatterns(){
   }
 }
 
+///
+/// Generates euclid distribution of hits
+/// stores into primaryHits array
+/// expects int hits (how many hits to distribute)
+/// and int instrument id (in which instrument in the array to store it)
+/// see https://diyelectromusic.com/2024/10/04/arduino-euclidean-gate-sequencer/
+void generateEuclid(int hits, int instId) {
+
+  if (hits > clockSubTicks) return; //safety
+
+  Serial.print("instrument ");
+  Serial.print(instId);
+  Serial.print(":");
+
+  int counter = 0; //counter for calculations
+
+  if (hits > 0) {
+    counter = clockSubTicks - hits; //only fill when not 0 hits
+  }
+
+  for (int i = 0; i < clockSubTicks; i++){ //loop through every clock subtick
+    counter += hits;
+
+    if (counter >= clockSubTicks) {
+      primaryHits[instId][i] = 1; //step is ON
+      Serial.print("1");
+    } else {
+      primaryHits[instId][i]  = 0; //step is OFF
+      Serial.print("0");
+    }
+    counter = counter % clockSubTicks; //modulo calculation. 
+  }
+  Serial.println();
+}
+
 void setup() {
   
   

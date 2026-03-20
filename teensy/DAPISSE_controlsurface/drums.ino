@@ -27,6 +27,7 @@ void readDrumPad() {
               //nüscht
             } else {
               numPrimaryHits[i]--;
+              generateEuclid(numPrimaryHits[i], i); //generate new euclid pattern
             }
             Serial.println(numPrimaryHits[i]);
           }
@@ -41,6 +42,7 @@ void readDrumPad() {
               //nüscht
             } else {
               numPrimaryHits[i]++;
+              generateEuclid(numPrimaryHits[i], i); //generate new euclid pattern
             }
             Serial.println(numPrimaryHits[i]);
           }

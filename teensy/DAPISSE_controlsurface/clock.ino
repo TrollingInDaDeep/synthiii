@@ -73,46 +73,50 @@ int getCurrentTick() {
 
 ///Run actions needed for next Tick -> currently unused
 /// variant 1 based on subtracting ticks until 0 are left
-void nextTick() {
-  mainClocks[0].lastTick = mainClocks[0].currentTick;
-  Serial.println(mainClocks[0].currentTick);
-  for (int i = 0; i < numSubClocks; i++){
-    subClocks[i].tickCounter++; //increase the tick counter
-    if (subClocks[i].tickCounter >= subClocks[i].ticksLeft) { // No ticks left -> trigger!
-      clockHandler(i);
+// void nextTick() {
+//   mainClocks[0].lastTick = mainClocks[0].currentTick;
+//   Serial.println(mainClocks[0].currentTick);
+//   for (int i = 0; i < numSubClocks; i++){
+//     subClocks[i].tickCounter++; //increase the tick counter
+//     if (subClocks[i].tickCounter >= subClocks[i].ticksLeft) { // No ticks left -> trigger!
+//       clockHandler(i);
 
-      //reset ticksLeft: Tick + delay
-      subClocks[i].ticksLeft = subClocks[i].tick + subClocks[i].delay; //necessary?
+//       //reset ticksLeft: Tick + delay
+//       subClocks[i].ticksLeft = subClocks[i].tick + subClocks[i].delay; //necessary?
 
-      //reset tick counter for subclock. 
-      subClocks[i].tickCounter = 0;
-    }
-  }
-    // if (runDrum){
-  //   nextDrumStep(); #
-  // }
-
-}
+//       //reset tick counter for subclock. 
+//       subClocks[i].tickCounter = 0;
+//     }
+//   }
+// }
 
 /// Run actions needed for next Tick
 /// variant 2 based on which tick we're currently in
 void nextTick2() {
   //loop through subclocks
-  for (int i = 0; i < numSubClocks; i++){
-      
+  for (int i = 0; i < numSubClocks; i++){ //loop through subcklocks / instruments
+    
+
     //if current tick number is set to trigger in the triggerTable
     if (containsNum(subClocks[i].triggerFrequency, mainClocks[0].currentTick)){
       
-
-      if (telephone[0].keypadMode != 4) {
+      if (telephone[0].keypadMode == 3) {
         clockHandler(i);
-      } else { // "i need a drummer" mode
+      } else {
         if (i < 1) { //sequencer
           clockHandler(i);
         }
       }
-      
     }
+    
+    if (telephone[0].keypadMode == 2) { //euclid mode
+      if (i >= 1 && i <= numDrumInstruments) { //drum instruments
+        if (primaryHits[i-1][mainClocks[0].currentTick]) { //if step is enabled in hit array -> trigger
+          clockHandler(i);
+        } //else if [secondary hit] -> trigger still
+      }
+    }
+
     if (telephone[0].keypadMode == 4) {
       if (i >= 1 && i <= numDrumInstruments) { //drum instruments
         //check and loop through drummer brain
