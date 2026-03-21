@@ -1,4 +1,5 @@
 #include <Control_Surface.h>
+#include <USBHost_t36.h>
 
 // Instantiate a MIDI Interface to use
 //USB Midi output
@@ -7,10 +8,11 @@ const  int synthMidiChannel = 12;
 Channel CSsynthMidiChannel = Channel_3;
 //drum channel definition below at drum struct
 
-//TRS Midi Output
-//HardwareSerialMIDI_Interface trsMIDI {Serial7, 115200}; //Serial7 is RX Pin 28 and TX Pin 29, see https://www.pjrc.com/teensy/td_libs_MIDI.html
-//USBDebugMIDI_Interface debugMIDI; //test output
-
+//USB HOST
+//secondary midi port for usb devices connected directly to teensy
+USBHost myusb; //instantiate midi port on USB secondary port on teensy
+USBHub hub1(myusb); //no idea what that's for
+MIDIDevice_BigBuffer midi1(myusb); //create a midi interface on the USB port
 
 
 //din1
@@ -377,10 +379,10 @@ const int numDrummerGenres = 10; //number of genre store slots, corresponds numb
 
 //stores midi note to be sent for every drum instrument
 int drumInstrumentNotes[numDrumInstruments] = {
-  63, //Kick
-  67, //snare
-  71, //highhat
-  75  //cymbals
+  48, //Kick 63
+  49, //snare 67
+  50, //highhat 71
+  51  //cymbals 75
 };
 
 //for euclid drum mode
@@ -393,7 +395,7 @@ int probSecondary[numDrumInstruments]; //probability of secondary hit occurring 
 
 //all variables that every drumpad has
 struct drumPad {
-  int drumMidiChannel = 13; //Midi channel to which the keypad notes are sent
+  int drumMidiChannel = 11; //Midi channel to which the keypad notes are sent
   int keypadMode = 2; //1 = play, 2 = Euclid, 3 = setRate, 4 = I need a Drummer
   //play: just play midi notes
   //Euclid: not implemented, euclidian patterns with secondary hits based on probability
@@ -2541,9 +2543,9 @@ void setup() {
   
   
   Control_Surface.begin();
-  midi.begin();
-  //trsMIDI.begin();
-  //debugMIDI.begin();
+  midi.begin(); //normal USB miti port
+  myusb.begin(); //secondary USB Host port
+
   Serial.begin(115200);
   setDefaultClockSettings();
 
@@ -2559,11 +2561,17 @@ void setup() {
   }
   selectMuxOutPin(Metropolis[0].stepPointer);
 
+  //attach handlers
+
+  //normal midi
   //should use midi.$$$ but i cant attach the interrupts //TODO
   usbMIDI.setHandleClock(handleClock);
   usbMIDI.setHandleStart(handleStart);
   usbMIDI.setHandleStop(handleStop);
   usbMIDI.setHandleSystemReset(handleReset);
+
+  //secondary host usb midi
+  midi1.setHandleNoteOn(OnNoteOn);
 
   //setup interrupt timer, calls function every 250 microseconds, even when other stuff is running
   //change this value if getting issues with controlsurface loop
@@ -2644,7 +2652,23 @@ void anythingAnytimeAllAtOnce(){
   midi.read();
   midi.update();
   //checkForMissedClocks(); //buggy asf
+
+  //secondary midi host tasks
+  myusb.Task(); 
+  midi1.read();
 }
+
+void OnNoteOn(byte channel, byte note, byte velocity) {
+  Serial.print("fakin noot, ch=");
+	Serial.print(channel);
+	Serial.print(", noot=");
+	Serial.print(note);
+	Serial.print(", velossi'i=");
+	Serial.print(velocity);
+  Serial.print("    Fack yeeees");
+	Serial.println();
+}
+
 
 //displays the benchmark values to see which steps take how long
 void benchmark() {

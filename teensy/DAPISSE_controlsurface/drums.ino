@@ -226,6 +226,11 @@ void startDrumNote(int subClockID) {
   
   //midi.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
   midi.sendNoteOn({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
+  uint8_t mtype = 0x90; // note on byte. see https://github.com/PaulStoffregen/USBHost_t36/blob/master/USBHost_t36.h#L1180
+  uint8_t mNote = drumInstrumentNotes[subClocks[subClockID].instrument];
+  uint8_t mVel = 127;
+  uint8_t mChan = telephone[0].drumMidiChannel;
+  midi1.send(mtype, mNote, mVel, mChan);
 }
 
 ///stops a drumnote reading note from drumInstrument array
