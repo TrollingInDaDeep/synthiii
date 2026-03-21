@@ -230,7 +230,11 @@ void startDrumNote(int subClockID) {
   uint8_t mNote = drumInstrumentNotes[subClocks[subClockID].instrument];
   uint8_t mVel = 127;
   uint8_t mChan = telephone[0].drumMidiChannel;
-  midi1.send(mtype, mNote, mVel, mChan);
+  //midi1.send(mtype, mNote, mVel, mChan);
+  for (int i = 0; i<4; i++){
+    midilist[i]->send(mtype, mNote, mVel, mChan);
+  }
+  
 }
 
 ///stops a drumnote reading note from drumInstrument array

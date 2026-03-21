@@ -12,8 +12,16 @@ Channel CSsynthMidiChannel = Channel_3;
 //secondary midi port for usb devices connected directly to teensy
 USBHost myusb; //instantiate midi port on USB secondary port on teensy
 USBHub hub1(myusb); //no idea what that's for
-MIDIDevice_BigBuffer midi1(myusb); //create a midi interface on the USB port
-
+USBHub hub2(myusb); //even less idea what that is for
+USBHub hub3(myusb); //even less idea what that is for
+USBHub hub4(myusb); //even less idea what that is for
+MIDIDevice_BigBuffer midi01(myusb); //create a midi interface on the USB port
+MIDIDevice_BigBuffer midi02(myusb);
+MIDIDevice_BigBuffer midi03(myusb);
+MIDIDevice_BigBuffer midi04(myusb);
+MIDIDevice_BigBuffer * midilist[4] = {
+  &midi01, &midi02, &midi03, &midi04
+};
 
 //din1
 //I7
@@ -2544,7 +2552,6 @@ void setup() {
   
   Control_Surface.begin();
   midi.begin(); //normal USB miti port
-  myusb.begin(); //secondary USB Host port
 
   Serial.begin(115200);
   setDefaultClockSettings();
@@ -2570,8 +2577,11 @@ void setup() {
   usbMIDI.setHandleStop(handleStop);
   usbMIDI.setHandleSystemReset(handleReset);
 
+  delay(1500); //wait for enumeration to complete before turning on USB host
+  myusb.begin(); //secondary USB Host port
+
   //secondary host usb midi
-  midi1.setHandleNoteOn(OnNoteOn);
+  //midi1.setHandleNoteOn(OnNoteOn);
 
   //setup interrupt timer, calls function every 250 microseconds, even when other stuff is running
   //change this value if getting issues with controlsurface loop
@@ -2655,7 +2665,7 @@ void anythingAnytimeAllAtOnce(){
 
   //secondary midi host tasks
   myusb.Task(); 
-  midi1.read();
+  //midi1.read();
 }
 
 void OnNoteOn(byte channel, byte note, byte velocity) {
