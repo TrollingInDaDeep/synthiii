@@ -1,0 +1,58 @@
+{
+    "current": 0,
+    "snapshots": [
+        {
+            "name": "Default",
+            "data": {
+                "eventblocker": {
+                    "bypassed": true,
+                    "parameters": {},
+                    "ports": {
+                        "blkcc": 1.0,
+                        "blknote": 0.0,
+                        "blkpc": 1.0,
+                        "blkpp": 0.0,
+                        "blkcp": 0.0,
+                        "blkpb": 0.0,
+                        "blksx": 1.0,
+                        "blkcm": 1.0,
+                        "cmt": 0.0,
+                        "cmf": 0.0,
+                        "cm1": -1.0,
+                        "cm2": -1.0
+                    },
+                    "preset": ""
+                },
+                "midi_display_lv2": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {},
+                    "preset": ""
+                },
+                "channelmap": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "chn1": 1.0,
+                        "chn2": 2.0,
+                        "chn3": 3.0,
+                        "chn4": 4.0,
+                        "chn5": 5.0,
+                        "chn6": 6.0,
+                        "chn7": 7.0,
+                        "chn8": 8.0,
+                        "chn9": 9.0,
+                        "chn10": 10.0,
+                        "chn11": 11.0,
+                        "chn12": 3.0,
+                        "chn13": 13.0,
+                        "chn14": 14.0,
+                        "chn15": 15.0,
+                        "chn16": 16.0
+                    },
+                    "preset": ""
+                }
+            }
+        }
+    ]
+}
