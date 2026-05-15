@@ -40,36 +40,28 @@ _:b8
     ingen:head <amsynth/midi> .
 
 _:b9
-    ingen:tail <midi_capture_136> ;
-    ingen:head <channelfilter_1/midiin> .
-
-_:b10
-    ingen:tail <midi_capture_136> ;
-    ingen:head <channelfilter/midiin> .
-
-_:b11
     ingen:tail <channelfilter_1/midiout> ;
     ingen:head <eventblocker/midiin> .
 
-_:b12
+_:b10
     ingen:tail <eventblocker/midiout> ;
     ingen:head <midi_playback_2> .
 
-_:b13
+_:b11
     ingen:tail <midi_capture_2> ;
     ingen:head <channelfilter/midiin> .
 
-_:b14
+_:b12
     ingen:tail <midi_capture_6> ;
     ingen:head <channelfilter/midiin> .
 
-_:b15
-    ingen:tail <midi_capture_152> ;
-    ingen:head <channelfilter/midiin> .
-
-_:b16
-    ingen:tail <midi_capture_152> ;
+_:b13
+    ingen:tail <midi_capture_170> ;
     ingen:head <channelfilter_1/midiin> .
+
+_:b14
+    ingen:tail <midi_capture_170> ;
+    ingen:head <channelfilter/midiin> .
 
 <Delay>
     ingen:canvasX 2713.0 ;
@@ -114,7 +106,7 @@ _:b16
         lv2:OutputPort .
 
 <Delay/l_delay>
-    ingen:value 176.692902 ;
+    ingen:value 200.078751 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 73 ;
@@ -126,7 +118,7 @@ _:b16
         lv2:InputPort .
 
 <Delay/rl_delay>
-    ingen:value 1.259843 ;
+    ingen:value 1.118110 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 71 ;
@@ -160,7 +152,7 @@ _:b16
         lv2:InputPort .
 
 <Delay/fx_mix>
-    ingen:value 0.000000 ;
+    ingen:value 24.409449 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 75 ;
@@ -283,7 +275,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/amp_release>
-    ingen:value 0.000000 ;
+    ingen:value 0.472441 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 3 ;
@@ -295,7 +287,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/osc1_waveform>
-    ingen:value 2.000000 ;
+    ingen:value 0.000000 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 8 ;
@@ -327,10 +319,10 @@ _:b16
         lv2:InputPort .
 
 <amsynth/filter_resonance>
-    ingen:value 0.893622 ;
+    ingen:value 0.320787 ;
     midi:binding [
         midi:channel 12 ;
-        midi:controllerNumber 64 ;
+        midi:controllerNumber 119 ;
         lv2:minimum 0.000000 ;
         lv2:maximum 0.970000 ;
         a midi:Controller ;
@@ -344,7 +336,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/filter_cutoff>
-    ingen:value 1.074803 ;
+    ingen:value 0.444882 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 66 ;
@@ -356,7 +348,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/osc2_detune>
-    ingen:value -0.039370 ;
+    ingen:value -0.023622 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 2 ;
@@ -380,7 +372,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/master_vol>
-    ingen:value 0.118110 ;
+    ingen:value 0.409449 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 0 ;
@@ -392,7 +384,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/lfo_freq>
-    ingen:value 2.362205 ;
+    ingen:value 0.000000 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 68 ;
@@ -409,7 +401,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/osc2_range>
-    ingen:value 0.889764 ;
+    ingen:value -0.622047 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 4 ;
@@ -469,7 +461,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/osc_mix_mode>
-    ingen:value 0.165354 ;
+    ingen:value 0.000000 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 12 ;
@@ -481,7 +473,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/osc1_pulsewidth>
-    ingen:value 0.637795 ;
+    ingen:value 0.000000 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 9 ;
@@ -529,7 +521,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/reverb_wet>
-    ingen:value 0.000000 ;
+    ingen:value 0.228346 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 74 ;
@@ -553,7 +545,7 @@ _:b16
         lv2:InputPort .
 
 <amsynth/distortion_crunch>
-    ingen:value 0.318898 ;
+    ingen:value 0.000000 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 92 ;
@@ -963,8 +955,8 @@ _:b16
         lv2:InputPort .
 
 <eventblocker>
-    ingen:canvasX 2557.5 ;
-    ingen:canvasY 742.9 ;
+    ingen:canvasX 2557.0 ;
+    ingen:canvasY 742.0 ;
     ingen:enabled true ;
     ingen:polyphonic false ;
     lv2:microVersion 0 ;
@@ -1086,7 +1078,7 @@ _:b16
         lv2:InputPort .
 
 <:rolling>
-    ingen:value 0 ;
+    ingen:value 1 ;
     lv2:index 2 ;
     a lv2:ControlPort ,
         lv2:InputPort .
@@ -1165,13 +1157,13 @@ _:b16
     a atom:AtomPort ,
         lv2:InputPort .
 
-<midi_capture_136>
+<midi_capture_170>
     atom:bufferType atom:Sequence ;
     atom:supports midi:MidiEvent ;
     lv2:index 11 ;
     lv2:name "Control Surface MIDI 1" ;
     lv2:portProperty lv2:connectionOptional ;
-    lv2:symbol "midi_capture_136" ;
+    lv2:symbol "midi_capture_170" ;
     <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
     a atom:AtomPort ,
         lv2:InputPort .
@@ -1209,13 +1201,13 @@ _:b16
     a atom:AtomPort ,
         lv2:OutputPort .
 
-<midi_playback_136>
+<midi_playback_170>
     atom:bufferType atom:Sequence ;
     atom:supports midi:MidiEvent ;
     lv2:index 15 ;
     lv2:name "Control Surface MIDI 1" ;
     lv2:portProperty lv2:connectionOptional ;
-    lv2:symbol "midi_playback_136" ;
+    lv2:symbol "midi_playback_170" ;
     <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
     a atom:AtomPort ,
         lv2:OutputPort .
@@ -1252,7 +1244,7 @@ _:b16
     pedal:addressings <addressings.json> ;
     pedal:screenshot <screenshot.png> ;
     pedal:thumbnail <thumbnail.png> ;
-    pedal:version 69 ;
+    pedal:version 70 ;
     ingen:polyphony 1 ;
     ingen:arc _:b1 ,
               _:b2 ,
@@ -1267,9 +1259,7 @@ _:b16
               _:b11 ,
               _:b12 ,
               _:b13 ,
-              _:b14 ,
-              _:b15 ,
-              _:b16 ;
+              _:b14 ;
     ingen:block <Delay> ,
                 <amsynth> ,
                 <channelfilter_1> ,
@@ -1285,11 +1275,11 @@ _:b16
              <control_out> ,
              <midi_capture_2> ,
              <midi_capture_6> ,
-             <midi_capture_136> ,
+             <midi_capture_170> ,
              <midi_capture_152> ,
              <midi_playback_2> ,
              <midi_playback_6> ,
-             <midi_playback_136> ,
+             <midi_playback_170> ,
              <midi_playback_152> ,
              <capture_1> ,
              <capture_2> ,
