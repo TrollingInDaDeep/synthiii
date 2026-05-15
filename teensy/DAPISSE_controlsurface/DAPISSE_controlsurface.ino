@@ -4,8 +4,8 @@
 // Instantiate a MIDI Interface to use
 //USB Midi output
 USBMIDI_Interface midi;
-const  int synthMidiChannel = 12;
-Channel CSsynthMidiChannel = Channel_3;
+//const  int synthMidiChannel = 12;
+Channel CSsynthMidiChannel = Channel_13;
 //drum channel definition below at drum struct
 
 //USB HOST
@@ -159,7 +159,7 @@ CCButton SEQ_NoteButtons[] {
 };
 
 CCPotentiometer I9_POTS[] {
-    { muxI9.pin(0), {0x40, CSsynthMidiChannel} },
+    { muxI9.pin(0), {0x77, CSsynthMidiChannel} }, //resonance, 0x40 (64) somehow buggy, so using 0x77 (119)
     { muxI9.pin(1), {0x41, CSsynthMidiChannel} },
     { muxI9.pin(2), {0x42, CSsynthMidiChannel} },
     { muxI9.pin(3), {0x43, CSsynthMidiChannel} },
