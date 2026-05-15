@@ -34,7 +34,16 @@ void readDrumPad() {
         }
 
         col = 1;
-        //loop through col 2 -> increase number of hits
+        //mute / unmute
+        for (int i = 0; i < 4; i++){
+          if (!telephone[0].ButtonStates[col][i]) {
+            subClocks[i+1].run = !subClocks[i+1].run;
+            
+          }
+        }
+
+        col = 2;
+        //loop through col 3 -> increase number of hits
         for (int i = 0; i < 4; i++){
           if (!telephone[0].ButtonStates[col][i]) {
 
@@ -47,32 +56,25 @@ void readDrumPad() {
             Serial.println(numPrimaryHits[i]);
           }
         }
-
-        col = 2;
         //loop through col 3 -> decrease secondary probability
-        for (int i = 0; i < 4; i++){
-          if (!telephone[0].ButtonStates[col][i]) {
-            //prob--
-            if (probSecondary[i] <= 0){
-              //nüscht
-            } else {
-              probSecondary[i]-= 5;
-            }
-            Serial.println(probSecondary[i]);
-          }
-        }
+        // for (int i = 0; i < 4; i++){
+        //   if (!telephone[0].ButtonStates[col][i]) {
+        //     //prob--
+        //     if (probSecondary[i] <= 0){
+        //       //nüscht
+        //     } else {
+        //       probSecondary[i]-= 5;
+        //     }
+        //     Serial.println(probSecondary[i]);
+        //   }
+        // }
 
         col = 3;
-        //loop through col 4 -> increase secondary probability
+        //Loop through col 4 -> play note
         for (int i = 0; i < 4; i++){
           if (!telephone[0].ButtonStates[col][i]) {
-            //prob++
-            if (probSecondary[i] >= 100){
-              //nüscht
-            } else {
-              probSecondary[i]+= 5;
-            }
-            Serial.println(probSecondary[i]);
+            stopDrumNote(i+1); //weak de-doubling algorithm
+            startDrumNote(i+1); //subclockID starts at 1 for drum instruments
           }
         }
       }

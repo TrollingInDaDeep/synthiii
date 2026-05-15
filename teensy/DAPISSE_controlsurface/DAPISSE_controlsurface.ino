@@ -397,7 +397,7 @@ int drumInstrumentNotes[numDrumInstruments] = {
 int primaryHits[numDrumInstruments][clockSubTicks]; //list of subtick number where primary hits happen (like in triggerTable)
 int numPrimaryHits[numDrumInstruments]; //how many hits get distributed over the 24 subticks
 
-int probSecondary[numDrumInstruments]; //probability of secondary hit occurring for each instrument
+int probSecondary[numDrumInstruments]; //probability of secondary hit occurring for each instrument (not implemented)
 
 
 
