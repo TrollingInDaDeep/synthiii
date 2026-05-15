@@ -47,3 +47,6 @@ Midi in
 	-> 
 
 Pedalboards in /var/modep/pedalboards
+
+When making changes in the pedalboards, run synthiii/syncPedalBoards.sh
+this will copy the pedalboards to the git repo. then commit and push it to save to github. (this is mainly for me to note, you might need to backup elsewhere)
