@@ -649,6 +649,29 @@
                         "chn16": 16.0
                     },
                     "preset": ""
+                },
+                "channelmap_1": {
+                    "bypassed": false,
+                    "parameters": {},
+                    "ports": {
+                        "chn1": 1.0,
+                        "chn2": 2.0,
+                        "chn3": 3.0,
+                        "chn4": 4.0,
+                        "chn5": 5.0,
+                        "chn6": 6.0,
+                        "chn7": 7.0,
+                        "chn8": 8.0,
+                        "chn9": 9.0,
+                        "chn10": 10.0,
+                        "chn11": 11.0,
+                        "chn12": 12.0,
+                        "chn13": 4.0,
+                        "chn14": 14.0,
+                        "chn15": 15.0,
+                        "chn16": 16.0
+                    },
+                    "preset": ""
                 }
             }
         }
