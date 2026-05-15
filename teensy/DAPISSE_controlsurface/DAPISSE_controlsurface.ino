@@ -404,7 +404,8 @@ int probSecondary[numDrumInstruments]; //probability of secondary hit occurring 
 //all variables that every drumpad has
 struct drumPad {
   int drumMidiChannel = 11; //Midi channel to which the keypad notes are sent
-  int keypadMode = 2; //1 = play, 2 = Euclid, 3 = setRate, 4 = I need a Drummer
+  int drumDummyChannel = 16; //dummy channel to send button presses to
+  int keypadMode = 2; //1 = play (only sending to dummy channel atm), 2 = Euclid, 3 = setRate, 4 = I need a Drummer
   //play: just play midi notes
   //Euclid: not implemented, euclidian patterns with secondary hits based on probability
   //setRate: set the trigger frequency of each drum instrument individually
@@ -2054,6 +2055,8 @@ Button seqButtons[] {
 ///
 /// Keypad
 ///
+
+//Midi notes sent on keypress
 const AddressMatrix<4, 4> keypadNotes = {{
   {60, 61, 62, 63},
   {64, 65, 66, 67},
@@ -2065,7 +2068,7 @@ NoteButtonMatrix<4, 4> keypadMatrix {
   {5,6,12,11}, //output LOW
   {7,8,9,10}, //input pullup
   keypadNotes,
-  Channel::createChannel(telephone[0].drumMidiChannel)
+  Channel::createChannel(telephone[0].drumDummyChannel)
 };
 
 
@@ -2659,7 +2662,11 @@ void loop() {
 //calls all actions that need to be called frequently
 void anythingAnytimeAllAtOnce(){
   updateClock();
+  
+
   midi.read();
+  
+  
   midi.update();
   //checkForMissedClocks(); //buggy asf
 
