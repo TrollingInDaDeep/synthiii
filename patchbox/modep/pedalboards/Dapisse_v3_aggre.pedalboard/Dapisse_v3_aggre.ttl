@@ -8,52 +8,48 @@
 @prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
 
 _:b1
-    ingen:tail <capture_2> ;
-    ingen:head <playback_2> .
-
-_:b2
-    ingen:tail <channelfilter_1/midiout> ;
-    ingen:head <midi_display_lv2/in> .
-
-_:b3
     ingen:tail <amsynth/out_l> ;
     ingen:head <Delay/left_in> .
 
-_:b4
-    ingen:tail <channelfilter_1/midiout> ;
-    ingen:head <midi_playback_2> .
-
-_:b5
-    ingen:tail <Delay/right_out> ;
-    ingen:head <playback_2> .
-
-_:b6
-    ingen:tail <capture_1> ;
-    ingen:head <playback_1> .
-
-_:b7
-    ingen:tail <amsynth/out_l> ;
-    ingen:head <Delay/right_in> .
-
-_:b8
+_:b2
     ingen:tail <Delay/left_out> ;
     ingen:head <playback_1> .
 
-_:b9
-    ingen:tail <midi_merger_out> ;
-    ingen:head <channelfilter/midiin> .
+_:b3
+    ingen:tail <capture_2> ;
+    ingen:head <playback_2> .
 
-_:b10
+_:b4
+    ingen:tail <channelfilter_1/midiout> ;
+    ingen:head <midi_display_lv2/in> .
+
+_:b5
+    ingen:tail <amsynth/out_l> ;
+    ingen:head <Delay/right_in> .
+
+_:b6
+    ingen:tail <Delay/right_out> ;
+    ingen:head <playback_2> .
+
+_:b7
+    ingen:tail <capture_1> ;
+    ingen:head <playback_1> .
+
+_:b8
     ingen:tail <channelfilter/midiout> ;
-    ingen:head <channelmap_1/midiin> .
-
-_:b11
-    ingen:tail <channelmap_1/midiout> ;
     ingen:head <amsynth/midi> .
 
-_:b12
-    ingen:tail <channelmap_1/midiout> ;
-    ingen:head <midi_display_lv2/in> .
+_:b9
+    ingen:tail <channelfilter_1/midiout> ;
+    ingen:head <midi_playback_2> .
+
+_:b10
+    ingen:tail <midi_capture_136> ;
+    ingen:head <channelfilter_1/midiin> .
+
+_:b11
+    ingen:tail <midi_capture_136> ;
+    ingen:head <channelfilter/midiin> .
 
 <Delay>
     ingen:canvasX 2713.0 ;
@@ -328,7 +324,7 @@ _:b12
         lv2:InputPort .
 
 <amsynth/filter_cutoff>
-    ingen:value 0.318898 ;
+    ingen:value 0.602362 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 66 ;
@@ -364,7 +360,7 @@ _:b12
         lv2:InputPort .
 
 <amsynth/master_vol>
-    ingen:value 1.000000 ;
+    ingen:value 0.118110 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 0 ;
@@ -376,7 +372,7 @@ _:b12
         lv2:InputPort .
 
 <amsynth/lfo_freq>
-    ingen:value 0.295276 ;
+    ingen:value 2.362205 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 68 ;
@@ -388,7 +384,7 @@ _:b12
         lv2:InputPort .
 
 <amsynth/lfo_waveform>
-    ingen:value 6.000000 ;
+    ingen:value 0.000000 ;
     a lv2:ControlPort ,
         lv2:InputPort .
 
@@ -405,7 +401,7 @@ _:b12
         lv2:InputPort .
 
 <amsynth/osc_mix>
-    ingen:value 0.039370 ;
+    ingen:value -0.023622 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 11 ;
@@ -537,7 +533,7 @@ _:b12
         lv2:InputPort .
 
 <amsynth/distortion_crunch>
-    ingen:value 0.000000 ;
+    ingen:value 0.311811 ;
     midi:binding [
         midi:channel 12 ;
         midi:controllerNumber 92 ;
@@ -629,144 +625,9 @@ _:b12
     a lv2:ControlPort ,
         lv2:InputPort .
 
-<channelfilter>
-    ingen:canvasX 780.0 ;
-    ingen:canvasY 202.0 ;
-    ingen:enabled true ;
-    ingen:polyphonic false ;
-    lv2:microVersion 0 ;
-    lv2:minorVersion 1544 ;
-    mod:builderVersion 0 ;
-    mod:releaseNumber 0 ;
-    lv2:port <channelfilter/chn1> ,
-             <channelfilter/chn2> ,
-             <channelfilter/chn3> ,
-             <channelfilter/chn4> ,
-             <channelfilter/chn5> ,
-             <channelfilter/chn6> ,
-             <channelfilter/chn7> ,
-             <channelfilter/chn8> ,
-             <channelfilter/chn9> ,
-             <channelfilter/chn10> ,
-             <channelfilter/chn11> ,
-             <channelfilter/chn12> ,
-             <channelfilter/chn13> ,
-             <channelfilter/chn14> ,
-             <channelfilter/chn15> ,
-             <channelfilter/chn16> ,
-             <channelfilter/latency> ,
-             <channelfilter/midiin> ,
-             <channelfilter/midiout> ,
-             <channelfilter/:bypass> ;
-    lv2:prototype <http://gareus.org/oss/lv2/midifilter#channelfilter> ;
-    pedal:instanceNumber 6 ;
-    pedal:preset <> ;
-    a ingen:Block .
-
-<channelfilter/midiin>
-    atom:bufferType atom:Sequence ;
-    atom:supports midi:MidiEvent ;
-    a atom:AtomPort ,
-        lv2:InputPort .
-
-<channelfilter/midiout>
-    atom:bufferType atom:Sequence ;
-    atom:supports midi:MidiEvent ;
-    a atom:AtomPort ,
-        lv2:OutputPort .
-
-<channelfilter/chn1>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn2>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn3>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn4>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn5>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn6>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn7>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn8>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn9>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn10>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn11>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn12>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn13>
-    ingen:value 1.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn14>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn15>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/chn16>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelfilter/latency>
-    a lv2:ControlPort ,
-        lv2:OutputPort .
-
-<channelfilter/:bypass>
-    ingen:value 0 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
 <channelfilter_1>
-    ingen:canvasX 1464.0 ;
-    ingen:canvasY 1083.0 ;
+    ingen:canvasX 772.0 ;
+    ingen:canvasY 729.0 ;
     ingen:enabled true ;
     ingen:polyphonic false ;
     lv2:microVersion 0 ;
@@ -1035,8 +896,8 @@ _:b12
         lv2:InputPort .
 
 <midi_display_lv2>
-    ingen:canvasX 2663.0 ;
-    ingen:canvasY 1130.0 ;
+    ingen:canvasX 1897.0 ;
+    ingen:canvasY 1216.0 ;
     ingen:enabled true ;
     ingen:polyphonic false ;
     lv2:microVersion 0 ;
@@ -1081,181 +942,137 @@ _:b12
     a lv2:ControlPort ,
         lv2:InputPort .
 
-<midigen>
-    ingen:canvasX 4540.0 ;
-    ingen:canvasY 1808.0 ;
-    ingen:enabled false ;
-    ingen:polyphonic false ;
-    lv2:microVersion 0 ;
-    lv2:minorVersion 512 ;
-    mod:builderVersion 0 ;
-    mod:releaseNumber 0 ;
-    lv2:port <midigen/sequence> ,
-             <midigen/bpm> ,
-             <midigen/progress> ,
-             <midigen/midiout> ,
-             <midigen/:bypass> ;
-    lv2:prototype <http://gareus.org/oss/lv2/midigen> ;
-    pedal:instanceNumber 1 ;
-    pedal:preset <> ;
-    a ingen:Block .
-
-<midigen/midiout>
-    atom:bufferType atom:Sequence ;
-    atom:supports midi:MidiEvent ;
-    a atom:AtomPort ,
-        lv2:OutputPort .
-
-<midigen/sequence>
-    ingen:value 0.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<midigen/bpm>
-    ingen:value 150.156250 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<midigen/progress>
-    a lv2:ControlPort ,
-        lv2:OutputPort .
-
-<midigen/:bypass>
-    ingen:value 1 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1>
-    ingen:canvasX 1243.6 ;
-    ingen:canvasY 202.8 ;
+<channelfilter>
+    ingen:canvasX 780.0 ;
+    ingen:canvasY 202.0 ;
     ingen:enabled true ;
     ingen:polyphonic false ;
     lv2:microVersion 0 ;
     lv2:minorVersion 1544 ;
     mod:builderVersion 0 ;
     mod:releaseNumber 0 ;
-    lv2:port <channelmap_1/chn1> ,
-             <channelmap_1/chn2> ,
-             <channelmap_1/chn3> ,
-             <channelmap_1/chn4> ,
-             <channelmap_1/chn5> ,
-             <channelmap_1/chn6> ,
-             <channelmap_1/chn7> ,
-             <channelmap_1/chn8> ,
-             <channelmap_1/chn9> ,
-             <channelmap_1/chn10> ,
-             <channelmap_1/chn11> ,
-             <channelmap_1/chn12> ,
-             <channelmap_1/chn13> ,
-             <channelmap_1/chn14> ,
-             <channelmap_1/chn15> ,
-             <channelmap_1/chn16> ,
-             <channelmap_1/latency> ,
-             <channelmap_1/midiin> ,
-             <channelmap_1/midiout> ,
-             <channelmap_1/:bypass> ;
-    lv2:prototype <http://gareus.org/oss/lv2/midifilter#channelmap> ;
-    pedal:instanceNumber 40 ;
+    lv2:port <channelfilter/chn1> ,
+             <channelfilter/chn2> ,
+             <channelfilter/chn3> ,
+             <channelfilter/chn4> ,
+             <channelfilter/chn5> ,
+             <channelfilter/chn6> ,
+             <channelfilter/chn7> ,
+             <channelfilter/chn8> ,
+             <channelfilter/chn9> ,
+             <channelfilter/chn10> ,
+             <channelfilter/chn11> ,
+             <channelfilter/chn12> ,
+             <channelfilter/chn13> ,
+             <channelfilter/chn14> ,
+             <channelfilter/chn15> ,
+             <channelfilter/chn16> ,
+             <channelfilter/latency> ,
+             <channelfilter/midiin> ,
+             <channelfilter/midiout> ,
+             <channelfilter/:bypass> ;
+    lv2:prototype <http://gareus.org/oss/lv2/midifilter#channelfilter> ;
+    pedal:instanceNumber 6 ;
     pedal:preset <> ;
     a ingen:Block .
 
-<channelmap_1/midiin>
+<channelfilter/midiin>
     atom:bufferType atom:Sequence ;
     atom:supports midi:MidiEvent ;
     a atom:AtomPort ,
         lv2:InputPort .
 
-<channelmap_1/midiout>
+<channelfilter/midiout>
     atom:bufferType atom:Sequence ;
     atom:supports midi:MidiEvent ;
     a atom:AtomPort ,
         lv2:OutputPort .
 
-<channelmap_1/chn1>
+<channelfilter/chn1>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn2>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn3>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn4>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn5>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn6>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn7>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn8>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn9>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn10>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn11>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn12>
+    ingen:value 0.000000 ;
+    a lv2:ControlPort ,
+        lv2:InputPort .
+
+<channelfilter/chn13>
     ingen:value 1.000000 ;
     a lv2:ControlPort ,
         lv2:InputPort .
 
-<channelmap_1/chn2>
-    ingen:value 2.000000 ;
+<channelfilter/chn14>
+    ingen:value 0.000000 ;
     a lv2:ControlPort ,
         lv2:InputPort .
 
-<channelmap_1/chn3>
-    ingen:value 3.000000 ;
+<channelfilter/chn15>
+    ingen:value 0.000000 ;
     a lv2:ControlPort ,
         lv2:InputPort .
 
-<channelmap_1/chn4>
-    ingen:value 4.000000 ;
+<channelfilter/chn16>
+    ingen:value 0.000000 ;
     a lv2:ControlPort ,
         lv2:InputPort .
 
-<channelmap_1/chn5>
-    ingen:value 5.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn6>
-    ingen:value 6.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn7>
-    ingen:value 7.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn8>
-    ingen:value 8.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn9>
-    ingen:value 9.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn10>
-    ingen:value 10.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn11>
-    ingen:value 11.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn12>
-    ingen:value 12.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn13>
-    ingen:value 3.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn14>
-    ingen:value 14.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn15>
-    ingen:value 15.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/chn16>
-    ingen:value 16.000000 ;
-    a lv2:ControlPort ,
-        lv2:InputPort .
-
-<channelmap_1/latency>
+<channelfilter/latency>
     a lv2:ControlPort ,
         lv2:OutputPort .
 
-<channelmap_1/:bypass>
+<channelfilter/:bypass>
     ingen:value 0 ;
     a lv2:ControlPort ,
         lv2:InputPort .
@@ -1330,15 +1147,81 @@ _:b12
     a lv2:AudioPort ,
         lv2:OutputPort .
 
-<midi_separated_mode>
-    ingen:value 0 ;
+<midi_capture_2>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
     lv2:index 9 ;
+    lv2:name "pisound MIDI 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "midi_capture_2" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<midi_capture_6>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    lv2:index 10 ;
+    lv2:name "pisound ctl MIDI 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "midi_capture_6" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<midi_capture_136>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    lv2:index 11 ;
+    lv2:name "Control Surface MIDI 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "midi_capture_136" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:InputPort .
+
+<midi_playback_2>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    lv2:index 12 ;
+    lv2:name "pisound MIDI 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "midi_playback_2" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<midi_playback_6>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    lv2:index 13 ;
+    lv2:name "pisound ctl MIDI 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "midi_playback_6" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<midi_playback_136>
+    atom:bufferType atom:Sequence ;
+    atom:supports midi:MidiEvent ;
+    lv2:index 14 ;
+    lv2:name "Control Surface MIDI 1" ;
+    lv2:portProperty lv2:connectionOptional ;
+    lv2:symbol "midi_playback_136" ;
+    <http://lv2plug.in/ns/ext/resize-port#minimumSize> 4096 ;
+    a atom:AtomPort ,
+        lv2:OutputPort .
+
+<midi_separated_mode>
+    ingen:value 1 ;
+    lv2:index 15 ;
     a atom:AtomPort ,
         lv2:InputPort .
 
 <midi_loopback>
     ingen:value 0 ;
-    lv2:index 10 ;
+    lv2:index 16 ;
     a atom:AtomPort ,
         lv2:InputPort .
 
@@ -1351,7 +1234,7 @@ _:b12
     pedal:addressings <addressings.json> ;
     pedal:screenshot <screenshot.png> ;
     pedal:thumbnail <thumbnail.png> ;
-    pedal:version 62 ;
+    pedal:version 65 ;
     ingen:polyphony 1 ;
     ingen:arc _:b1 ,
               _:b2 ,
@@ -1363,16 +1246,13 @@ _:b12
               _:b8 ,
               _:b9 ,
               _:b10 ,
-              _:b11 ,
-              _:b12 ;
+              _:b11 ;
     ingen:block <Delay> ,
                 <amsynth> ,
-                <channelfilter> ,
                 <channelfilter_1> ,
                 <channelmap> ,
                 <midi_display_lv2> ,
-                <midigen> ,
-                <channelmap_1> ;
+                <channelfilter> ;
     lv2:port <:bpb> ,
              <:bpm> ,
              <:rolling> ,
@@ -1380,6 +1260,12 @@ _:b12
              <midi_loopback> ,
              <control_in> ,
              <control_out> ,
+             <midi_capture_2> ,
+             <midi_capture_6> ,
+             <midi_capture_136> ,
+             <midi_playback_2> ,
+             <midi_playback_6> ,
+             <midi_playback_136> ,
              <capture_1> ,
              <capture_2> ,
              <playback_1> ,
