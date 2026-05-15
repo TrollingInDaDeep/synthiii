@@ -3,18 +3,19 @@ wlan setup via lan
 user: patch
 pw: ras
 
-LAN IP: 192.168.0.152
+LAN IP: 192.168.0.152 #changes from time to time, will be different for you, use for example angryIP scanner to search IP
 WLAN IP: 172.24.1.1
 WLAN SSID: Dapisse
 PSK: Dapisse69
 sudo systemctl start mec
 sudo systemctl stop orac
 
-
+# access GUI via VNC. need to enable gui first
 tightvncserver -geometry 600x400
 raspberr
 move window: alt+space -> move -> maus oder pfeiltasten -> enter / klick
 
+##dont know what that does, most probably no more needed
 /usr/bin/pd -rt -alsamidi -nogui -audiobuf 4 /home/patch/synthiii/main.pd
 /usr/bin/pd -rt -alsamidi -nogui -audiobuf 4 /home/patch/synthiii/readComPort.pd
 
@@ -22,16 +23,27 @@ move window: alt+space -> move -> maus oder pfeiltasten -> enter / klick
 DAPISSE Pedalboard:
 midi filter (channel 2, synth) -> Hauptsynth -> Delay -> Out
 
-Midi filter für drum channel (channel 3) 
--> noteToChannel Map:
-	- C auf channel 1
-	- D# auf channel 2
-	- E auf channel 3
-	- G auf channel 4
+AM Synth -> Delay -> out
 
-dann jeweils für jedes drum instrument
-channel filter (1) -> transpose -> Drum synth
-channel filter (2) -> transpose -> highHat synth
-channel filter (3) -> transpose -> snare synth
+Midi Mapping AM synth (not affected by channel filter or midi cable connected to am synth)
+Set the mapping accordingly through MIDI learn via Web UI.
+If you decide to change the midi channel you can either remap everything manually or use Linux magic:
+1. connect to patchbox via ssh
+Follow the commands:
+cd /var/modep/
+# check which midi channel is currently set:
+cat pedalboards/<your pedalboard>.pedalboard/<your pedalboard>.ttl | grep midi
+# replace channel number with sed
+# sed -i 's/midi:channel <oldmidichannel> ;/midi:channel <newmidichannel> ;/g' pedalboards/<yourpedalboard>.pedalboard/<yourpedalboard>.ttl
+#example: change from 3 to 13 (NOTE, CHANNELS ARE 0 BASED)
+sed -i 's/midi:channel 2 ;/midi:channel 12 ;/g' pedalboards/Dapisse_v3_aggre.pedalboard/Dapisse_v3_aggre.ttl
+# load pedalboard again in modep UI to see the changes
+
+
+
+Midi in
+	-> Channel 13 -> AMSynth
+	-> all midi to output
+	-> 
 
 Pedalboards in /var/modep/pedalboards
