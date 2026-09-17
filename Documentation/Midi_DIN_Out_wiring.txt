@@ -1,0 +1,21 @@
+Connector on Teensy Main Board:
+(called ain as I planned to use it differently. used as output here)
+ain4
++
+-
+_1 -> 21 -> RX5
+_2 -> 20 -> TX5 !! (Use Serial5)
+_3 -> 19
+_4 -> 18
+inSelA
+inSelB
+inSelC
+
+
+Wires of Ain4 To go to Midi DIN Connector
++ (Weiss)-> 47 Ohm -> Pin 4 (Rechts)
+- (Grau) -> Pin 2 (Mitte)
+ain4_2 (Blau) (TX5) -> 47 Ohm -> Pin 5 (Links)
+
+
+

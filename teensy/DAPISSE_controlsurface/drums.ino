@@ -228,6 +228,8 @@ void startDrumNote(int subClockID) {
   
   //midi.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
   midi.sendNoteOn({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
+  //debug for testing DIN midi out
+  //DINMIDIOUT.sendNoteOn({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
   uint8_t mtype = 0x90; // note on byte. see https://github.com/PaulStoffregen/USBHost_t36/blob/master/USBHost_t36.h#L1180
   uint8_t mNote = drumInstrumentNotes[subClocks[subClockID].instrument];
   uint8_t mVel = 127;
@@ -243,6 +245,8 @@ void startDrumNote(int subClockID) {
 void stopDrumNote(int subClockID) {
   //midi.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
   midi.sendNoteOff({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
+  //debug for testing DIN midi out
+  //DINMIDIOUT.sendNoteOff({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
 }
 
 void resetDrums(){
