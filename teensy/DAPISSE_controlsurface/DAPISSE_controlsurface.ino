@@ -11,9 +11,14 @@ Channel CSsynthMidiChannel = Channel_13;
 //Serial MIDI output
 HardwareSerialMIDI_Interface DINMIDIOUT {Serial5}; //Connected to +3.3/GND/TX5(pin20)
 
-
 // Instantiate a debug MIDI interface for debugging in the Serial Monitor
-USBDebugMIDI_Interface midi_dbg;
+USBDebugMIDI_Output midimon;
+MIDI_Pipe mpipe;
+
+//Midi connection pipes
+//MIDI_Pipe pipe_rx_USB, pipe_tx_USB, pipe_tx_DIN, pipe_tx_DBG;
+MIDI_PipeFactory<7> pipes;
+
 
 //USB HOST
 //secondary midi port for usb devices connected directly to teensy
@@ -29,11 +34,6 @@ MIDIDevice_BigBuffer midi04(myusb);
 MIDIDevice_BigBuffer * midilist[4] = {
   &midi01, &midi02, &midi03, &midi04
 };
-
-
-//Midi connection pipes
-//MIDI_Pipe pipe_rx_USB, pipe_tx_USB, pipe_tx_DIN, pipe_tx_DBG;
-MIDI_PipeFactory<7> pipes;
 
 //din1
 //I7
@@ -2562,18 +2562,21 @@ void generateEuclid(int hits, int instId) {
   Serial.println();
 }
 
+
 void setup() {
   
   midi.setAsDefault(); //set usb midi as default midi port
   //pipe_rx_USB, pipe_tx_USB, pipe_tx_DIN
   Control_Surface >> pipes >> midi;
-  Control_Surface >> pipes >> DINMIDIOUT;
-  Control_Surface >> pipes >> midi_dbg;
-  midi >> pipes >> Control_Surface;
-  midi >> pipes >> DINMIDIOUT;
-  midi >> pipes >> midi_dbg;
-
+  //Control_Surface >> pipes >> DINMIDIOUT;
+  Control_Surface >> pipes >> midimon;
+  //midi >> pipes >> Control_Surface;
+  //midi >> pipes >> DINMIDIOUT;
+  //midi >> pipes >> midi_dbg;
+  //midi >> pipes >> midimon;
   Control_Surface.begin();
+
+
   //midi.begin(); //normal USB midi port
   //midi_dbg.begin();
   //DINMIDIOUT.begin(); //DIN midi output Port
@@ -2611,7 +2614,6 @@ void setup() {
   //setup interrupt timer, calls function every 250 microseconds, even when other stuff is running
   //change this value if getting issues with controlsurface loop
   quickReadTimer.begin(anythingAnytimeAllAtOnce, 250);
-  midi.sendNoteOn(64,127);
 }
 
 void loop() {
