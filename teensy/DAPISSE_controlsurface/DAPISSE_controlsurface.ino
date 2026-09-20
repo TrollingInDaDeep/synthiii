@@ -2228,15 +2228,15 @@ void UpdateInternalVars(){
     if (Metropolis[0].run){
       // Serial.println("play")
       resetClock();
-      //midi.sendStart();
-      midi.sendRealTime(RealTimeMessage::Start);
+      //Control_Surface.sendStart();
+      Control_Surface.sendRealTime(RealTimeMessage::Start);
     } else {
       // Serial.println("pause"); #
       stopLastNote();
       stopNote(Metropolis[0].stepPointer);
       stopAllNotes();
-      //midi.sendStop();
-      midi.sendRealTime(RealTimeMessage::Stop);
+      //Control_Surface.sendStop();
+      Control_Surface.sendRealTime(RealTimeMessage::Stop);
     }
   }
   if (internalDigital[1].getState() == Button::State::Falling){
@@ -2441,7 +2441,7 @@ void handleClock() {
       mainClocks[0].extTicksCounter = 0;
 
       //do the actual clock cycle
-      midi.sendRealTime(RealTimeMessage::TimingClock);
+      Control_Surface.sendRealTime(RealTimeMessage::TimingClock);
       nextPulse();
     }
   }
@@ -2568,18 +2568,13 @@ void setup() {
   midi.setAsDefault(); //set usb midi as default midi port
   //pipe_rx_USB, pipe_tx_USB, pipe_tx_DIN
   Control_Surface >> pipes >> midi;
-  //Control_Surface >> pipes >> DINMIDIOUT;
-  Control_Surface >> pipes >> midimon;
+  Control_Surface >> pipes >> DINMIDIOUT;
+  //Control_Surface >> pipes >> midimon;
   //midi >> pipes >> Control_Surface;
   //midi >> pipes >> DINMIDIOUT;
   //midi >> pipes >> midi_dbg;
   //midi >> pipes >> midimon;
   Control_Surface.begin();
-
-
-  //midi.begin(); //normal USB midi port
-  //midi_dbg.begin();
-  //DINMIDIOUT.begin(); //DIN midi output Port
 
   Serial.begin(115200);
   setDefaultClockSettings();
@@ -2690,7 +2685,6 @@ void anythingAnytimeAllAtOnce(){
   
 
   midi.read();
-  
   
   midi.update();
   //checkForMissedClocks(); //buggy asf

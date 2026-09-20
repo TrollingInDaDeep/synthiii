@@ -226,15 +226,13 @@ void startDrumNote(int subClockID) {
 
   //probability
   
-  //midi.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
-  midi.sendNoteOn({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
-  //debug for testing DIN midi out
-  //DINMIDIOUT.sendNoteOn({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
+  //Control_Surface.sendNoteOn(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
+  Control_Surface.sendNoteOn({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
   uint8_t mtype = 0x90; // note on byte. see https://github.com/PaulStoffregen/USBHost_t36/blob/master/USBHost_t36.h#L1180
   uint8_t mNote = drumInstrumentNotes[subClocks[subClockID].instrument];
   uint8_t mVel = 127;
   uint8_t mChan = telephone[0].drumMidiChannel;
-  //midi1.send(mtype, mNote, mVel, mChan);
+
   for (int i = 0; i<4; i++){
     midilist[i]->send(mtype, mNote, mVel, mChan);
   }
@@ -243,10 +241,8 @@ void startDrumNote(int subClockID) {
 
 ///stops a drumnote reading note from drumInstrument array
 void stopDrumNote(int subClockID) {
-  //midi.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
-  midi.sendNoteOff({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
-  //debug for testing DIN midi out
-  //DINMIDIOUT.sendNoteOff({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
+  //Control_Surface.sendNoteOff(drumInstrumentNotes[subClocks[subClockID].instrument], 127, subClocks[subClockID].midiChannel);
+  Control_Surface.sendNoteOff({drumInstrumentNotes[subClocks[subClockID].instrument], CSdrumMidiChannel}, 127);
 }
 
 void resetDrums(){
